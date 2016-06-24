@@ -14,16 +14,20 @@ namespace CS_2_C
     {
         private Dictionary<string, string> m_convert = new Dictionary<string, string>()
         {
+            { "void", "void" },
+
             { "int", "int32_t" },
             { "uint", "uint32_t" },
             { "short", "int16_t" },
             { "ushort", "uint16_t" },
             { "byte", "uint8_t" },
             { "sbyte", "int8_t" },
+
             { "float", "float" },
             { "double", "double" },
+            
             { "string", "char*" },
-            { "void", "void" }
+            { "string[]", "char**" }
         };
 
         /// <summary>

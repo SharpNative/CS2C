@@ -148,10 +148,9 @@ namespace CS_2_C
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
             m_sb.AppendLine("/* Method <" + node.Identifier + "> */");
+
             TypeSyntax type = node.ReturnType;
-
             string typeNameConverted;
-
             if(m_convert.IsGeneric(type))
             {
                 typeNameConverted = m_convert.Convert(type);
@@ -161,8 +160,43 @@ namespace CS_2_C
                 throw new NotImplementedException();
             }
 
-            // className_methodName
-            m_sb.AppendLine(string.Format("{0} {1}_{2}_{3}()", typeNameConverted, m_currentNamespace.Name.ToString().Replace(".", "_"), m_currentClass.Identifier, node.Identifier));
+            // namespaceName_className_methodName
+            m_sb.Append(string.Format("{0} {1}_{2}_{3}(", typeNameConverted, m_currentNamespace.Name.ToString().Replace(".", "_"), m_currentClass.Identifier, node.Identifier));
+
+            // Check for parameters
+            IEnumerable<SyntaxNode> nodes = node.ChildNodes();
+            foreach(SyntaxNode childNode in nodes)
+            {
+                if(childNode.Kind() == SyntaxKind.ParameterList)
+                {
+                    // Get parameters
+                    ParameterListSyntax param = childNode as ParameterListSyntax;
+                    IEnumerable<SyntaxNode> paramNodes = param.ChildNodes();
+
+                    // TODO: out and ref
+                    foreach (ParameterSyntax paramNode in paramNodes)
+                    {
+                        TypeSyntax paramType = paramNode.Type;
+                        string paramTypeNameConverted;
+                        if (m_convert.IsGeneric(paramType))
+                        {
+                            paramTypeNameConverted = m_convert.Convert(paramType);
+                        }
+                        else
+                        {
+                            throw new NotImplementedException();
+                        }
+
+                        m_sb.Append(string.Format("{0} {1}", paramTypeNameConverted, paramNode.Identifier));
+
+                        // A comma if it's not the last parameter
+                        if (paramNode != paramNodes.Last())
+                            m_sb.Append(", ");
+                    }
+                }
+            }
+
+            m_sb.AppendLine(")");
 
             base.VisitMethodDeclaration(node);
         }

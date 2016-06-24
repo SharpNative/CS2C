@@ -18,6 +18,10 @@ namespace CS_2_C
         private NamespaceDeclarationSyntax m_currentNamespace;
         private int m_curBraces;
 
+        /// <summary>
+        /// Walks through the syntax and outputs C code to a <see cref="FormattedStringBuilder">FormattedStringBuilder</see>
+        /// </summary>
+        /// <param name="sb">The formatted string builder</param>
         public SyntaxWalker(FormattedStringBuilder sb) : base(SyntaxWalkerDepth.Token)
         {
             m_convert = new TypeConversion();
@@ -25,6 +29,10 @@ namespace CS_2_C
             m_curBraces = 0;
         }
 
+        /// <summary>
+        /// Visits a class declaration
+        /// </summary>
+        /// <param name="node">The class declaration node</param>
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
             m_currentClass = node;
@@ -32,14 +40,17 @@ namespace CS_2_C
             base.VisitClassDeclaration(node);
         }
 
+        /// <summary>
+        /// Visits a variable declaration
+        /// </summary>
+        /// <param name="node">The variable declaration node</param>
         public override void VisitVariableDeclaration(VariableDeclarationSyntax node)
         {
             foreach(VariableDeclaratorSyntax variable in node.Variables)
             {
+                // Convert type
                 TypeSyntax type = node.Type;
-            
                 string typeNameConverted;
-
                 if (m_convert.IsGeneric(type))
                 {
                     typeNameConverted = m_convert.Convert(type);
@@ -58,6 +69,10 @@ namespace CS_2_C
             base.VisitVariableDeclaration(node);
         }
         
+        /// <summary>
+        /// Visits an expression
+        /// </summary>
+        /// <param name="statementNode">The expression node</param>
         public override void VisitExpressionStatement(ExpressionStatementSyntax statementNode)
         {
             IEnumerable<SyntaxNode> nodes = statementNode.Expression.ChildNodes();
@@ -80,11 +95,13 @@ namespace CS_2_C
                 SyntaxKind firstKind = first.Kind();
 
                 string memberName;
+                // Own class
                 if(firstKind == SyntaxKind.IdentifierName)
                 {
                     IdentifierNameSyntax name = nodes.First() as IdentifierNameSyntax;
                     memberName = m_currentNamespace.Name.ToString() + "_" + m_currentClass.Identifier + "_" + name.Identifier;
                 }
+                // Another class
                 else if(firstKind == SyntaxKind.SimpleMemberAccessExpression)
                 {
                     MemberAccessExpressionSyntax name = nodes.First() as MemberAccessExpressionSyntax;
@@ -98,17 +115,20 @@ namespace CS_2_C
                 m_sb.AppendIndent();
 
                 m_sb.Append(string.Format("{0}(", memberName));
+
+                // Arguments
                 foreach(SyntaxNode node in nodes)
                 {
                     if(node.Kind() == SyntaxKind.ArgumentList)
                     {
                         ArgumentListSyntax args = node as ArgumentListSyntax;
                         IEnumerable<SyntaxNode> argNodes = args.ChildNodes();
+
                         foreach (ArgumentSyntax argument in argNodes)
                         {
-                            Console.WriteLine(argument.ToString());
                             m_sb.Append(argument.ToString());
 
+                            // A comma if it's not the last argument
                             if (argument != argNodes.Last())
                                 m_sb.Append(", ");
                         }
@@ -121,6 +141,10 @@ namespace CS_2_C
             base.VisitExpressionStatement(statementNode);
         }
 
+        /// <summary>
+        /// Visits a method declaration
+        /// </summary>
+        /// <param name="node">The method declaration node</param>
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
             m_sb.AppendLine("/* Method <" + node.Identifier + "> */");
@@ -143,17 +167,16 @@ namespace CS_2_C
             base.VisitMethodDeclaration(node);
         }
 
-        public override void VisitIdentifierName(IdentifierNameSyntax node)
-        {
-            //Console.WriteLine("identifier: "+node.Identifier);
-            base.VisitIdentifierName(node);
-        }
-
+        /// <summary>
+        /// Visits a token
+        /// </summary>
+        /// <param name="token">The token</param>
         public override void VisitToken(SyntaxToken token)
         {
             SyntaxKind kind = token.Kind();
             if (kind == SyntaxKind.CloseBraceToken)
             {
+                // First two braces are from namespace and class
                 if(m_curBraces > 2)
                 {
                     m_sb.UnIndent();
@@ -164,6 +187,7 @@ namespace CS_2_C
             }
             else if(kind == SyntaxKind.OpenBraceToken)
             {
+                // First two braces are from namespace and class
                 if (m_curBraces > 1)
                 {
                     m_sb.Indent();
@@ -176,6 +200,10 @@ namespace CS_2_C
             base.VisitToken(token);
         }
 
+        /// <summary>
+        /// Visits a namespace declaration
+        /// </summary>
+        /// <param name="node">The namespace declaration node</param>
         public override void VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
         {
             m_currentNamespace = node;
@@ -183,6 +211,10 @@ namespace CS_2_C
             base.VisitNamespaceDeclaration(node);
         }
 
+        /// <summary>
+        /// Visits a node
+        /// </summary>
+        /// <param name="node">The node</param>
         public override void Visit(SyntaxNode node)
         {
             /*Console.WriteLine(node.GetText());

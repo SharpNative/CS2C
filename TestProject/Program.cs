@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OS
+namespace TestProject
 {
     class Program
     {
@@ -15,12 +15,12 @@ namespace OS
             int c = a + b;
             b = 2;
             Method2(33, 44, 88);
-            OS.jemoeder.shit.hi();
+            TestProject.OtherNameSpace.shit.hi();
         }
 
         static void Method2(int a, int b, int c)
         {
-            string jemoeder = "lo";
+            string teststring = "lo";
         }
     }
 }

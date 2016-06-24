@@ -164,6 +164,7 @@ namespace CS_2_C
             m_sb.Append(string.Format("{0} {1}_{2}_{3}(", typeNameConverted, m_currentNamespace.Name.ToString().Replace(".", "_"), m_currentClass.Identifier, node.Identifier));
 
             // Check for parameters
+            int paramCount = 0;
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
             foreach(SyntaxNode childNode in nodes)
             {
@@ -172,6 +173,7 @@ namespace CS_2_C
                     // Get parameters
                     ParameterListSyntax param = childNode as ParameterListSyntax;
                     IEnumerable<SyntaxNode> paramNodes = param.ChildNodes();
+                    paramCount = paramNodes.Count();
 
                     // TODO: out and ref
                     foreach (ParameterSyntax paramNode in paramNodes)
@@ -194,6 +196,12 @@ namespace CS_2_C
                             m_sb.Append(", ");
                     }
                 }
+            }
+
+            // Insert void if no parameters are found
+            if(paramCount == 0)
+            {
+                m_sb.Append("void");
             }
 
             m_sb.AppendLine(")");

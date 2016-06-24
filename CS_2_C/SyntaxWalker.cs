@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using CS_2_C.Generators;
 
 namespace CS_2_C
 {
     public class SyntaxWalker : CSharpSyntaxWalker
     {
         private FormattedStringBuilder m_sb;
-        private TypeConversion m_convert;
+        private WalkerContext m_context;
 
-        private ClassDeclarationSyntax m_currentClass;
-        private NamespaceDeclarationSyntax m_currentNamespace;
         private int m_curBraces;
 
         /// <summary>
@@ -24,9 +22,9 @@ namespace CS_2_C
         /// <param name="sb">The formatted string builder</param>
         public SyntaxWalker(FormattedStringBuilder sb) : base(SyntaxWalkerDepth.Token)
         {
-            m_convert = new TypeConversion();
             m_sb = sb;
             m_curBraces = 0;
+            m_context = new WalkerContext(sb);
         }
 
         /// <summary>
@@ -35,8 +33,114 @@ namespace CS_2_C
         /// <param name="node">The class declaration node</param>
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            m_currentClass = node;
+            m_context.CurrentClass = node;
             m_sb.AppendLine("/* Class <" + node.Identifier + "> */");
+
+            // Struct for classes
+            m_sb.AppendLine(m_context.CurrentClassStructName);
+            m_sb.AppendLine("{");
+
+            // Temporarily hold all the fields so we can put them in the initialization method
+            Dictionary<string, EqualsValueClauseSyntax> staticFields = new Dictionary<string, EqualsValueClauseSyntax>();
+            Dictionary<string, EqualsValueClauseSyntax> nonStaticFields = new Dictionary<string, EqualsValueClauseSyntax>();
+            Dictionary<string, TypeSyntax> staticFieldTypes = new Dictionary<string, TypeSyntax>();
+
+            #region Get the needed info for fields and create struct
+
+            // Loop through the children to find the fields
+            IEnumerable<SyntaxNode> nodes = node.ChildNodes();
+            foreach(SyntaxNode childNode in nodes)
+            {
+                // Found a field
+                if(childNode.Kind() == SyntaxKind.FieldDeclaration)
+                {
+                    FieldDeclarationSyntax fieldNode = childNode as FieldDeclarationSyntax;
+                    IEnumerable<SyntaxNode> fieldNodeChildren = fieldNode.ChildNodes();
+
+                    bool isStatic = false;
+
+                    IEnumerable<SyntaxToken> fieldNodeTokens = fieldNode.ChildTokens();
+                    foreach(SyntaxToken token in fieldNodeTokens)
+                    {
+                        if (token.Kind() == SyntaxKind.StaticKeyword)
+                            isStatic = true;
+                    }
+
+                    foreach (SyntaxNode fieldNodeChild in fieldNodeChildren)
+                    {
+                        VariableDeclarationSyntax variableDeclaration = fieldNodeChild as VariableDeclarationSyntax;
+                        foreach (VariableDeclaratorSyntax variable in variableDeclaration.Variables)
+                        {
+                            m_sb.AppendLine("\t/* Field: " + variable.Identifier + " */");
+                            m_sb.AppendLine(string.Format("\t{0} {1};", m_context.ConvertTypeName(variableDeclaration.Type), variable.Identifier));
+
+                            if (isStatic)
+                            {
+                                staticFields.Add(variable.Identifier.ToString(), variable.Initializer);
+                                staticFieldTypes.Add(variable.Identifier.ToString(), variableDeclaration.Type);
+                            }
+                            else
+                            {
+                                nonStaticFields.Add(variable.Identifier.ToString(), variable.Initializer);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // End of struct
+            m_sb.AppendLine("};");
+
+            #endregion
+
+            #region Static fields
+
+            string convertedClassName = m_context.ConvertClassName(node.Identifier.ToString());
+
+            m_sb.AppendLine("struct");
+            m_sb.AppendLine("{");
+            foreach(KeyValuePair<string, EqualsValueClauseSyntax> pair in staticFields)
+            {
+                m_sb.AppendLine(string.Format("\t{0} {1};", staticFieldTypes[pair.Key], pair.Key));
+            }
+            m_sb.Append("}");
+            m_sb.AppendLine(string.Format(" classStatics_{0};", convertedClassName));
+            m_sb.AppendLine("");
+            
+            // .cctor
+            m_sb.AppendLine(string.Format("void classCctor_{0}(void)", convertedClassName));
+            m_sb.AppendLine("{");
+            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in staticFields)
+            {
+                m_sb.AppendLine(string.Format("\tclassStatics_{0}.{1} {2};", convertedClassName, pair.Key, staticFields[pair.Key]));
+            }
+            m_sb.AppendLine("}");
+            m_sb.AppendLine("");
+
+            #endregion
+
+            #region Class initialization method
+
+            // Class initialization method: returns a pointer to this object
+            m_sb.AppendLine("");
+            m_sb.AppendLine(string.Format("{0}* classInit_{1}_{2}(void)", m_context.CurrentClassStructName, m_context.CurrentNamespaceFormatted, node.Identifier));
+            m_sb.AppendLine("{");
+            m_sb.AppendLine(string.Format("\t{0}* object = malloc(sizeof({0}));", m_context.CurrentClassStructName));
+            m_sb.AppendLine("\tif(!object)");
+            m_sb.AppendLine("\t\treturn NULL;");
+            
+            // Loop through the fields and initialize them
+            foreach(KeyValuePair<string, EqualsValueClauseSyntax> pair in nonStaticFields)
+            {
+                m_sb.AppendLine(string.Format("\tobject->{0} {1};", pair.Key, pair.Value));
+            }
+            
+            m_sb.AppendLine("\treturn object;");
+            m_sb.AppendLine("}");
+            m_sb.AppendLine("");
+
+            #endregion
+
             base.VisitClassDeclaration(node);
         }
 
@@ -46,29 +150,28 @@ namespace CS_2_C
         /// <param name="node">The variable declaration node</param>
         public override void VisitVariableDeclaration(VariableDeclarationSyntax node)
         {
+            // If the current braces is under 3, it means we're inside a class definition, outside a method
+            if (m_curBraces < 3)
+                return;
+
             foreach(VariableDeclaratorSyntax variable in node.Variables)
             {
-                // Convert type
-                TypeSyntax type = node.Type;
-                string typeNameConverted;
-                if (m_convert.IsGeneric(type))
-                {
-                    typeNameConverted = m_convert.Convert(type);
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-
                 m_sb.AppendIndent();
                 m_sb.AppendLine(string.Format("/* Variable {0} */", variable.Identifier));
                 m_sb.AppendIndent();
-                m_sb.AppendLine(string.Format("{0} {1} {2};", typeNameConverted, variable.Identifier, variable.Initializer));
+                m_sb.AppendLine(string.Format("{0} {1} {2};", m_context.ConvertTypeName(node.Type), variable.Identifier, variable.Initializer));
             }
 
             base.VisitVariableDeclaration(node);
         }
-        
+
+        public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
+        {
+            MethodGenerator constructorGen = new MethodGenerator(m_context, MethodGeneratorType.Constructor);
+            constructorGen.Generate(node);
+            base.VisitConstructorDeclaration(node);
+        }
+
         /// <summary>
         /// Visits an expression
         /// </summary>
@@ -99,7 +202,7 @@ namespace CS_2_C
                 if(firstKind == SyntaxKind.IdentifierName)
                 {
                     IdentifierNameSyntax name = nodes.First() as IdentifierNameSyntax;
-                    memberName = m_currentNamespace.Name.ToString() + "_" + m_currentClass.Identifier + "_" + name.Identifier;
+                    memberName = m_context.CurrentClassNameFormatted + "_" + name.Identifier;
                 }
                 // Another class
                 else if(firstKind == SyntaxKind.SimpleMemberAccessExpression)
@@ -113,7 +216,6 @@ namespace CS_2_C
                 }
 
                 m_sb.AppendIndent();
-
                 m_sb.Append(string.Format("{0}(", memberName));
 
                 // Arguments
@@ -147,65 +249,8 @@ namespace CS_2_C
         /// <param name="node">The method declaration node</param>
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
-            m_sb.AppendLine("/* Method <" + node.Identifier + "> */");
-
-            TypeSyntax type = node.ReturnType;
-            string typeNameConverted;
-            if(m_convert.IsGeneric(type))
-            {
-                typeNameConverted = m_convert.Convert(type);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-
-            // namespaceName_className_methodName
-            m_sb.Append(string.Format("{0} {1}_{2}_{3}(", typeNameConverted, m_currentNamespace.Name.ToString().Replace(".", "_"), m_currentClass.Identifier, node.Identifier));
-
-            // Check for parameters
-            int paramCount = 0;
-            IEnumerable<SyntaxNode> nodes = node.ChildNodes();
-            foreach(SyntaxNode childNode in nodes)
-            {
-                if(childNode.Kind() == SyntaxKind.ParameterList)
-                {
-                    // Get parameters
-                    ParameterListSyntax param = childNode as ParameterListSyntax;
-                    IEnumerable<SyntaxNode> paramNodes = param.ChildNodes();
-                    paramCount = paramNodes.Count();
-
-                    // TODO: out and ref
-                    foreach (ParameterSyntax paramNode in paramNodes)
-                    {
-                        TypeSyntax paramType = paramNode.Type;
-                        string paramTypeNameConverted;
-                        if (m_convert.IsGeneric(paramType))
-                        {
-                            paramTypeNameConverted = m_convert.Convert(paramType);
-                        }
-                        else
-                        {
-                            throw new NotImplementedException();
-                        }
-
-                        m_sb.Append(string.Format("{0} {1}", paramTypeNameConverted, paramNode.Identifier));
-
-                        // A comma if it's not the last parameter
-                        if (paramNode != paramNodes.Last())
-                            m_sb.Append(", ");
-                    }
-                }
-            }
-
-            // Insert void if no parameters are found
-            if(paramCount == 0)
-            {
-                m_sb.Append("void");
-            }
-
-            m_sb.AppendLine(")");
-
+            MethodGenerator methodGen = new MethodGenerator(m_context, MethodGeneratorType.Method);
+            methodGen.Generate(node);
             base.VisitMethodDeclaration(node);
         }
 
@@ -248,7 +293,7 @@ namespace CS_2_C
         /// <param name="node">The namespace declaration node</param>
         public override void VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
         {
-            m_currentNamespace = node;
+            m_context.CurrentNamespace = node;
             m_sb.AppendLine("/* Namespace <" + node.Name + "> */");
             base.VisitNamespaceDeclaration(node);
         }
@@ -259,8 +304,7 @@ namespace CS_2_C
         /// <param name="node">The node</param>
         public override void Visit(SyntaxNode node)
         {
-            /*Console.WriteLine(node.GetText());
-            Console.WriteLine("Visited " + node.GetType());*/
+            //Console.WriteLine("Visited " + node.GetType());
             base.Visit(node);
         }
     }

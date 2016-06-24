@@ -8,9 +8,12 @@ namespace TestProject.OtherNameSpace
 {
     class shit
     {
-        public static void hi()
-        {
+        static int staticTest = 4;
+        public int nonStaticTest = 2;
 
+        public shit()
+        {
+            string yolo = "";
         }
     }
 }

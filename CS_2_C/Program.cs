@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
@@ -35,8 +32,7 @@ namespace CS_2_C
                 Console.WriteLine("------------");
             }
 
-            Console.Write(sb.ToString());
-            Console.ReadLine();
+            File.WriteAllText("output.c", sb.ToString());
         }
     }
 }

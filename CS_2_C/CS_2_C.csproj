@@ -100,10 +100,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FormattedStringBuilder.cs" />
+    <Compile Include="Generators\IGenerator.cs" />
+    <Compile Include="Generators\MethodGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SyntaxWalker.cs" />
     <Compile Include="TypeConversion.cs" />
+    <Compile Include="WalkerContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

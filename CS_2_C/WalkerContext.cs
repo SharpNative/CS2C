@@ -21,12 +21,21 @@ namespace CS_2_C
         /// </summary>
         public string CurrentNamespaceFormatted { get { return CurrentNamespace.Name.ToString().Replace(".", "_"); } }
 
+        /// <summary>
+        /// Contextwalker
+        /// </summary>
+        /// <param name="sb">The formatted string builder</param>
         public WalkerContext(FormattedStringBuilder sb)
         {
             TypeConvert = new TypeConversion();
             Writer = sb;
         }
         
+        /// <summary>
+        /// Convert class name to a formatted name
+        /// </summary>
+        /// <param name="identifier">The class name</param>
+        /// <returns>The formatted name</returns>
         public string ConvertClassName(string identifier)
         {
             return CurrentNamespaceFormatted + "_" + identifier;

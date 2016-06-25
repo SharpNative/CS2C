@@ -33,6 +33,7 @@ namespace CS_2_C
             }
 
             File.WriteAllText("output.c", sb.ToString());
+            Console.ReadLine();
         }
     }
 }

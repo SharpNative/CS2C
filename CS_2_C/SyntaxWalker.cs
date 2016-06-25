@@ -16,6 +16,9 @@ namespace CS_2_C
 
         private int m_curBraces;
 
+        private MethodGenerator m_methodGen;
+        private MethodGenerator m_constructorGen;
+
         /// <summary>
         /// Walks through the syntax and outputs C code to a <see cref="FormattedStringBuilder">FormattedStringBuilder</see>
         /// </summary>
@@ -25,6 +28,10 @@ namespace CS_2_C
             m_sb = sb;
             m_curBraces = 0;
             m_context = new WalkerContext(sb);
+
+            // Generators
+            m_methodGen = new MethodGenerator(m_context, MethodGeneratorType.Method);
+            m_constructorGen = new MethodGenerator(m_context, MethodGeneratorType.Constructor);
         }
 
         /// <summary>
@@ -167,8 +174,7 @@ namespace CS_2_C
 
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
         {
-            MethodGenerator constructorGen = new MethodGenerator(m_context, MethodGeneratorType.Constructor);
-            constructorGen.Generate(node);
+            m_constructorGen.Generate(node);
             base.VisitConstructorDeclaration(node);
         }
 
@@ -249,8 +255,7 @@ namespace CS_2_C
         /// <param name="node">The method declaration node</param>
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
-            MethodGenerator methodGen = new MethodGenerator(m_context, MethodGeneratorType.Method);
-            methodGen.Generate(node);
+            m_methodGen.Generate(node);
             base.VisitMethodDeclaration(node);
         }
 

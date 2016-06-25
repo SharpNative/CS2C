@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CS_2_C
 {
@@ -15,6 +16,8 @@ namespace CS_2_C
         public string CurrentClassStructName { get { return string.Format("struct class_{0}", CurrentClassNameFormatted); } }
 
         public FormattedStringBuilder Writer { get; private set; }
+
+        public SemanticModel Model { get; private set; }
         
         /// <summary>
         /// Gets the current namespace name formatted
@@ -25,10 +28,11 @@ namespace CS_2_C
         /// Contextwalker
         /// </summary>
         /// <param name="sb">The formatted string builder</param>
-        public WalkerContext(FormattedStringBuilder sb)
+        public WalkerContext(FormattedStringBuilder sb, SemanticModel model)
         {
             TypeConvert = new TypeConversion();
             Writer = sb;
+            Model = model;
         }
         
         /// <summary>
@@ -55,7 +59,8 @@ namespace CS_2_C
             }
             else
             {
-                typeNameConverted = ConvertClassName(type.ToString());
+                string nameSpace = Model.GetTypeInfo(type).Type.ContainingNamespace.ToString().Replace(".", "_");
+                typeNameConverted = string.Format("struct class_{0}_{1}*", ConvertClassName(type.ToString()), nameSpace);
             }
 
             return typeNameConverted;

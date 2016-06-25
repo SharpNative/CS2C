@@ -15,9 +15,8 @@ namespace CS_2_C.Generators
         Constructor = 1
     }
 
-    class MethodGenerator: IGenerator<BaseMethodDeclarationSyntax>
+    class MethodGenerator: GeneratorBase<BaseMethodDeclarationSyntax>
     {
-        private WalkerContext m_context;
         private MethodGeneratorType m_type;
 
         /// <summary>
@@ -35,7 +34,7 @@ namespace CS_2_C.Generators
         /// Generates a method declaration
         /// </summary>
         /// <param name="node">The base method declaration</param>
-        public void Generate(BaseMethodDeclarationSyntax node)
+        public override void Generate(BaseMethodDeclarationSyntax node)
         {
             SyntaxToken identifier = default(SyntaxToken);
             string returnType = null;
@@ -80,11 +79,11 @@ namespace CS_2_C.Generators
             // Not static? Object reference is required as parameter
             if(!isStatic)
             {
-                m_context.Writer.Append(string.Format("{0}* obj, ", m_context.CurrentClassStructName));
+                m_context.Writer.Append(string.Format("{0}* obj", m_context.CurrentClassStructName));
             }
 
             // Check for parameters
-            int paramCount = (isStatic ? 0 : 1);
+            int paramCount = 0;
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
             foreach (SyntaxNode childNode in nodes)
             {
@@ -95,17 +94,26 @@ namespace CS_2_C.Generators
                     IEnumerable<SyntaxNode> paramNodes = param.ChildNodes();
                     paramCount = paramNodes.Count();
 
+                    if (paramCount > 0 && !isStatic)
+                        m_context.Writer.Append(", ");
+                    
                     // TODO: out and ref
                     foreach (ParameterSyntax paramNode in paramNodes)
                     {
-                        m_context.Writer.Append(string.Format("{0} param_{1}", m_context.ConvertTypeName(paramNode.Type), paramNode.Identifier));
+                        m_context.Writer.Append(string.Format("{0} {1}", m_context.ConvertTypeName(paramNode.Type), paramNode.Identifier));
 
                         // A comma if it's not the last parameter
                         if (paramNode != paramNodes.Last())
                             m_context.Writer.Append(", ");
                     }
+
+                    break;
                 }
             }
+
+            // Object reference
+            if (!isStatic)
+                paramCount++;
 
             // Insert void if no parameters are found
             if (paramCount == 0)

@@ -21,10 +21,11 @@ namespace CS_2_C
             Console.WriteLine("-------------");
 
             FormattedStringBuilder sb = new FormattedStringBuilder();
-            SyntaxWalker walker = new SyntaxWalker(sb);
+            
             foreach(Document document in project.Documents)
             {
                 Console.WriteLine("File: " + document.Name);
+                SyntaxWalker walker = new SyntaxWalker(sb, document.GetSemanticModelAsync().Result);
                 SyntaxTree tree = document.GetSyntaxTreeAsync().Result;
                 SyntaxNode node = tree.GetRoot();
                 walker.Visit(node);

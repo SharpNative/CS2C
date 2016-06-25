@@ -12,7 +12,7 @@ namespace CS_2_C.Generators
     class VariableGenerator : GeneratorBase<VariableDeclarationSyntax>
     {
         /// <summary>
-        /// variable declaration generator
+        /// Variable declaration generator
         /// </summary>
         /// <param name="context">The walker context</param>
         public VariableGenerator(WalkerContext context)
@@ -20,6 +20,10 @@ namespace CS_2_C.Generators
             m_context = context;
         }
 
+        /// <summary>
+        /// Generate code for variable declaration
+        /// </summary>
+        /// <param name="node"></param>
         public override void Generate(VariableDeclarationSyntax node)
         {
             foreach (VariableDeclaratorSyntax variable in node.Variables)

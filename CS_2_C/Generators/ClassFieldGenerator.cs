@@ -20,6 +20,10 @@ namespace CS_2_C.Generators
             m_context = context;
         }
 
+        /// <summary>
+        /// Calls the class fields and .cctor generators
+        /// </summary>
+        /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
             // Temporarily hold all the fields so we can put them in the initialization method

@@ -1,9 +1,7 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CS_2_C.Generators
 {
@@ -18,13 +16,38 @@ namespace CS_2_C.Generators
             m_context = context;
         }
 
+        /// <summary>
+        /// Generates a simple assignment
+        /// </summary>
+        /// <param name="node">The expression node</param>
         public override void Generate(ExpressionStatementSyntax node)
         {
             string code = node.GetText().ToString().Trim();
             m_context.Writer.AppendIndent();
             m_context.Writer.AppendLine(string.Format("/* Expression {0} */", code));
+
             m_context.Writer.AppendIndent();
-            m_context.Writer.AppendLine(code);
+
+            ChildSyntaxList nodes = node.ChildNodes().First().ChildNodesAndTokens();
+            foreach (SyntaxNodeOrToken childNode in nodes)
+            {
+                SyntaxKind kind = childNode.Kind();
+                
+                if (kind == SyntaxKind.IdentifierName)
+                {
+                    m_context.Writer.Append(m_context.ConvertVariableName(childNode.AsNode()));
+                }
+                else if(kind == SyntaxKind.EqualsToken)
+                {
+                    m_context.Writer.Append(" = ");
+                }
+                else
+                {
+                    m_context.Writer.Append(childNode.ToString());
+                }
+            }
+            
+            m_context.Writer.AppendLine(";");
         }
     }
 }

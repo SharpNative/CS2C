@@ -21,15 +21,22 @@ namespace CS_2_C.Generators
             m_nonStaticFieldTypes = nonStaticFieldTypes;
         }
 
+        /// <summary>
+        /// Generates the class struct
+        /// </summary>
+        /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
             m_context.Writer.AppendLine(m_context.CurrentClassStructName);
             m_context.Writer.AppendLine("{");
 
+            // Usage count for garbage collector
+            m_context.Writer.AppendLine("\tint32_t usage_count;");
+
             foreach (KeyValuePair<string, TypeSyntax> pair in m_nonStaticFieldTypes)
             {
                 m_context.Writer.AppendLine("\t/* Field: " + pair.Key + " */");
-                m_context.Writer.AppendLine(string.Format("\t{0} {1};", m_context.ConvertTypeName(pair.Value), pair.Key));
+                m_context.Writer.AppendLine(string.Format("\t{0} field_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
 
             m_context.Writer.AppendLine("};");

@@ -21,6 +21,10 @@ namespace CS_2_C.Generators
             m_staticFieldTypes = staticFieldTypes;
         }
 
+        /// <summary>
+        /// Generates the static fields class struct
+        /// </summary>
+        /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
             string convertedClassName = m_context.ConvertClassName(node.Identifier.ToString());

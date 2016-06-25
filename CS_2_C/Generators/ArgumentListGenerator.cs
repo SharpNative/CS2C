@@ -20,6 +20,10 @@ namespace CS_2_C.Generators
             m_context = context;
         }
 
+        /// <summary>
+        /// Generates the argument list code
+        /// </summary>
+        /// <param name="node">The argument list</param>
         public override void Generate(ArgumentListSyntax node)
         {
             IEnumerable<SyntaxNode> argNodes = node.ChildNodes();

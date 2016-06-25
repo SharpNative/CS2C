@@ -21,6 +21,10 @@ namespace CS_2_C.Generators
             m_staticFields = staticFields;
         }
 
+        /// <summary>
+        /// Generate the .cctor method of a class
+        /// </summary>
+        /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
             string convertedClassName = m_context.ConvertClassName(node.Identifier.ToString());

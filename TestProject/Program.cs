@@ -17,11 +17,12 @@ namespace TestProject
             b = 2;
             Method2(33, 44, 88);
 
-            shit nein = new shit();
+            TestClass nein = new TestClass(44);
         }
 
         static void Method2(int a, int b, int c)
         {
+            Console.WriteLine("Method2!");
             string teststring = "lo";
         }
     }

@@ -6,14 +6,23 @@ using System.Threading.Tasks;
 
 namespace TestProject.OtherNameSpace
 {
-    class shit
+    class TestClass
     {
         static int staticTest = 4;
-        public int nonStaticTest = 2;
+        private int nonStaticTest = 2;
 
-        public shit()
+        
+
+        public TestClass(int test)
         {
-            string yolo = "";
+            Console.WriteLine("we are in the constructor of shit");
+            nonStaticTest = 56;
+            staticTest = test;
+        }
+
+        public int getNonStaticTest()
+        {
+            return nonStaticTest;
         }
     }
 }

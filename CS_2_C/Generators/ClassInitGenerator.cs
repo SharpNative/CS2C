@@ -21,6 +21,10 @@ namespace CS_2_C.Generators
             m_nonStaticFields = nonStaticFields;
         }
 
+        /// <summary>
+        /// Generates the class initialization method
+        /// </summary>
+        /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
             // Class initialization method: returns a pointer to this object
@@ -32,9 +36,10 @@ namespace CS_2_C.Generators
             m_context.Writer.AppendLine("\t\treturn NULL;");
 
             // Loop through the fields and initialize them
+            m_context.Writer.AppendLine("\tobject->usage_count = 0;");
             foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_nonStaticFields)
             {
-                m_context.Writer.AppendLine(string.Format("\tobject->{0} {1};", pair.Key, pair.Value));
+                m_context.Writer.AppendLine(string.Format("\tobject->field_{0} {1};", pair.Key, pair.Value));
             }
 
             m_context.Writer.AppendLine("\treturn object;");

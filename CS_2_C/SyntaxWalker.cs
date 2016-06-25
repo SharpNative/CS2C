@@ -22,6 +22,7 @@ namespace CS_2_C
         private SimpleAssignmentGenerator m_simpleAssignmentGen;
         private InvocationGenerator m_invocationGen;
         private ClassFieldGenerator m_classFieldGen;
+        private ReturnStatementGenerator m_returnStatementGen;
 
         /// <summary>
         /// Walks through the syntax and outputs C code to a <see cref="FormattedStringBuilder">FormattedStringBuilder</see>
@@ -40,6 +41,7 @@ namespace CS_2_C
             m_simpleAssignmentGen = new SimpleAssignmentGenerator(m_context);
             m_invocationGen = new InvocationGenerator(m_context);
             m_classFieldGen = new ClassFieldGenerator(m_context);
+            m_returnStatementGen = new ReturnStatementGenerator(m_context);
         }
 
         /// <summary>
@@ -68,6 +70,10 @@ namespace CS_2_C
             base.VisitVariableDeclaration(node);
         }
 
+        /// <summary>
+        /// Visit a constructor declaration
+        /// </summary>
+        /// <param name="node">The constructor declaration node</param>
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
         {
             m_constructorGen.Generate(node);
@@ -149,6 +155,16 @@ namespace CS_2_C
             m_context.CurrentNamespace = node;
             m_sb.AppendLine("/* Namespace <" + node.Name + "> */");
             base.VisitNamespaceDeclaration(node);
+        }
+
+        /// <summary>
+        /// Visits a return statement node
+        /// </summary>
+        /// <param name="node"></param>
+        public override void VisitReturnStatement(ReturnStatementSyntax node)
+        {
+            m_returnStatementGen.Generate(node);
+            base.VisitReturnStatement(node);
         }
 
         /// <summary>

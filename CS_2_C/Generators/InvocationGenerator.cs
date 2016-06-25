@@ -20,6 +20,10 @@ namespace CS_2_C.Generators
             m_context = context;
         }
 
+        /// <summary>
+        /// Generates an invocation
+        /// </summary>
+        /// <param name="node">The expression</param>
         public override void Generate(ExpressionStatementSyntax node)
         {
             IEnumerable<SyntaxNode> nodes = node.Expression.ChildNodes();

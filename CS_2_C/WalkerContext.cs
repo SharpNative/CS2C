@@ -60,7 +60,7 @@ namespace CS_2_C
             else
             {
                 string nameSpace = Model.GetTypeInfo(type).Type.ContainingNamespace.ToString().Replace(".", "_");
-                typeNameConverted = string.Format("struct class_{0}_{1}*", ConvertClassName(type.ToString()), nameSpace);
+                typeNameConverted = string.Format("struct class_{0}_{1}*", nameSpace, type.ToString());
             }
 
             return typeNameConverted;

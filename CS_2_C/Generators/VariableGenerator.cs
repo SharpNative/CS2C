@@ -44,14 +44,13 @@ namespace CS_2_C.Generators
                         IdentifierNameSyntax name = objNodes.First() as IdentifierNameSyntax;
                         ArgumentListSyntax args = obj.ArgumentList;
                         string nameSpace = m_context.Model.GetTypeInfo(obj).Type.ContainingNamespace.ToString().Replace(".", "_");
-                        string convertedClassName = m_context.ConvertClassName(obj.Type.ToString());
 
                         // Class initialization
-                        m_context.Writer.AppendLine(string.Format("classInit_{0}_{1}();", nameSpace, convertedClassName));
+                        m_context.Writer.AppendLine(string.Format("classInit_{0}_{1}();", nameSpace, name.Identifier));
 
                         // Call Constructor
                         m_context.Writer.AppendIndent();
-                        m_context.Writer.Append(string.Format("{0} {1} = {2}_{3}_{4}(", typeName, variable.Identifier, nameSpace, convertedClassName, name.Identifier));
+                        m_context.Writer.Append(string.Format("{0}_{1}_{2}(", nameSpace, name.Identifier, name.Identifier));
 
                         // Own object as argument
                         m_context.Writer.Append(variable.Identifier.ToString());

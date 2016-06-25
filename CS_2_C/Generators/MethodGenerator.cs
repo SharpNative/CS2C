@@ -46,7 +46,7 @@ namespace CS_2_C.Generators
             {
                 ConstructorDeclarationSyntax nodeTyped = node as ConstructorDeclarationSyntax;
                 identifier = nodeTyped.Identifier;
-                returnType = m_context.CurrentClassStructName + "*";
+                returnType = "void";
 
                 m_context.Writer.AppendLine("/* Constructor <" + identifier + "> */");
             }

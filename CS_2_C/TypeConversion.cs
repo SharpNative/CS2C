@@ -25,7 +25,7 @@ namespace CS_2_C
 
             { "float", "float" },
             { "double", "double" },
-            
+
             { "string", "char*" },
             { "string[]", "char**" }
         };
@@ -37,7 +37,6 @@ namespace CS_2_C
         /// <returns>If the type is a generic type</returns>
         public bool IsGeneric(TypeSyntax type)
         {
-            //Console.WriteLine("full string: " + type.ToFullString().Trim());
             return m_convert.ContainsKey(type.ToString().Trim());
         }
 

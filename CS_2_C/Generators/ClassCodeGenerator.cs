@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace CS_2_C.Generators
 {
-    class ClassFieldGenerator : GeneratorBase<ClassDeclarationSyntax>
+    class ClassCodeGenerator : GeneratorBase<ClassDeclarationSyntax>
     {
         /// <summary>
         /// Class field generator
         /// </summary>
         /// <param name="context">The walker context</param>
-        public ClassFieldGenerator(WalkerContext context)
+        public ClassCodeGenerator(WalkerContext context)
         {
             m_context = context;
         }
@@ -59,12 +59,16 @@ namespace CS_2_C.Generators
                             string identifier = variable.Identifier.ToString();
                             if (isStatic)
                             {
-                                staticFields.Add(identifier, variable.Initializer);
+                                if (variable.Initializer != null)
+                                    staticFields.Add(identifier, variable.Initializer);
+
                                 staticFieldTypes.Add(identifier, variableDeclaration.Type);
                             }
                             else
                             {
-                                nonStaticFields.Add(identifier, variable.Initializer);
+                                if (variable.Initializer != null)
+                                    nonStaticFields.Add(identifier, variable.Initializer);
+
                                 nonStaticFieldTypes.Add(identifier, variableDeclaration.Type);
                             }
                         }

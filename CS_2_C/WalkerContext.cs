@@ -49,7 +49,7 @@ namespace CS_2_C
         /// <summary>
         /// Converts the C# type to a C type name
         /// </summary>
-        /// <param name="type">The c# type</param>
+        /// <param name="type">The C# type</param>
         /// <returns>The C type name</returns>
         public string ConvertTypeName(TypeSyntax type)
         {
@@ -57,6 +57,11 @@ namespace CS_2_C
             if (TypeConvert.IsGeneric(type))
             {
                 typeNameConverted = TypeConvert.Convert(type);
+            }
+            else if(type is PointerTypeSyntax)
+            {
+                PointerTypeSyntax ptr = type as PointerTypeSyntax;
+                typeNameConverted = ConvertTypeName(ptr.ElementType) + "*";
             }
             else
             {

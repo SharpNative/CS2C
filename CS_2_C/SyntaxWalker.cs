@@ -19,10 +19,9 @@ namespace CS_2_C
         private MethodGenerator m_methodGen;
         private MethodGenerator m_constructorGen;
         private VariableGenerator m_variableGen;
-        private SimpleAssignmentGenerator m_simpleAssignmentGen;
-        private InvocationGenerator m_invocationGen;
-        private ClassFieldGenerator m_classFieldGen;
+        private ClassCodeGenerator m_classFieldGen;
         private ReturnStatementGenerator m_returnStatementGen;
+        private ExpressionStatementGenerator m_expressionGen;
 
         /// <summary>
         /// Walks through the syntax and outputs C code to a <see cref="FormattedStringBuilder">FormattedStringBuilder</see>
@@ -38,10 +37,9 @@ namespace CS_2_C
             m_methodGen = new MethodGenerator(m_context, MethodGeneratorType.Method);
             m_constructorGen = new MethodGenerator(m_context, MethodGeneratorType.Constructor);
             m_variableGen = new VariableGenerator(m_context);
-            m_simpleAssignmentGen = new SimpleAssignmentGenerator(m_context);
-            m_invocationGen = new InvocationGenerator(m_context);
-            m_classFieldGen = new ClassFieldGenerator(m_context);
+            m_classFieldGen = new ClassCodeGenerator(m_context);
             m_returnStatementGen = new ReturnStatementGenerator(m_context);
+            m_expressionGen = new ExpressionStatementGenerator(m_context);
         }
 
         /// <summary>
@@ -86,20 +84,7 @@ namespace CS_2_C
         /// <param name="statementNode">The expression node</param>
         public override void VisitExpressionStatement(ExpressionStatementSyntax node)
         {
-            SyntaxKind kind = node.Expression.Kind();
-            if(kind == SyntaxKind.SimpleAssignmentExpression)
-            {
-                m_simpleAssignmentGen.Generate(node);
-            }
-            else if(kind == SyntaxKind.InvocationExpression)
-            {
-                m_invocationGen.Generate(node);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-
+            m_expressionGen.Generate(node);
             base.VisitExpressionStatement(node);
         }
 
@@ -123,15 +108,15 @@ namespace CS_2_C
             if (kind == SyntaxKind.CloseBraceToken)
             {
                 // First two braces are from namespace and class
-                if(m_curBraces > 2)
+                if (m_curBraces > 2)
                 {
                     m_sb.UnIndent();
                     m_sb.AppendLine("}");
                 }
-                
+
                 m_curBraces--;
             }
-            else if(kind == SyntaxKind.OpenBraceToken)
+            else if (kind == SyntaxKind.OpenBraceToken)
             {
                 // First two braces are from namespace and class
                 if (m_curBraces > 1)
@@ -139,7 +124,7 @@ namespace CS_2_C
                     m_sb.Indent();
                     m_sb.AppendLine("{");
                 }
-                
+
                 m_curBraces++;
             }
 

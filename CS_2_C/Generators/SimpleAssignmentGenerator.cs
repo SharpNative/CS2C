@@ -1,12 +1,15 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Linq;
 
 namespace CS_2_C.Generators
 {
-    class SimpleAssignmentGenerator : GeneratorBase<ExpressionStatementSyntax>
+    class SimpleAssignmentGenerator : GeneratorBase<ExpressionSyntax>
     {
+        private SimpleMemberAccessGenerator m_simpleMemberAccessGen;
+
         /// <summary>
         /// Simple assignment generator
         /// </summary>
@@ -14,13 +17,14 @@ namespace CS_2_C.Generators
         public SimpleAssignmentGenerator(WalkerContext context)
         {
             m_context = context;
+            m_simpleMemberAccessGen = new SimpleMemberAccessGenerator(m_context);
         }
 
         /// <summary>
         /// Generates a simple assignment
         /// </summary>
         /// <param name="node">The expression node</param>
-        public override void Generate(ExpressionStatementSyntax node)
+        public override void Generate(ExpressionSyntax node)
         {
             string code = node.GetText().ToString().Trim();
             m_context.Writer.AppendIndent();
@@ -28,22 +32,34 @@ namespace CS_2_C.Generators
 
             m_context.Writer.AppendIndent();
 
-            ChildSyntaxList nodes = node.ChildNodes().First().ChildNodesAndTokens();
-            foreach (SyntaxNodeOrToken childNode in nodes)
+            ChildSyntaxList nodes = node.ChildNodesAndTokens();
+            foreach (SyntaxNodeOrToken child in nodes)
             {
-                SyntaxKind kind = childNode.Kind();
-                
+                SyntaxKind kind = child.Kind();
+
                 if (kind == SyntaxKind.IdentifierName)
                 {
-                    m_context.Writer.Append(m_context.ConvertVariableName(childNode.AsNode()));
+                    m_context.Writer.Append(m_context.ConvertVariableName(child.AsNode()));
                 }
-                else if(kind == SyntaxKind.EqualsToken)
+                else if (kind == SyntaxKind.EqualsToken)
                 {
                     m_context.Writer.Append(" = ");
                 }
+                else if (kind == SyntaxKind.SimpleMemberAccessExpression)
+                {
+                    m_simpleMemberAccessGen.Generate(child.AsNode() as ExpressionSyntax);
+                }
+                else if(kind == SyntaxKind.AddExpression ||
+                        kind == SyntaxKind.SubtractExpression ||
+                        kind == SyntaxKind.MultiplyExpression ||
+                        kind == SyntaxKind.DivideExpression)
+                {
+                    ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);
+                    expressionGen.Generate(child.AsNode() as ExpressionSyntax);
+                }
                 else
                 {
-                    m_context.Writer.Append(childNode.ToString());
+                    m_context.Writer.Append(child.ToString());
                 }
             }
             

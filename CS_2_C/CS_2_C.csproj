@@ -100,6 +100,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FormattedStringBuilder.cs" />
+    <Compile Include="Generators\ExpressionGenerator.cs" />
+    <Compile Include="Generators\ObjectCreationExpressionGenerator.cs" />
+    <Compile Include="Generators\ExpressionStatementGenerator.cs" />
+    <Compile Include="Generators\SimpleMemberAccessGenerator.cs" />
     <Compile Include="Generators\ReturnStatementGenerator.cs" />
     <Compile Include="Generators\ClassInitGenerator.cs" />
     <Compile Include="Generators\ClassCctorGenerator.cs" />
@@ -111,7 +115,7 @@
     <Compile Include="Generators\MethodGenerator.cs" />
     <Compile Include="Generators\InvocationGenerator.cs" />
     <Compile Include="Generators\SimpleAssignmentGenerator.cs" />
-    <Compile Include="Generators\ClassFieldGenerator.cs" />
+    <Compile Include="Generators\ClassCodeGenerator.cs" />
     <Compile Include="Generators\VariableGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CS_2_C.Generators
 {
-    class InvocationGenerator : GeneratorBase<ExpressionStatementSyntax>
+    class InvocationGenerator : GeneratorBase<ExpressionSyntax>
     {
         /// <summary>
         /// Invocation generator
@@ -24,9 +24,9 @@ namespace CS_2_C.Generators
         /// Generates an invocation
         /// </summary>
         /// <param name="node">The expression</param>
-        public override void Generate(ExpressionStatementSyntax node)
+        public override void Generate(ExpressionSyntax node)
         {
-            IEnumerable<SyntaxNode> nodes = node.Expression.ChildNodes();
+            IEnumerable<SyntaxNode> nodes = node.ChildNodes();
 
             // IdentifierNameSyntax -> own class
             // ... -> other class

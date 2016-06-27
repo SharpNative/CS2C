@@ -10,6 +10,7 @@ namespace CS_2_C.Generators
     class ClassCctorGenerator : GeneratorBase<ClassDeclarationSyntax>
     {
         private Dictionary<string, EqualsValueClauseSyntax> m_staticFields;
+        private ExpressionGenerator m_expressionGen;
 
         /// <summary>
         /// Class .cctor generator
@@ -19,6 +20,7 @@ namespace CS_2_C.Generators
         {
             m_context = context;
             m_staticFields = staticFields;
+            m_expressionGen = new ExpressionGenerator(m_context);
         }
 
         /// <summary>
@@ -34,7 +36,10 @@ namespace CS_2_C.Generators
 
             foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_staticFields)
             {
-                m_context.Writer.AppendLine(string.Format("\tclassStatics_{0}.{1} {2};", convertedClassName, pair.Key, pair.Value));
+                m_context.Writer.Append(string.Format("\tclassStatics_{0}.{1} = ", convertedClassName, pair.Key));
+                ExpressionSyntax expression = pair.Value.Value;
+                m_expressionGen.Generate(expression);
+                m_context.Writer.AppendLine(";");
             }
 
             m_context.Writer.AppendLine("}");

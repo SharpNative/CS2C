@@ -15,7 +15,7 @@ namespace LibCS2C
         {
 
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
-            Project project = workspace.OpenProjectAsync("../../../TestProject/TestProject.csproj").Result;
+            Project project = workspace.OpenProjectAsync(path).Result;
 
             Console.WriteLine("Project name: " + project.Name);
             Console.WriteLine("-------------");

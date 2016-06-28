@@ -121,6 +121,7 @@
     <Compile Include="Generators\InvocationGenerator.cs" />
     <Compile Include="Generators\SimpleAssignmentGenerator.cs" />
     <Compile Include="Generators\ClassCodeGenerator.cs" />
+    <Compile Include="Generators\PropertyGenerator.cs" />
     <Compile Include="Generators\VariableGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

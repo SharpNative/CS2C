@@ -10,16 +10,18 @@ namespace CS_2_C.Generators
     class ClassInitGenerator : GeneratorBase<ClassDeclarationSyntax>
     {
         private Dictionary<string, EqualsValueClauseSyntax> m_nonStaticFields;
+        private Dictionary<string, EqualsValueClauseSyntax> m_propertyInitialValues;
         private ExpressionGenerator m_expressionGen;
 
         /// <summary>
         /// Class struct generator
         /// </summary>
         /// <param name="context">The walker context</param>
-        public ClassInitGenerator(WalkerContext context, Dictionary<string, EqualsValueClauseSyntax> nonStaticFields)
+        public ClassInitGenerator(WalkerContext context, Dictionary<string, EqualsValueClauseSyntax> nonStaticFields, Dictionary<string, EqualsValueClauseSyntax> propertyInitialValues)
         {
             m_context = context;
             m_nonStaticFields = nonStaticFields;
+            m_propertyInitialValues = propertyInitialValues;
             m_expressionGen = new ExpressionGenerator(m_context);
         }
 
@@ -37,11 +39,22 @@ namespace CS_2_C.Generators
             m_context.Writer.AppendLine("\tif(!object)");
             m_context.Writer.AppendLine("\t\treturn NULL;");
 
+            // For the garbage collector
+            m_context.Writer.AppendLine("\tobject->usage_count = 1;");
+
             // Loop through the fields and initialize them
-            m_context.Writer.AppendLine("\tobject->usage_count = 0;");
             foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_nonStaticFields)
             {
                 m_context.Writer.Append(string.Format("\tobject->field_{0} = ", pair.Key));
+                ExpressionSyntax expression = pair.Value.Value;
+                m_expressionGen.Generate(expression);
+                m_context.Writer.AppendLine(";");
+            }
+
+            // Loop through the properties and initialize them
+            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_propertyInitialValues)
+            {
+                m_context.Writer.Append(string.Format("\tobject->prop_{0} = ", pair.Key));
                 ExpressionSyntax expression = pair.Value.Value;
                 m_expressionGen.Generate(expression);
                 m_context.Writer.AppendLine(";");

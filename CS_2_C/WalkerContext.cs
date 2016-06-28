@@ -102,11 +102,15 @@ namespace CS_2_C
         {
             string typeNameConverted = "";
             ISymbol symbol = Model.GetSymbolInfo(node).Symbol;
-
+            
             // Static field
             if (symbol.IsStatic)
             {
                 typeNameConverted = string.Format("classStatics_{0}.{1}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+            }
+            else if(symbol.Kind == SymbolKind.Property)
+            {
+                typeNameConverted = string.Format("{0}_{1}_getter(obj)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
             }
             // Parameter or local variable
             else if (symbol.ContainingSymbol.Kind == SymbolKind.Method)

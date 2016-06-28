@@ -8,6 +8,8 @@ namespace TestProject.OtherNameSpace
 {
     class TestClass
     {
+        public int testing { get; private set; } = 10;
+
         static int staticTest = 4;
         private int nonStaticTest = 2;
         private int test;
@@ -15,6 +17,7 @@ namespace TestProject.OtherNameSpace
         public TestClass(int test)
         {
             Console.WriteLine("we are in the constructor of shit");
+            int aaa = testing;
             nonStaticTest = 56 + test;
             staticTest = test;
             this.test = test;

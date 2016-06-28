@@ -16,6 +16,7 @@ namespace CS_2_C
         private MethodGenerator m_methodGen;
         private MethodGenerator m_constructorGen;
         private ClassCodeGenerator m_classFieldGen;
+        private PropertyGenerator m_propertyGen;
 
         /// <summary>
         /// Walks through the syntax and outputs C code to a <see cref="FormattedStringBuilder">FormattedStringBuilder</see>
@@ -30,6 +31,7 @@ namespace CS_2_C
             m_methodGen = new MethodGenerator(m_context, MethodGeneratorType.Method);
             m_constructorGen = new MethodGenerator(m_context, MethodGeneratorType.Constructor);
             m_classFieldGen = new ClassCodeGenerator(m_context);
+            m_propertyGen = new PropertyGenerator(m_context);
         }
 
         /// <summary>
@@ -70,6 +72,7 @@ namespace CS_2_C
         /// <param name="node">The property node</param>
         public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
+            m_propertyGen.Generate(node);
             base.VisitPropertyDeclaration(node);
         }
 

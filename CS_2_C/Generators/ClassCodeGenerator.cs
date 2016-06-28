@@ -26,18 +26,22 @@ namespace CS_2_C.Generators
         /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
-            // Temporarily hold all the fields so we can put them in the initialization method
+            // Temporarily hold all the fields/properties so we can put them in the initialization method
             Dictionary<string, EqualsValueClauseSyntax> staticFields = new Dictionary<string, EqualsValueClauseSyntax>();
             Dictionary<string, EqualsValueClauseSyntax> nonStaticFields = new Dictionary<string, EqualsValueClauseSyntax>();
             Dictionary<string, TypeSyntax> staticFieldTypes = new Dictionary<string, TypeSyntax>();
             Dictionary<string, TypeSyntax> nonStaticFieldTypes = new Dictionary<string, TypeSyntax>();
+            Dictionary<string, TypeSyntax> propertyTypes = new Dictionary<string, TypeSyntax>();
+            Dictionary<string, EqualsValueClauseSyntax> propertyInitialValues = new Dictionary<string, EqualsValueClauseSyntax>();
 
             // Loop through the children to find the fields
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
             foreach (SyntaxNode childNode in nodes)
             {
+                SyntaxKind kind = childNode.Kind();
+
                 // Found a field
-                if (childNode.Kind() == SyntaxKind.FieldDeclaration)
+                if (kind == SyntaxKind.FieldDeclaration)
                 {
                     FieldDeclarationSyntax fieldNode = childNode as FieldDeclarationSyntax;
                     IEnumerable<SyntaxNode> fieldNodeChildren = fieldNode.ChildNodes();
@@ -74,13 +78,22 @@ namespace CS_2_C.Generators
                         }
                     }
                 }
+                // Found a property
+                else if(kind == SyntaxKind.PropertyDeclaration)
+                {
+                    PropertyDeclarationSyntax propertyDeclaration = childNode as PropertyDeclarationSyntax;
+                    string identifier = propertyDeclaration.Identifier.ToString();
+                    
+                    propertyTypes.Add(identifier, propertyDeclaration.Type);
+                    propertyInitialValues.Add(identifier, propertyDeclaration.Initializer);
+                }
             }
 
             // Other generators
-            ClassStructGenerator structGen = new ClassStructGenerator(m_context, nonStaticFieldTypes);
+            ClassStructGenerator structGen = new ClassStructGenerator(m_context, nonStaticFieldTypes, propertyTypes);
             ClassStaticStructGenerator staticStructGen = new ClassStaticStructGenerator(m_context, staticFieldTypes);
             ClassCctorGenerator cctorGen = new ClassCctorGenerator(m_context, staticFields);
-            ClassInitGenerator classInitGen = new ClassInitGenerator(m_context, nonStaticFields);
+            ClassInitGenerator classInitGen = new ClassInitGenerator(m_context, nonStaticFields, propertyInitialValues);
 
             structGen.Generate(node);
             staticStructGen.Generate(node);

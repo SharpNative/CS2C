@@ -119,6 +119,11 @@ namespace CS_2_C.Generators
             {
                 m_castExpressionGen.Generate(node as CastExpressionSyntax);
             }
+            else if(kind == SyntaxKind.IdentifierName)
+            {
+                IdentifierNameSyntax name = node as IdentifierNameSyntax;
+                m_context.Writer.Append(m_context.ConvertVariableName(name));
+            }
             else
             {
                 m_context.Writer.Append(node.ToString());

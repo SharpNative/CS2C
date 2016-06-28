@@ -27,10 +27,8 @@ namespace CS_2_C.Generators
         public override void Generate(ExpressionSyntax node)
         {
             string code = node.GetText().ToString().Trim();
-            m_context.Writer.AppendIndent();
+            
             m_context.Writer.AppendLine(string.Format("/* Expression {0} */", code));
-
-            m_context.Writer.AppendIndent();
 
             ChildSyntaxList nodes = node.ChildNodesAndTokens();
             foreach (SyntaxNodeOrToken child in nodes)

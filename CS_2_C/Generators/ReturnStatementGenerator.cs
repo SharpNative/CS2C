@@ -26,7 +26,6 @@ namespace CS_2_C.Generators
         /// <param name="node">The return statement</param>
         public override void Generate(ReturnStatementSyntax node)
         {
-            m_context.Writer.AppendIndent();
             m_context.Writer.Append("return ");
 
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();

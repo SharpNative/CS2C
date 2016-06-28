@@ -32,10 +32,8 @@ namespace CS_2_C.Generators
             foreach (VariableDeclaratorSyntax variable in node.Variables)
             {
                 string typeName = m_context.ConvertTypeName(node.Type);
-
-                m_context.Writer.AppendIndent();
+                
                 m_context.Writer.AppendLine(string.Format("/* Variable {0} */", variable.ToString()));
-                m_context.Writer.AppendIndent();
                 m_context.Writer.Append(string.Format("{0} {1} = ", typeName, variable.Identifier));
 
                 ExpressionSyntax expression = variable.Initializer.Value;

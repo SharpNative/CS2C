@@ -50,8 +50,7 @@ namespace CS_2_C.Generators
             {
                 throw new NotSupportedException();
             }
-
-            m_context.Writer.AppendIndent();
+            
             m_context.Writer.Append(string.Format("{0}(", memberName));
 
             // Arguments

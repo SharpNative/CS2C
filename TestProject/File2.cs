@@ -22,8 +22,40 @@ namespace TestProject.OtherNameSpace
 
         public unsafe void TestPointer()
         {
-            int x = 42 + test;
+            int x = 42 ;
             int* ptr = &x;
+
+
+            int* address = (int*)0xB8000;
+            address[0] = 3;
+
+            int t = 0;
+            int test = (int)(((t << 3) | (t >> 3)) & 22);
+            test <<= 3;
+
+            test >>= 5;
+            test |= 1;
+            test >>= 2;
+            test = ~1337;
+
+            if(!(test > 3))
+            {
+                Console.WriteLine("hisdfqksdlfj");
+            }
+            else if(test == 8)
+            {
+                t = 4;
+            }
+            else
+            {
+                Console.WriteLine("else");
+            }
+
+
+            if((address[1] == 3 && x == 88888) && x + 1 < 8 && x != 222)
+            {
+                Console.WriteLine("hooray");
+            }
         }
 
         public int getNonStaticTest()

@@ -11,6 +11,8 @@ namespace CS_2_C
         private StringBuilder m_sb;
         private string m_tabs;
 
+        private bool m_alreadyIndented = false;
+
         /// <summary>
         /// Formatted string builder
         /// </summary>
@@ -53,6 +55,12 @@ namespace CS_2_C
         /// <param name="text">The text</param>
         public void Append(string text)
         {
+            if(!m_alreadyIndented)
+            {
+                m_alreadyIndented = true;
+                AppendIndent();
+            }
+
             m_sb.Append(text);
         }
 
@@ -62,8 +70,16 @@ namespace CS_2_C
         /// <param name="text">The text</param>
         public void AppendLine(string text)
         {
+            if(!m_alreadyIndented)
+            {
+                m_alreadyIndented = true;
+                AppendIndent();
+            }
+
             m_sb.AppendLine(text);
+            m_alreadyIndented = false;
         }
+
 
         /// <summary>
         /// Converts the buffer to a string

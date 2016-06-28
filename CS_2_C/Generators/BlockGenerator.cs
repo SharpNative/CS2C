@@ -15,6 +15,7 @@ namespace CS_2_C.Generators
         private ReturnStatementGenerator m_returnStatementGen;
         private ExpressionStatementGenerator m_expressionStatementGen;
         private LocalDeclarationGenerator m_localDeclarationGen;
+        private IfStatementGenerator m_ifStatementGen;
 
         /// <summary>
         /// Block generator
@@ -27,6 +28,7 @@ namespace CS_2_C.Generators
             m_returnStatementGen = new ReturnStatementGenerator(m_context);
             m_expressionStatementGen = new ExpressionStatementGenerator(m_context);
             m_localDeclarationGen = new LocalDeclarationGenerator(m_context);
+            m_ifStatementGen = new IfStatementGenerator(m_context);
         }
 
         /// <summary>
@@ -36,7 +38,7 @@ namespace CS_2_C.Generators
         public override void Generate(BlockSyntax node)
         {
             m_context.Writer.Indent();
-
+            
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
 
             foreach(SyntaxNode childNode in nodes)
@@ -58,6 +60,10 @@ namespace CS_2_C.Generators
                 else if(kind == SyntaxKind.LocalDeclarationStatement)
                 {
                     m_localDeclarationGen.Generate(childNode as LocalDeclarationStatementSyntax);
+                }
+                else if(kind == SyntaxKind.IfStatement)
+                {
+                    m_ifStatementGen.Generate(childNode as IfStatementSyntax);
                 }
                 else
                 {

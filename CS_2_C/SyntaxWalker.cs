@@ -65,6 +65,15 @@ namespace CS_2_C
         }
 
         /// <summary>
+        /// Visits a property declaration
+        /// </summary>
+        /// <param name="node">The property node</param>
+        public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        {
+            base.VisitPropertyDeclaration(node);
+        }
+
+        /// <summary>
         /// Visits a namespace declaration
         /// </summary>
         /// <param name="node">The namespace declaration node</param>

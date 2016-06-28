@@ -100,7 +100,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FormattedStringBuilder.cs" />
+    <Compile Include="Generators\LocalDeclarationGenerator.cs" />
     <Compile Include="Generators\ExpressionGenerator.cs" />
+    <Compile Include="Generators\BlockGenerator.cs" />
     <Compile Include="Generators\ObjectCreationExpressionGenerator.cs" />
     <Compile Include="Generators\ExpressionStatementGenerator.cs" />
     <Compile Include="Generators\SimpleMemberAccessGenerator.cs" />

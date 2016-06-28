@@ -18,6 +18,7 @@ namespace CS_2_C.Generators
     class MethodGenerator: GeneratorBase<BaseMethodDeclarationSyntax>
     {
         private MethodGeneratorType m_type;
+        private BlockGenerator m_blockGen;
 
         /// <summary>
         /// Method declaration generator
@@ -28,6 +29,7 @@ namespace CS_2_C.Generators
         {
             m_context = context;
             m_type = type;
+            m_blockGen = new BlockGenerator(m_context);
         }
 
         /// <summary>
@@ -46,7 +48,7 @@ namespace CS_2_C.Generators
             {
                 ConstructorDeclarationSyntax nodeTyped = node as ConstructorDeclarationSyntax;
                 identifier = nodeTyped.Identifier;
-                returnType = "void";
+                returnType = m_context.CurrentClassStructName + "*";
 
                 m_context.Writer.AppendLine("/* Constructor <" + identifier + "> */");
             }
@@ -122,6 +124,17 @@ namespace CS_2_C.Generators
             }
 
             m_context.Writer.AppendLine(")");
+            
+            // Block containing the code of the method
+            m_context.Writer.AppendLine("{");
+
+            m_blockGen.Generate(node.Body);
+
+            // If the method is a constructor, we need to return the object
+            if(m_type == MethodGeneratorType.Constructor)
+                m_context.Writer.AppendLine("\treturn obj;");
+
+            m_context.Writer.AppendLine("}");
         }
     }
 }

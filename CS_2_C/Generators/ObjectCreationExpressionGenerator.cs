@@ -28,17 +28,12 @@ namespace CS_2_C.Generators
             IdentifierNameSyntax name = objNodes.First() as IdentifierNameSyntax;
             ArgumentListSyntax args = node.ArgumentList;
             string nameSpace = m_context.Model.GetTypeInfo(node).Type.ContainingNamespace.ToString().Replace(".", "_");
-
-            // Class initialization
-            m_context.Writer.AppendLine(string.Format("classInit_{0}_{1}();", nameSpace, name.Identifier));
-
+            
             // Call Constructor
-            m_context.Writer.AppendIndent();
             m_context.Writer.Append(string.Format("{0}_{1}_{2}(", nameSpace, name.Identifier, name.Identifier));
 
-            // Own object as argument
-            // TODO: fix this
-            m_context.Writer.Append(/*variable.Identifier.ToString()*/"variable");
+            // Class initialization (returns the object, we can pass it as an argument to the constructor)
+            m_context.Writer.Append(string.Format("classInit_{0}_{1}()", nameSpace, name.Identifier));
 
             // Remaining arguments
             int argCount = args.ChildNodes().Count();

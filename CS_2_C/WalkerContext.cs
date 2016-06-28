@@ -6,20 +6,46 @@ namespace CS_2_C
 {
     class WalkerContext
     {
+        /// <summary>
+        /// Type conversion helper
+        /// </summary>
         public TypeConversion TypeConvert { get; private set; }
 
+        /// <summary>
+        /// The current class
+        /// </summary>
         public ClassDeclarationSyntax CurrentClass { get; set; }
 
+        /// <summary>
+        /// The current namespace
+        /// </summary>
         public NamespaceDeclarationSyntax CurrentNamespace { get; set; }
 
+        /// <summary>
+        /// The current amount of open braces
+        /// </summary>
+        public int CurrentBraces { get; set; }
+
+        /// <summary>
+        /// Formatted current class name
+        /// </summary>
         public string CurrentClassNameFormatted { get { return ConvertClassName(CurrentClass.Identifier.ToString()); } }
 
+        /// <summary>
+        /// Gets the current class converted to the struct name
+        /// </summary>
         public string CurrentClassStructName { get { return string.Format("struct class_{0}", CurrentClassNameFormatted); } }
 
+        /// <summary>
+        /// Gets the output writer
+        /// </summary>
         public FormattedStringBuilder Writer { get; private set; }
 
+        /// <summary>
+        /// Gets the semantic Model
+        /// </summary>
         public SemanticModel Model { get; private set; }
-        
+
         /// <summary>
         /// Gets the current namespace name formatted
         /// </summary>
@@ -35,7 +61,7 @@ namespace CS_2_C
             Writer = sb;
             Model = model;
         }
-        
+
         /// <summary>
         /// Convert class name to a formatted name
         /// </summary>
@@ -45,7 +71,7 @@ namespace CS_2_C
         {
             return CurrentNamespaceFormatted + "_" + identifier;
         }
-        
+
         /// <summary>
         /// Converts the C# type to a C type name
         /// </summary>
@@ -58,7 +84,7 @@ namespace CS_2_C
             {
                 typeNameConverted = TypeConvert.Convert(type);
             }
-            else if(type is PointerTypeSyntax)
+            else if (type is PointerTypeSyntax)
             {
                 PointerTypeSyntax ptr = type as PointerTypeSyntax;
                 typeNameConverted = ConvertTypeName(ptr.ElementType) + "*";
@@ -81,7 +107,7 @@ namespace CS_2_C
         {
             string typeNameConverted = "";
             ISymbol symbol = Model.GetSymbolInfo(node).Symbol;
-            
+
             // Static field
             if (symbol.IsStatic)
             {

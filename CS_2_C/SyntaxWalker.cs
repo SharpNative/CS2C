@@ -16,12 +16,12 @@ namespace CS_2_C
         private MethodGenerator m_methodGen;
         private MethodGenerator m_constructorGen;
         private ClassCodeGenerator m_classFieldGen;
-        
+
         /// <summary>
         /// Walks through the syntax and outputs C code to a <see cref="FormattedStringBuilder">FormattedStringBuilder</see>
         /// </summary>
         /// <param name="sb">The formatted string builder</param>
-        public SyntaxWalker(FormattedStringBuilder sb, SemanticModel model) : base(SyntaxWalkerDepth.Token)
+        public SyntaxWalker(FormattedStringBuilder sb, SemanticModel model) : base(SyntaxWalkerDepth.Node)
         {
             m_sb = sb;
             m_context = new WalkerContext(sb, model);
@@ -63,7 +63,7 @@ namespace CS_2_C
             m_methodGen.Generate(node);
             base.VisitMethodDeclaration(node);
         }
-        
+
         /// <summary>
         /// Visits a namespace declaration
         /// </summary>

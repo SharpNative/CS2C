@@ -27,41 +27,67 @@ namespace LibCS2C.Generators
         public override void Generate(ExpressionSyntax node)
         {
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
-
-            // IdentifierNameSyntax -> own class
-            // ... -> other class
             SyntaxNode first = nodes.First();
             SyntaxKind firstKind = first.Kind();
+            
+            string memberName = "";
+            bool needsObjReference = false;
 
-            string memberName;
             // Own class
             if (firstKind == SyntaxKind.IdentifierName)
             {
-                IdentifierNameSyntax name = nodes.First() as IdentifierNameSyntax;
+                IdentifierNameSyntax name = first as IdentifierNameSyntax;
                 memberName = m_context.CurrentClassNameFormatted + "_" + name.Identifier;
             }
             // Another class
             else if (firstKind == SyntaxKind.SimpleMemberAccessExpression)
             {
+                ISymbol symbol = m_context.Model.GetSymbolInfo(first).Symbol;
                 MemberAccessExpressionSyntax name = first as MemberAccessExpressionSyntax;
-                memberName = name.ToFullString().Trim().Replace(".", "_");
+
+                // Static
+                if (symbol.IsStatic)
+                {
+                    memberName = name.ToString().Replace(".", "_");
+                }
+                // Belongs to class
+                else
+                {
+                    needsObjReference = true;
+                    memberName = string.Format("{0}_{1}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+                }
             }
             else
             {
                 throw new NotSupportedException();
             }
-            
+
             m_context.Writer.Append(string.Format("{0}(", memberName));
 
             // Arguments
             ArgumentListGenerator argGen = new ArgumentListGenerator(m_context);
+            ArgumentListSyntax argsList = null;
             foreach (SyntaxNode childNode in nodes)
             {
                 if (childNode.Kind() == SyntaxKind.ArgumentList)
                 {
-                    argGen.Generate(childNode as ArgumentListSyntax);
+                    argsList = childNode as ArgumentListSyntax;
+                    break;
                 }
             }
+
+            // Reference to the object if needed
+            if (needsObjReference)
+            {
+                string objName = (first.ChildNodes().First() as IdentifierNameSyntax).Identifier.ToString();
+
+                if(argsList.Arguments.Count() == 0)
+                    m_context.Writer.Append(objName);
+                else
+                    m_context.Writer.Append(objName + ", ");
+            }
+
+            argGen.Generate(argsList);
 
             m_context.Writer.AppendLine(");");
         }

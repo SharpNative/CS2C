@@ -27,28 +27,37 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression of the member access</param>
         public override void Generate(ExpressionSyntax node)
         {
-            SyntaxNode[] nodes = node.ChildNodes().ToArray();
-            for(int i = 0, l = nodes.Length; i < l; i++)
+            bool first = true;
+            SyntaxNodeOrToken[] nodes = node.ChildNodesAndTokens().ToArray();
+            for (int i = 0, l = nodes.Length; i < l; i++)
             {
-                SyntaxNode childNode = nodes[i];
-                SyntaxKind childKind = childNode.Kind();
+                SyntaxNodeOrToken child = nodes[i];
+                SyntaxKind kind = child.Kind();
 
-                if (childKind == SyntaxKind.ThisExpression)
+                if (kind == SyntaxKind.ThisExpression)
                 {
                     // If this is the start of the expression and an identifier follows
                     // that means an "obj->" was not emitted already
-                    if(!(i == 0 && i + 1 < l && nodes[i + 1].Kind() == SyntaxKind.IdentifierName))
+                    if (!(i == 0 && i + 1 < l && nodes[i + 1].Kind() == SyntaxKind.IdentifierName))
                         m_context.Writer.Append("obj->");
                 }
-                else if (childKind == SyntaxKind.IdentifierName)
+                else if (kind == SyntaxKind.IdentifierName)
                 {
-                    IdentifierNameSyntax name = childNode as IdentifierNameSyntax;
-                    m_context.Writer.Append(m_context.ConvertVariableName(name));
+                    if (first)
+                        m_context.Writer.Append(m_context.ConvertVariableName(child.AsNode() as IdentifierNameSyntax));
+                    else
+                        m_context.Writer.Append((child.AsNode() as IdentifierNameSyntax).Identifier.ToString());
+                }
+                else if (kind == SyntaxKind.DotToken)
+                {
+                    m_context.Writer.Append("->");
                 }
                 else
                 {
-                    m_context.Writer.Append(childNode.ToString());
+                    m_context.Writer.Append(child.ToString());
                 }
+
+                first = false;
             }
         }
     }

@@ -65,7 +65,7 @@ namespace LibCS2C.Generators
 
                     if (setAccessor != default(AccessorDeclarationSyntax))
                     {
-                        m_context.Writer.AppendLine(string.Format("void {1}_{2}_setter({3}* obj, {0} value)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier, m_context.CurrentClassStructName));
+                        m_context.Writer.AppendLine(string.Format("{0} {1}_{2}_setter({3}* obj, {0} value)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier, m_context.CurrentClassStructName));
                         m_context.Writer.AppendLine("{");
 
                         if(setAccessor.Body == null)
@@ -77,7 +77,8 @@ namespace LibCS2C.Generators
                             BlockGenerator block = new BlockGenerator(m_context);
                             block.Generate(setAccessor.Body);
                         }
-                        
+
+                        m_context.Writer.AppendLine("\treturn value;");
                         m_context.Writer.AppendLine("}");
                     }
                 }

@@ -11,7 +11,7 @@ namespace TestProject
     {
         struct TestStruct
         {
-            int lol;
+            public int lol = 2;
         }
 
         static void Main(string[] args)
@@ -23,6 +23,11 @@ namespace TestProject
             Method2(33, 44, 88);
 
             TestClass nein = new TestClass(44);
+            nein.TestPointer();
+            
+
+            TestStruct at = new TestStruct();
+            at.lol = 23;
         }
 
         static void Method2(int a, int b, int c)

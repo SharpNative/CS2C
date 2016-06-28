@@ -110,7 +110,7 @@ namespace LibCS2C
                 typeNameConverted = string.Format("classStatics_{0}.{1}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
             }
             // Property
-            else if(symbol.Kind == SymbolKind.Property)
+            else if (symbol.Kind == SymbolKind.Property)
             {
                 typeNameConverted = string.Format("{0}_{1}_getter(obj)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
             }
@@ -124,7 +124,7 @@ namespace LibCS2C
             {
                 typeNameConverted = string.Format("obj->field_{0}", symbol.Name);
             }
-
+            
             return typeNameConverted;
         }
 

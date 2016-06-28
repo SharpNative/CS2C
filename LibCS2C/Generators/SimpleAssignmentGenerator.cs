@@ -47,8 +47,10 @@ namespace LibCS2C.Generators
                 {
                     // Skip the first identifier if it's a property
                     // because we already emitted the code for the setter
-                    if ((isProperty && !first) || !isProperty)
+                    if (!isProperty || !first)
+                    {
                         m_context.Writer.Append(m_context.ConvertVariableName(child.AsNode()));
+                    }
                 }
                 else if (kind == SyntaxKind.EqualsToken)
                 {

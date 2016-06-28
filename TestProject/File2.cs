@@ -28,6 +28,7 @@ namespace TestProject.OtherNameSpace
             int x = 42 ;
             int* ptr = &x;
 
+            int tests = 10;
 
             int* address = (int*)0xB8000;
             address[0] = 3;

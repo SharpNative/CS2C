@@ -9,6 +9,11 @@ namespace TestProject
 {
     class Program
     {
+        struct TestStruct
+        {
+            int lol;
+        }
+
         static void Main(string[] args)
         {
             int a = 5;

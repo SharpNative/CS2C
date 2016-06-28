@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 
@@ -108,11 +109,12 @@ namespace LibCS2C
             {
                 typeNameConverted = string.Format("classStatics_{0}.{1}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
             }
+            // Property
             else if(symbol.Kind == SymbolKind.Property)
             {
                 typeNameConverted = string.Format("{0}_{1}_getter(obj)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
             }
-            // Parameter or local variable
+            // Argument or local variable
             else if (symbol.ContainingSymbol.Kind == SymbolKind.Method)
             {
                 typeNameConverted = symbol.Name;
@@ -124,6 +126,19 @@ namespace LibCS2C
             }
 
             return typeNameConverted;
+        }
+
+        /// <summary>
+        /// Checks if the syntax node kind is a sub expression
+        /// </summary>
+        /// <param name="kind">The syntax kind</param>
+        /// <returns>If it's a sub expression</returns>
+        public bool IsSubExpression(SyntaxKind kind)
+        {
+            return kind == SyntaxKind.AddExpression ||
+                   kind == SyntaxKind.SubtractExpression ||
+                   kind == SyntaxKind.MultiplyExpression ||
+                   kind == SyntaxKind.DivideExpression;
         }
     }
 }

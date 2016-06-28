@@ -26,10 +26,18 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression node</param>
         public override void Generate(ExpressionSyntax node)
         {
-            string code = node.GetText().ToString().Trim();
-            
-            m_context.Writer.AppendLine(string.Format("/* Expression {0} */", code));
+            // The first node will be an identifier
+            // Check its type, if it's a property, that means we need to use the setter
 
+            ISymbol symbol = m_context.Model.GetSymbolInfo(node.ChildNodes().First()).Symbol;
+            bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);
+
+            if (isProperty)
+            {
+                m_context.Writer.Append(string.Format("{0}_{1}_setter(obj, ", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
+            }
+
+            bool first = true;
             ChildSyntaxList nodes = node.ChildNodesAndTokens();
             foreach (SyntaxNodeOrToken child in nodes)
             {
@@ -37,20 +45,21 @@ namespace LibCS2C.Generators
 
                 if (kind == SyntaxKind.IdentifierName)
                 {
-                    m_context.Writer.Append(m_context.ConvertVariableName(child.AsNode()));
+                    // Skip the first identifier if it's a property
+                    // because we already emitted the code for the setter
+                    if ((isProperty && !first) || !isProperty)
+                        m_context.Writer.Append(m_context.ConvertVariableName(child.AsNode()));
                 }
                 else if (kind == SyntaxKind.EqualsToken)
                 {
-                    m_context.Writer.Append(" = ");
+                    if (!isProperty)
+                        m_context.Writer.Append(" = ");
                 }
                 else if (kind == SyntaxKind.SimpleMemberAccessExpression)
                 {
                     m_simpleMemberAccessGen.Generate(child.AsNode() as ExpressionSyntax);
                 }
-                else if(kind == SyntaxKind.AddExpression ||
-                        kind == SyntaxKind.SubtractExpression ||
-                        kind == SyntaxKind.MultiplyExpression ||
-                        kind == SyntaxKind.DivideExpression)
+                else if (m_context.IsSubExpression(kind))
                 {
                     ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);
                     expressionGen.Generate(child.AsNode() as ExpressionSyntax);
@@ -59,8 +68,15 @@ namespace LibCS2C.Generators
                 {
                     m_context.Writer.Append(child.ToString());
                 }
+
+                first = false;
             }
-            
+
+            if (isProperty)
+            {
+                m_context.Writer.Append(")");
+            }
+
             m_context.Writer.AppendLine(";");
         }
     }

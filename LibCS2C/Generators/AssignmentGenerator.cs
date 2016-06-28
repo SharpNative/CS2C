@@ -17,7 +17,11 @@ namespace LibCS2C.Generators
             RightShift,
             BinaryOr,
             ExclusiveOr,
-            BinaryAnd
+            BinaryAnd,
+            Add,
+            Substract,
+            Multiply,
+            Divide
         }
 
         private AssignmentType m_assignmentType;
@@ -34,9 +38,9 @@ namespace LibCS2C.Generators
         }
 
         /// <summary>
-        /// Generates the left shift assignment 
+        /// Generates the assignment 
         /// </summary>
-        /// <param name="node">The left shift assignment</param>
+        /// <param name="node">The assignment</param>
         public override void Generate(AssignmentExpressionSyntax node)
         {
             ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);
@@ -47,18 +51,39 @@ namespace LibCS2C.Generators
                 case AssignmentType.BinaryAnd:
                     m_context.Writer.Append(" &= ");
                     break;
+
                 case AssignmentType.BinaryOr:
                     m_context.Writer.Append(" |= ");
                     break;
+
                 case AssignmentType.LeftShift:
                     m_context.Writer.Append(" <<= ");
                     break;
+
                 case AssignmentType.RightShift:
                     m_context.Writer.Append(" >>= ");
                     break;
+
                 case AssignmentType.ExclusiveOr:
                     m_context.Writer.Append(" ^= ");
                     break;
+
+                case AssignmentType.Add:
+                    m_context.Writer.Append(" += ");
+                    break;
+
+                case AssignmentType.Substract:
+                    m_context.Writer.Append(" -= ");
+                    break;
+
+                case AssignmentType.Multiply:
+                    m_context.Writer.Append(" *= ");
+                    break;
+
+                case AssignmentType.Divide:
+                    m_context.Writer.Append(" /= ");
+                    break;
+
                 default:
                     break;
             }

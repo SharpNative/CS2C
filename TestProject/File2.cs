@@ -21,6 +21,7 @@ namespace TestProject.OtherNameSpace
             nonStaticTest = 56 + test;
             staticTest = test;
             this.test = test;
+            testing = staticTest;
         }
 
         public unsafe void TestPointer()
@@ -54,12 +55,23 @@ namespace TestProject.OtherNameSpace
             {
                 Console.WriteLine("else");
             }
-
-
+            
             if((address[1] == 3 && x == 88888) && x + 1 < 8 && x != 222)
             {
                 Console.WriteLine("hooray");
             }
+
+            --t;
+            t *= 4;
+            ++t;
+            t--;
+            t /= 2;
+            t++;
+
+            t -= 55;
+            t += 44;
+
+            t *= testing++;
         }
 
         public int getNonStaticTest()

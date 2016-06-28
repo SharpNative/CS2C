@@ -10,25 +10,34 @@ namespace LibCS2C
 {
     public class Compiler
     {
-
+        /// <summary>
+        /// Compiles a project
+        /// </summary>
+        /// <param name="path">The project path</param>
+        /// <returns></returns>
         public static string CompileProject(string path)
         {
-
+            // Workspace to open project
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
             Project project = workspace.OpenProjectAsync(path).Result;
 
             Console.WriteLine("Project name: " + project.Name);
             Console.WriteLine("-------------");
 
+            // Buffer that holds all the output code
             FormattedStringBuilder sb = new FormattedStringBuilder();
 
+            // Loop through each file of the project
             foreach (Document document in project.Documents)
             {
                 Console.WriteLine("File: " + document.Name);
+
+                // Go through the syntax tree and convert the code
                 SyntaxWalker walker = new SyntaxWalker(sb, document.GetSemanticModelAsync().Result);
                 SyntaxTree tree = document.GetSyntaxTreeAsync().Result;
                 SyntaxNode node = tree.GetRoot();
                 walker.Visit(node);
+
                 Console.WriteLine("End of file: " + document.Name);
                 Console.WriteLine("------------");
             }

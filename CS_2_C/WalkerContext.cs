@@ -20,12 +20,7 @@ namespace CS_2_C
         /// The current namespace
         /// </summary>
         public NamespaceDeclarationSyntax CurrentNamespace { get; set; }
-
-        /// <summary>
-        /// The current amount of open braces
-        /// </summary>
-        public int CurrentBraces { get; set; }
-
+        
         /// <summary>
         /// Formatted current class name
         /// </summary>

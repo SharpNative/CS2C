@@ -11,6 +11,8 @@ namespace LibCS2C.Generators
 {
     class ArgumentListGenerator : GeneratorBase<ArgumentListSyntax>
     {
+        private ExpressionGenerator m_expressionGen;
+
         /// <summary>
         /// Argument list generator
         /// </summary>
@@ -18,6 +20,7 @@ namespace LibCS2C.Generators
         public ArgumentListGenerator(WalkerContext context)
         {
             m_context = context;
+            m_expressionGen = new ExpressionGenerator(m_context);
         }
 
         /// <summary>
@@ -29,7 +32,11 @@ namespace LibCS2C.Generators
             IEnumerable<SyntaxNode> argNodes = node.ChildNodes();
             foreach (ArgumentSyntax argument in argNodes)
             {
-                m_context.Writer.Append(argument.ToString());
+                IEnumerable<SyntaxNode> children = argument.ChildNodes();
+                foreach(ExpressionSyntax child in children)
+                {
+                    m_expressionGen.Generate(child);
+                }
 
                 // A comma if it's not the last argument
                 if (argument != argNodes.Last())

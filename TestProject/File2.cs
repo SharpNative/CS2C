@@ -27,7 +27,7 @@ namespace TestProject.OtherNameSpace
         private int nonStaticTest = 2;
         private int test;
 
-       
+        public static extern void testing123();
         
         public TestClass(int test)
         {
@@ -51,7 +51,7 @@ namespace TestProject.OtherNameSpace
             {
                 Console.WriteLine("test");
             }
-                
+            testing123();
         }
 
         public unsafe void TestPointer()

@@ -77,7 +77,6 @@ namespace LibCS2C.Generators
 
             string method = string.Format("{0} {1}_{2}", returnType, m_context.CurrentClassNameFormatted, identifier);
             
-
             StringBuilder sb = new StringBuilder();
 
             // namespaceName_className_methodName
@@ -129,13 +128,20 @@ namespace LibCS2C.Generators
             }
 
             sb.Append(")");
-
-            m_context.Writer.AppendLine(sb.ToString());
-            m_context.MethodPrototypes.Add(sb.ToString());
             
+            // Append to properties
+            m_context.MethodPrototypes.Add(sb.ToString());
+
+            // If this has no body, we only generate the prototype
+            if (node.Body == null)
+                return;
+
+            // Append the declaration so we can add contents
+            m_context.Writer.AppendLine(sb.ToString());
+
             // Block containing the code of the method
             m_context.Writer.AppendLine("{");
-
+            
             m_blockGen.Generate(node.Body);
 
             // If the method is a constructor, we need to return the object

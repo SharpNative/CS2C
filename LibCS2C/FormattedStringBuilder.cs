@@ -30,6 +30,15 @@ namespace LibCS2C
             m_tabs += "\t";
         }
 
+        public void RemoveLastChars(int times = 1)
+        {
+            string str = m_sb.ToString();
+            str = str.Substring(0, str.Length - times);
+
+            m_sb = new StringBuilder(str);
+        }
+
+
         /// <summary>
         /// Removes a tab
         /// </summary>

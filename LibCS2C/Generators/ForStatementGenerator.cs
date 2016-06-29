@@ -34,17 +34,22 @@ namespace LibCS2C.Generators
             m_context.Writer.Append("for(");
 
             if(node.Declaration != null)
+            {
                 m_variableGen.Generate(node.Declaration);
+            }
             m_context.Writer.Append(";");
 
             if(node.Condition != null)
+            {
                 m_expressionGen.Generate(node.Condition);
+            }
             m_context.Writer.Append(";");
 
             SeparatedSyntaxList<ExpressionSyntax> nodes = node.Incrementors;
             foreach (ExpressionSyntax expression in nodes)
             {
                 m_expressionGen.Generate(expression);
+                m_context.Writer.RemoveLastChars(3);
             }
 
             m_context.Writer.AppendLine(")");

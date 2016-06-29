@@ -48,14 +48,17 @@ namespace LibCS2C.Generators
                 // Static
                 if (symbol.IsStatic)
                 {
-                    memberName = name.ToString().Replace(".", "_");
+                    /*symbol.ContainingType
+                    memberName = name.ToString().Replace(".", "_");*/
                 }
                 // Belongs to class
                 else
                 {
                     needsObjReference = true;
-                    memberName = string.Format("{0}_{1}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+                    
                 }
+
+                memberName = string.Format("{0}_{1}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
             }
             else
             {

@@ -29,7 +29,50 @@ namespace LibCS2C.Generators
         /// <param name="node">The struct declaration</param>
         public override void Generate(StructDeclarationSyntax node)
         {
-            string structName = "";
+            // Check for attributes
+            bool packed = false;
+
+            SyntaxList<AttributeListSyntax> attribLists = node.AttributeLists;
+            foreach(AttributeListSyntax attribList in attribLists)
+            {
+                SeparatedSyntaxList<AttributeSyntax> attribs = attribList.Attributes;
+                foreach(AttributeSyntax attrib in attribs)
+                {
+                    IdentifierNameSyntax name = attrib.ChildNodes().First() as IdentifierNameSyntax;
+                    string identifier = name.Identifier.ToString();
+
+                    // Defines layout of the struct
+                    if(identifier.Equals("StructLayoutAttribute"))
+                    {
+                        SeparatedSyntaxList<AttributeArgumentSyntax> argsList = attrib.ArgumentList.Arguments;
+                        foreach(AttributeArgumentSyntax arg in argsList)
+                        {
+                            SyntaxNode first = arg.ChildNodes().First();
+                            SyntaxKind kind = first.Kind();
+                            
+                            if(kind == SyntaxKind.NameEquals)
+                            {
+                                NameEqualsSyntax nameEquals = first as NameEqualsSyntax;
+                                string nameIdentifier = nameEquals.Name.Identifier.ToString();
+
+                                if(nameIdentifier.Equals("Pack"))
+                                {
+                                    // TODO: support more sizes for packing
+                                    packed = true;
+                                }
+                            }
+                        }
+                    }
+                    // Unknown attribute
+                    else
+                    {
+                        Console.WriteLine("Unknown attribute on struct: " + identifier);
+                    }
+                }
+            }
+
+            // Create struct name
+            string structName;
             if (node.Parent is ClassDeclarationSyntax)
             {
                 structName = string.Format("{0}_{1}", m_context.CurrentClassNameFormatted, node.Identifier.ToString());
@@ -71,17 +114,22 @@ namespace LibCS2C.Generators
             // Struct
             m_context.Writer.AppendLine(string.Format("struct struct_{0}", structName));
             m_context.Writer.AppendLine("{");
-
-            // Usage count for garbage collector
-            m_context.Writer.AppendLine("\tint32_t usage_count;");
-
+            
             foreach (KeyValuePair<string, TypeSyntax> pair in fieldTypes)
             {
                 m_context.Writer.AppendLine("\t/* Field: " + pair.Key + " */");
                 m_context.Writer.AppendLine(string.Format("\t{0} field_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
 
-            m_context.Writer.AppendLine("};");
+            // Usage count for garbage collector
+            // To the end because the struct can be used to read data,
+            // if we would put in it the front, the data will be incorrect
+            m_context.Writer.AppendLine("\tint32_t usage_count;");
+
+            if(packed)
+                m_context.Writer.AppendLine("} __attribute__((packed));");
+            else
+                m_context.Writer.AppendLine("};");
             m_context.Writer.AppendLine("");
 
             // Init code

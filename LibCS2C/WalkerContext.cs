@@ -159,11 +159,15 @@ namespace LibCS2C
                    kind == SyntaxKind.SubtractExpression ||
                    kind == SyntaxKind.MultiplyExpression ||
                    kind == SyntaxKind.DivideExpression ||
+                   kind == SyntaxKind.BitwiseAndExpression ||
+                   kind == SyntaxKind.BitwiseNotExpression ||
+                   kind == SyntaxKind.BitwiseOrExpression ||
                    kind == SyntaxKind.EqualsExpression ||
                    kind == SyntaxKind.LessThanExpression ||
                    kind == SyntaxKind.GreaterThanExpression ||
                    kind == SyntaxKind.LessThanOrEqualExpression ||
-                   kind == SyntaxKind.GreaterThanOrEqualExpression;
+                   kind == SyntaxKind.GreaterThanOrEqualExpression ||
+                   kind == SyntaxKind.ParenthesizedExpression;
         }
     }
 }

@@ -22,6 +22,10 @@
                 X = 0;
                 Y++;
             }
+            else if (ch == '\t')
+            {
+                X = (X + 4) & ~(4 - 1);
+            }
             else
             {
                 vidmem[(Y * 25 + X) * 2 + 0] = (byte)ch;

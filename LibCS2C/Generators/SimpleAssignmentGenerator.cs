@@ -32,7 +32,7 @@ namespace LibCS2C.Generators
         {
             // The first node will be an identifier
             // Check its type, if it's a property, that means we need to use the setter
-
+            
             ISymbol symbol = m_context.Model.GetSymbolInfo(node.ChildNodes().First()).Symbol;
             bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);
 

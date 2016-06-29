@@ -132,6 +132,9 @@ namespace LibCS2C.Generators
                 case SyntaxKind.MultiplyExpression:
                 case SyntaxKind.DivideExpression:
                 case SyntaxKind.ParenthesizedExpression:
+                case SyntaxKind.BitwiseAndExpression:
+                case SyntaxKind.BitwiseNotExpression:
+                case SyntaxKind.BitwiseOrExpression:
                     ChildSyntaxList children = node.ChildNodesAndTokens();
                     foreach (SyntaxNodeOrToken child in children)
                     {
@@ -149,7 +152,7 @@ namespace LibCS2C.Generators
                     break;
 
                 case SyntaxKind.IdentifierName:
-                    m_context.Writer.Append(m_context.ConvertVariableName(node as IdentifierNameSyntax));
+                    m_context.Writer.Append(m_context.ConvertVariableName(node));
                     break;
 
                 case SyntaxKind.CastExpression:

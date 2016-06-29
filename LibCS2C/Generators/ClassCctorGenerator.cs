@@ -31,7 +31,11 @@ namespace LibCS2C.Generators
         {
             string convertedClassName = m_context.ConvertClassName(node.Identifier.ToString());
 
-            m_context.Writer.AppendLine(string.Format("void classCctor_{0}(void)", convertedClassName));
+            string functionName = string.Format("classCctor_{0}", convertedClassName);
+
+            m_context.CctorList.Add(functionName);
+
+            m_context.Writer.AppendLine(string.Format("void {0}(void)", functionName));
             m_context.Writer.AppendLine("{");
 
             foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_staticFields)

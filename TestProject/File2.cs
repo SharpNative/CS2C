@@ -13,6 +13,12 @@ namespace TestProject.OtherNameSpace
         int abc = 44;
     }
 
+    enum drollen
+    {
+        test = 0,
+        testtt = 1
+    }
+
     class TestClass
     {
         public int testing { get; private set; } = 10;
@@ -20,6 +26,8 @@ namespace TestProject.OtherNameSpace
         static int staticTest = 4;
         private int nonStaticTest = 2;
         private int test;
+
+       
         
         public TestClass(int test)
         {
@@ -30,7 +38,20 @@ namespace TestProject.OtherNameSpace
             this.test = test;
             testing = staticTest;
 
+            int aze = drollen.test;
+
             OutsideClassStruct abc = new OutsideClassStruct();
+
+            for (int i = 0; i < 10 && i < 15; i++)
+            {
+                Console.WriteLine("jeej");
+            }
+
+            for (;;)
+            {
+                Console.WriteLine("test");
+            }
+                
         }
 
         public unsafe void TestPointer()

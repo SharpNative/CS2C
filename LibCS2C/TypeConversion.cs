@@ -27,6 +27,7 @@ namespace LibCS2C
             { "float", "float" },
             { "double", "double" },
 
+            { "char", "char" },
             { "string", "char*" },
             { "string[]", "char**" }
         };

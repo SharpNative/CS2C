@@ -74,14 +74,19 @@ namespace LibCS2C.Generators
                 else
                     m_context.Writer.AppendLine("/* Method <" + identifier + "> */");
             }
+
+            string method = string.Format("{0} {1}_{2}", returnType, m_context.CurrentClassNameFormatted, identifier);
             
+
+            StringBuilder sb = new StringBuilder();
+
             // namespaceName_className_methodName
-            m_context.Writer.Append(string.Format("{0} {1}_{2}(", returnType, m_context.CurrentClassNameFormatted, identifier));
-            
+            sb.Append(string.Format("{0}(", method));
+
             // Not static? Object reference is required as parameter
-            if(!isStatic)
+            if (!isStatic)
             {
-                m_context.Writer.Append(string.Format("{0}* obj", m_context.CurrentClassStructName));
+                sb.Append(string.Format("{0}* obj", m_context.CurrentClassStructName));
             }
 
             // Check for parameters
@@ -97,16 +102,16 @@ namespace LibCS2C.Generators
                     paramCount = paramNodes.Count();
 
                     if (paramCount > 0 && !isStatic)
-                        m_context.Writer.Append(", ");
+                        sb.Append(", ");
                     
-                    // TODO: out and ref
+                    // TODO: out and ref-+
                     foreach (ParameterSyntax paramNode in paramNodes)
                     {
-                        m_context.Writer.Append(string.Format("{0} {1}", m_context.ConvertTypeName(paramNode.Type), paramNode.Identifier));
+                        sb.Append(string.Format("{0} {1}", m_context.ConvertTypeName(paramNode.Type), paramNode.Identifier));
 
                         // A comma if it's not the last parameter
                         if (paramNode != paramNodes.Last())
-                            m_context.Writer.Append(", ");
+                            sb.Append(", ");
                     }
 
                     break;
@@ -120,10 +125,13 @@ namespace LibCS2C.Generators
             // Insert void if no parameters are found
             if (paramCount == 0)
             {
-                m_context.Writer.Append("void");
+                sb.Append("void");
             }
 
-            m_context.Writer.AppendLine(")");
+            sb.Append(")");
+
+            m_context.Writer.AppendLine(sb.ToString());
+            m_context.MethodPrototypes.Add(sb.ToString());
             
             // Block containing the code of the method
             m_context.Writer.AppendLine("{");

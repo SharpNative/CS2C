@@ -27,39 +27,51 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression of the member access</param>
         public override void Generate(ExpressionSyntax node)
         {
-            SyntaxNodeOrToken[] children = node.ChildNodesAndTokens().ToArray();
-
             bool hasThis = true;
             bool first = true;
 
-            for (int i = 0, l = children.Length; i < l; i++)
+            ITypeSymbol symbol = m_context.Model.GetTypeInfo(node).Type;
+            SyntaxNodeOrToken[] children = node.ChildNodesAndTokens().ToArray();
+            
+            // enum
+            if (symbol.TypeKind == TypeKind.Enum)
             {
-                SyntaxNodeOrToken child = children[i];
-                SyntaxKind kind = child.Kind();
-
-                if (kind == SyntaxKind.ThisExpression)
+                IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
+                m_context.Writer.Append("enum_" + symbol.ToString().Replace(".", "_") + "_" + name.Identifier);
+            }
+            else
+            {
+                // TODO: simplify this
+                
+                for (int i = 0, l = children.Length; i < l; i++)
                 {
-                    hasThis = true;
-                }
-                else if (kind == SyntaxKind.IdentifierName)
-                {
-                    IdentifierNameSyntax name = child.AsNode() as IdentifierNameSyntax;
+                    SyntaxNodeOrToken child = children[i];
+                    SyntaxKind kind = child.Kind();
 
-                    if (hasThis && !first)
-                        m_context.Writer.Append(string.Format("field_{0}", name.Identifier));
+                    if (kind == SyntaxKind.ThisExpression)
+                    {
+                        hasThis = true;
+                    }
+                    else if (kind == SyntaxKind.IdentifierName)
+                    {
+                        IdentifierNameSyntax name = child.AsNode() as IdentifierNameSyntax;
+
+                        if (hasThis && !first)
+                            m_context.Writer.Append(string.Format("field_{0}", name.Identifier));
+                        else
+                            m_context.Writer.Append(m_context.ConvertVariableName(name));
+
+                        first = false;
+                    }
+                    else if (kind == SyntaxKind.DotToken)
+                    {
+                        if (!hasThis || !first)
+                            m_context.Writer.Append("->");
+                    }
                     else
-                        m_context.Writer.Append(m_context.ConvertVariableName(name));
-
-                    first = false;
-                }
-                else if (kind == SyntaxKind.DotToken)
-                {
-                    if (!hasThis || !first)
-                        m_context.Writer.Append("->");
-                }
-                else
-                {
-                    m_context.Writer.Append(child.ToString());
+                    {
+                        m_context.Writer.Append(child.ToString());
+                    }
                 }
             }
         }

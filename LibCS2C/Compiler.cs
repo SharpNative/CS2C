@@ -27,13 +27,16 @@ namespace LibCS2C
             // Buffer that holds all the output code
             FormattedStringBuilder sb = new FormattedStringBuilder();
 
+            SyntaxWalker walker = new SyntaxWalker(sb);
+
             // Loop through each file of the project
             foreach (Document document in project.Documents)
             {
                 Console.WriteLine("File: " + document.Name);
 
+                walker.SetDocument(document);
+
                 // Go through the syntax tree and convert the code
-                SyntaxWalker walker = new SyntaxWalker(sb, document.GetSemanticModelAsync().Result);
                 SyntaxTree tree = document.GetSyntaxTreeAsync().Result;
                 SyntaxNode node = tree.GetRoot();
                 walker.Visit(node);
@@ -41,6 +44,8 @@ namespace LibCS2C
                 Console.WriteLine("End of file: " + document.Name);
                 Console.WriteLine("------------");
             }
+
+            walker.Finish();
 
             return sb.ToString();
         }

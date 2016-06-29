@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Collections.Generic;
 
 namespace LibCS2C
 {
@@ -10,7 +11,13 @@ namespace LibCS2C
         /// <summary>
         /// Type conversion helper
         /// </summary>
-        public TypeConversion TypeConvert { get; private set; }
+        public TypeConversion TypeConvert { get; private set; } = new TypeConversion();
+
+        public List<string> CctorList { get; private set; } = new List<string>();
+
+        public List<string> MethodPrototypes { get; private set; } = new List<string>();
+
+        public Dictionary<string, string> Enums { get; private set; } = new Dictionary<string, string>();
 
         /// <summary>
         /// The current class
@@ -40,7 +47,7 @@ namespace LibCS2C
         /// <summary>
         /// Gets the semantic Model
         /// </summary>
-        public SemanticModel Model { get; private set; }
+        public SemanticModel Model { get; set; }
 
         /// <summary>
         /// Gets the current namespace name formatted
@@ -51,11 +58,9 @@ namespace LibCS2C
         /// Contextwalker
         /// </summary>
         /// <param name="sb">The formatted string builder</param>
-        public WalkerContext(FormattedStringBuilder sb, SemanticModel model)
+        public WalkerContext(FormattedStringBuilder sb)
         {
-            TypeConvert = new TypeConversion();
             Writer = sb;
-            Model = model;
         }
 
         /// <summary>

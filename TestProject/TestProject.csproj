@@ -49,7 +49,6 @@
     </ProjectReference>
   </ItemGroup>
   <Target Name="Build">
-    <Message Text=" Here I Am  " />
     <CompileProjectTask Path="$(MSBuildProjectFullPath)" Outpath="$(MSBuildProjectDirectory)/out/output.c" />
   </Target>
 </Project>

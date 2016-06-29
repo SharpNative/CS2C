@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using LibCS2C.Generators;
+using System.Collections.Generic;
 
 namespace LibCS2C
 {
@@ -18,15 +19,16 @@ namespace LibCS2C
         private ClassCodeGenerator m_classFieldGen;
         private PropertyGenerator m_propertyGen;
         private StructGenerator m_structGen;
+        private EnumGenerator m_enumGen;
 
         /// <summary>
         /// Walks through the syntax and outputs C code to a <see cref="FormattedStringBuilder">FormattedStringBuilder</see>
         /// </summary>
         /// <param name="sb">The formatted string builder</param>
-        public SyntaxWalker(FormattedStringBuilder sb, SemanticModel model) : base(SyntaxWalkerDepth.Node)
+        public SyntaxWalker(FormattedStringBuilder sb) : base(SyntaxWalkerDepth.Node)
         {
             m_sb = sb;
-            m_context = new WalkerContext(sb, model);
+            m_context = new WalkerContext(sb);
 
             // Generators
             m_methodGen = new MethodGenerator(m_context, MethodGeneratorType.Method);
@@ -34,6 +36,12 @@ namespace LibCS2C
             m_classFieldGen = new ClassCodeGenerator(m_context);
             m_propertyGen = new PropertyGenerator(m_context);
             m_structGen = new StructGenerator(m_context);
+            m_enumGen = new EnumGenerator(m_context);
+        }
+
+        public void SetDocument(Document doc)
+        {
+            m_context.Model = doc.GetSemanticModelAsync().Result;
         }
 
         /// <summary>
@@ -89,6 +97,12 @@ namespace LibCS2C
             base.VisitPropertyDeclaration(node);
         }
 
+        public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
+        {
+            m_enumGen.Generate(node);
+            base.VisitEnumDeclaration(node);
+        }
+
         /// <summary>
         /// Visits a namespace declaration
         /// </summary>
@@ -98,6 +112,35 @@ namespace LibCS2C
             m_context.CurrentNamespace = node;
             m_sb.AppendLine("/* Namespace <" + node.Name + "> */");
             base.VisitNamespaceDeclaration(node);
+        }
+
+        public void Finish()
+        {
+            m_context.Writer.AppendLine("void init(void)");
+            m_context.Writer.AppendLine("{");
+
+            foreach(string cctor in m_context.CctorList)
+            {
+                m_context.Writer.AppendLine(string.Format("\t{0}();", cctor));
+            }
+
+            m_context.Writer.AppendLine("}");
+            
+            string begin = "";
+            begin += "/* Method prototypes */\r\n";
+            foreach (string prototype in m_context.MethodPrototypes)
+            {
+                begin += prototype + ";\r\n";
+            }
+
+            begin += "/* Enums */\r\n";
+            foreach (KeyValuePair<string, string> pair in m_context.Enums)
+            {
+                begin += string.Format("#define enum_{0} ({1})\r\n", pair.Key, pair.Value);
+            }
+
+            begin += "\r\n";
+            m_context.Writer.Prepend(begin);
         }
     }
 }

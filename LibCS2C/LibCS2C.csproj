@@ -103,6 +103,8 @@
     <Compile Include="Compiler.cs" />
     <Compile Include="FormattedStringBuilder.cs" />
     <Compile Include="Generators\ArgumentListGenerator.cs" />
+    <Compile Include="Generators\EnumGenerator.cs" />
+    <Compile Include="Generators\ForStatementGenerator.cs" />
     <Compile Include="Generators\StructGenerator.cs" />
     <Compile Include="Generators\PrePostExpressionGenerator.cs" />
     <Compile Include="Generators\AssignmentGenerator.cs" />

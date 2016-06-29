@@ -81,6 +81,11 @@ namespace LibCS2C
         }
 
 
+        public void Prepend(string text)
+        {
+            m_sb.Insert(0, text);
+        }
+
         /// <summary>
         /// Converts the buffer to a string
         /// </summary>

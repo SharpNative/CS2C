@@ -16,6 +16,7 @@ namespace LibCS2C.Generators
         private ExpressionStatementGenerator m_expressionStatementGen;
         private LocalDeclarationGenerator m_localDeclarationGen;
         private IfStatementGenerator m_ifStatementGen;
+        private ForStatementGenerator m_forStatementGen;
 
         /// <summary>
         /// Block generator
@@ -29,6 +30,7 @@ namespace LibCS2C.Generators
             m_expressionStatementGen = new ExpressionStatementGenerator(m_context);
             m_localDeclarationGen = new LocalDeclarationGenerator(m_context);
             m_ifStatementGen = new IfStatementGenerator(m_context);
+            m_forStatementGen = new ForStatementGenerator(m_context);
         }
 
         /// <summary>
@@ -64,6 +66,10 @@ namespace LibCS2C.Generators
                 else if(kind == SyntaxKind.IfStatement)
                 {
                     m_ifStatementGen.Generate(childNode as IfStatementSyntax);
+                }
+                else if(kind == SyntaxKind.ForStatement)
+                {
+                    m_forStatementGen.Generate(childNode as ForStatementSyntax);
                 }
                 else
                 {

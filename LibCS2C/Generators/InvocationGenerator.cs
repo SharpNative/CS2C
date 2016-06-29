@@ -75,7 +75,7 @@ namespace LibCS2C.Generators
 
             argGen.Generate(argsList);
 
-            m_context.Writer.AppendLine(");");
+            m_context.Writer.Append(")");
         }
     }
 }

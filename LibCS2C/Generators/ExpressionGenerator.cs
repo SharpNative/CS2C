@@ -83,6 +83,7 @@ namespace LibCS2C.Generators
 
                 case SyntaxKind.InvocationExpression:
                     m_invocationGen.Generate(node as ExpressionSyntax);
+                    m_context.Writer.AppendLine(";");
                     break;
 
                 case SyntaxKind.LeftShiftAssignmentExpression:

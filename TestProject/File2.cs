@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace TestProject.OtherNameSpace
 {
+    public struct OutsideClassStruct
+    {
+
+    }
+
     class TestClass
     {
         public int testing { get; private set; } = 10;
@@ -22,6 +27,8 @@ namespace TestProject.OtherNameSpace
             staticTest = test;
             this.test = test;
             testing = staticTest;
+
+            OutsideClassStruct abc = new OutsideClassStruct();
         }
 
         public unsafe void TestPointer()

@@ -55,10 +55,9 @@ namespace LibCS2C.Generators
                             isStatic = true;
                     }
 
-                    foreach (SyntaxNode fieldNodeChild in fieldNodeChildren)
+                    foreach (VariableDeclarationSyntax fieldNodeChild in fieldNodeChildren)
                     {
-                        VariableDeclarationSyntax variableDeclaration = fieldNodeChild as VariableDeclarationSyntax;
-                        foreach (VariableDeclaratorSyntax variable in variableDeclaration.Variables)
+                        foreach (VariableDeclaratorSyntax variable in fieldNodeChild.Variables)
                         {
                             string identifier = variable.Identifier.ToString();
                             if (isStatic)
@@ -66,14 +65,14 @@ namespace LibCS2C.Generators
                                 if (variable.Initializer != null)
                                     staticFields.Add(identifier, variable.Initializer);
 
-                                staticFieldTypes.Add(identifier, variableDeclaration.Type);
+                                staticFieldTypes.Add(identifier, fieldNodeChild.Type);
                             }
                             else
                             {
                                 if (variable.Initializer != null)
                                     nonStaticFields.Add(identifier, variable.Initializer);
 
-                                nonStaticFieldTypes.Add(identifier, variableDeclaration.Type);
+                                nonStaticFieldTypes.Add(identifier, fieldNodeChild.Type);
                             }
                         }
                     }

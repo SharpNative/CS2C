@@ -32,7 +32,6 @@ namespace LibCS2C.Generators
         public override void Generate(ClassDeclarationSyntax node)
         {
             // Class initialization method: returns a pointer to this object
-            m_context.Writer.AppendLine("");
             m_context.Writer.AppendLine(string.Format("{0}* classInit_{1}_{2}(void)", m_context.CurrentClassStructName, m_context.CurrentNamespaceFormatted, node.Identifier));
             m_context.Writer.AppendLine("{");
             m_context.Writer.AppendLine(string.Format("\t{0}* object = malloc(sizeof({0}));", m_context.CurrentClassStructName));

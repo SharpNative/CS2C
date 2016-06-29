@@ -27,37 +27,40 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression of the member access</param>
         public override void Generate(ExpressionSyntax node)
         {
+            SyntaxNodeOrToken[] children = node.ChildNodesAndTokens().ToArray();
+
+            bool hasThis = true;
             bool first = true;
-            SyntaxNodeOrToken[] nodes = node.ChildNodesAndTokens().ToArray();
-            for (int i = 0, l = nodes.Length; i < l; i++)
+
+            for (int i = 0, l = children.Length; i < l; i++)
             {
-                SyntaxNodeOrToken child = nodes[i];
+                SyntaxNodeOrToken child = children[i];
                 SyntaxKind kind = child.Kind();
 
                 if (kind == SyntaxKind.ThisExpression)
                 {
-                    // If this is the start of the expression and an identifier follows
-                    // that means an "obj->" was not emitted already
-                    if (!(i == 0 && i + 1 < l && nodes[i + 1].Kind() == SyntaxKind.IdentifierName))
-                        m_context.Writer.Append("obj->");
+                    hasThis = true;
                 }
                 else if (kind == SyntaxKind.IdentifierName)
                 {
-                    if (first)
-                        m_context.Writer.Append(m_context.ConvertVariableName(child.AsNode() as IdentifierNameSyntax));
+                    IdentifierNameSyntax name = child.AsNode() as IdentifierNameSyntax;
+
+                    if (hasThis && !first)
+                        m_context.Writer.Append(string.Format("field_{0}", name.Identifier));
                     else
-                        m_context.Writer.Append((child.AsNode() as IdentifierNameSyntax).Identifier.ToString());
+                        m_context.Writer.Append(m_context.ConvertVariableName(name));
+
+                    first = false;
                 }
                 else if (kind == SyntaxKind.DotToken)
                 {
-                    m_context.Writer.Append("->");
+                    if (!hasThis || !first)
+                        m_context.Writer.Append("->");
                 }
                 else
                 {
                     m_context.Writer.Append(child.ToString());
                 }
-
-                first = false;
             }
         }
     }

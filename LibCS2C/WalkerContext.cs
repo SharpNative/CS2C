@@ -21,7 +21,7 @@ namespace LibCS2C
         /// The current namespace
         /// </summary>
         public NamespaceDeclarationSyntax CurrentNamespace { get; set; }
-        
+
         /// <summary>
         /// Formatted current class name
         /// </summary>
@@ -87,8 +87,20 @@ namespace LibCS2C
             }
             else
             {
-                string nameSpace = Model.GetTypeInfo(type).Type.ContainingNamespace.ToString().Replace(".", "_");
-                typeNameConverted = string.Format("struct class_{0}_{1}*", nameSpace, type.ToString());
+                ITypeSymbol typeSymbol = Model.GetTypeInfo(type).Type;
+                string nameSpace = typeSymbol.ContainingNamespace.ToString().Replace(".", "_");
+
+                if (typeSymbol.TypeKind == TypeKind.Class)
+                {
+                    typeNameConverted = string.Format("struct class_{0}_{1}*", nameSpace, type.ToString());
+                }
+                else
+                {
+                    if (typeSymbol.ContainingType == null)
+                        typeNameConverted = string.Format("struct struct_{0}_{1}*", nameSpace, type.ToString());
+                    else
+                        typeNameConverted = string.Format("struct struct_{0}_{1}*", typeSymbol.ContainingType.ToString().Replace(".", "_"), type.ToString());
+                }
             }
 
             return typeNameConverted;
@@ -103,7 +115,7 @@ namespace LibCS2C
         {
             string typeNameConverted = "";
             ISymbol symbol = Model.GetSymbolInfo(node).Symbol;
-            
+
             // Static field
             if (symbol.IsStatic)
             {
@@ -124,7 +136,7 @@ namespace LibCS2C
             {
                 typeNameConverted = string.Format("obj->field_{0}", symbol.Name);
             }
-            
+
             return typeNameConverted;
         }
 

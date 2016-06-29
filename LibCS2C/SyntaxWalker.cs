@@ -17,6 +17,7 @@ namespace LibCS2C
         private MethodGenerator m_constructorGen;
         private ClassCodeGenerator m_classFieldGen;
         private PropertyGenerator m_propertyGen;
+        private StructGenerator m_structGen;
 
         /// <summary>
         /// Walks through the syntax and outputs C code to a <see cref="FormattedStringBuilder">FormattedStringBuilder</see>
@@ -32,6 +33,18 @@ namespace LibCS2C
             m_constructorGen = new MethodGenerator(m_context, MethodGeneratorType.Constructor);
             m_classFieldGen = new ClassCodeGenerator(m_context);
             m_propertyGen = new PropertyGenerator(m_context);
+            m_structGen = new StructGenerator(m_context);
+        }
+
+        /// <summary>
+        /// Visits a struct declaration
+        /// </summary>
+        /// <param name="node">The struct declaration node</param>
+        public override void VisitStructDeclaration(StructDeclarationSyntax node)
+        {
+            m_sb.AppendLine("/* Struct <" + node.Identifier + "> */");
+            m_structGen.Generate(node);
+            base.VisitStructDeclaration(node);
         }
 
         /// <summary>

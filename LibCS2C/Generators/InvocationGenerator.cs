@@ -37,34 +37,30 @@ namespace LibCS2C.Generators
             if (firstKind == SyntaxKind.IdentifierName)
             {
                 IdentifierNameSyntax name = first as IdentifierNameSyntax;
-                memberName = m_context.CurrentClassNameFormatted + "_" + name.Identifier;
+                memberName = string.Format("{0}_{1}", m_context.CurrentClassNameFormatted, name.Identifier);
             }
             // Another class
             else if (firstKind == SyntaxKind.SimpleMemberAccessExpression)
             {
-                ISymbol symbol = m_context.Model.GetSymbolInfo(first).Symbol;
                 MemberAccessExpressionSyntax name = first as MemberAccessExpressionSyntax;
-                needsObjReference = !symbol.IsStatic;
-                memberName = string.Format("{0}_{1}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+                ITypeSymbol symbol = m_context.Model.GetTypeInfo(name.ChildNodes().First()).Type;
+                ITypeSymbol symbolParent = m_context.Model.GetTypeInfo(name).Type;
+                
+                needsObjReference = (symbolParent != null && !symbolParent.IsStatic);
+                memberName = string.Format("{0}_{1}_{2}", symbol.ContainingSymbol.ToString().Replace(".", "_"), symbol.Name, name.Name);
             }
             else
             {
                 throw new NotSupportedException();
             }
-
+            
             m_context.Writer.Append(string.Format("{0}(", memberName));
 
             // Arguments
             ArgumentListGenerator argGen = new ArgumentListGenerator(m_context);
-            ArgumentListSyntax argsList = null;
-            foreach (SyntaxNode childNode in nodes)
-            {
-                if (childNode.Kind() == SyntaxKind.ArgumentList)
-                {
-                    argsList = childNode as ArgumentListSyntax;
-                    break;
-                }
-            }
+            ArgumentListSyntax argsList = (from a in nodes
+                                           where a.Kind() == SyntaxKind.ArgumentList
+                                           select a).FirstOrDefault() as ArgumentListSyntax;
 
             // Reference to the object if needed
             if (needsObjReference)

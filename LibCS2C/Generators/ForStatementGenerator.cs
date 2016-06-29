@@ -39,9 +39,8 @@ namespace LibCS2C.Generators
                 m_context.Writer.Append(";");
 
             if(node.Condition != null)
-            {
                 m_expressionGen.Generate(node.Condition);
-            }
+            
             m_context.Writer.Append(";");
 
             SeparatedSyntaxList<ExpressionSyntax> nodes = node.Incrementors;

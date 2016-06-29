@@ -52,7 +52,13 @@ namespace LibCS2C.Generators
 
             if (isProperty)
             {
-                m_context.Writer.Append(string.Format("{0}_{1}_setter(obj, {0}_{1}_getter(obj){2}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, type));
+                string objName;
+                if (symbol.IsStatic)
+                    objName = "NULL";
+                else
+                    objName = "obj";
+
+                m_context.Writer.Append(string.Format("{0}_{1}_setter({3}, {0}_{1}_getter({3}){2}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, type, objName));
             }
             else
             {

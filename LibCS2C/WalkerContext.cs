@@ -120,16 +120,19 @@ namespace LibCS2C
         {
             string typeNameConverted = "";
             ISymbol symbol = Model.GetSymbolInfo(node).Symbol;
-
+            
+            // Property
+            if (symbol.Kind == SymbolKind.Property)
+            {
+                if(symbol.IsStatic)
+                    typeNameConverted = string.Format("{0}_{1}_getter(NULL)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+                else
+                    typeNameConverted = string.Format("{0}_{1}_getter(obj)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+            }
             // Static field
-            if (symbol.IsStatic)
+            else if (symbol.IsStatic)
             {
                 typeNameConverted = string.Format("classStatics_{0}.{1}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
-            }
-            // Property
-            else if (symbol.Kind == SymbolKind.Property)
-            {
-                typeNameConverted = string.Format("{0}_{1}_getter(obj)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
             }
             // Argument or local variable
             else if (symbol.ContainingSymbol.Kind == SymbolKind.Method)
@@ -155,7 +158,12 @@ namespace LibCS2C
             return kind == SyntaxKind.AddExpression ||
                    kind == SyntaxKind.SubtractExpression ||
                    kind == SyntaxKind.MultiplyExpression ||
-                   kind == SyntaxKind.DivideExpression;
+                   kind == SyntaxKind.DivideExpression ||
+                   kind == SyntaxKind.EqualsExpression ||
+                   kind == SyntaxKind.LessThanExpression ||
+                   kind == SyntaxKind.GreaterThanExpression ||
+                   kind == SyntaxKind.LessThanOrEqualExpression ||
+                   kind == SyntaxKind.GreaterThanOrEqualExpression;
         }
     }
 }

@@ -1,11 +1,8 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -26,7 +23,6 @@ namespace LibCS2C.Generators
         /// <param name="node">The cast</param>
         public override void Generate(CastExpressionSyntax node)
         {
-            Console.WriteLine(node.Type + "->" + m_context.ConvertTypeName(node.Type));
             m_context.Writer.Append(string.Format("({0})", m_context.ConvertTypeName(node.Type)));
 
             ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);

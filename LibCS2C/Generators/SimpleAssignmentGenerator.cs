@@ -38,7 +38,6 @@ namespace LibCS2C.Generators
 
             if (isProperty)
             {
-                Console.WriteLine("simple assignment: " + node);
                 if (symbol.IsStatic)
                     m_context.Writer.Append(string.Format("{0}_{1}_setter(NULL, ", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
                 else

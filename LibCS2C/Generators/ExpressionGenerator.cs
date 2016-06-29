@@ -121,6 +121,11 @@ namespace LibCS2C.Generators
                     m_divideAssignmentGen.Generate(node as AssignmentExpressionSyntax);
                     break;
 
+                case SyntaxKind.LessThanExpression:
+                case SyntaxKind.GreaterThanExpression:
+                case SyntaxKind.LessThanOrEqualExpression:
+                case SyntaxKind.GreaterThanOrEqualExpression:
+                case SyntaxKind.EqualsExpression:
                 case SyntaxKind.AddExpression:
                 case SyntaxKind.SubtractExpression:
                 case SyntaxKind.MultiplyExpression:
@@ -133,7 +138,7 @@ namespace LibCS2C.Generators
 
                         if (child.IsToken)
                         {
-                            m_context.Writer.Append(" " + child.ToString() + " ");
+                            m_context.Writer.Append(" " + child + " ");
                         }
                         else
                         {

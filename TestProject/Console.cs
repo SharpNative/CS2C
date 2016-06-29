@@ -1,5 +1,13 @@
 ﻿namespace Sharpen
 {
+    public class Test
+    {
+        private static int Length(string str)
+        {
+            return 3;
+        }
+    }
+
     public unsafe class Console
     {
         private static byte* vidmem = (byte*)0xB8000;
@@ -33,7 +41,7 @@
 
         public static void Write(string text)
         {
-            for (int i = 0; i < String.Length(text); i++)
+            for (int i = 0; i < Test.Length(text); i++)
                 PutChar(text[i]);
         }
 

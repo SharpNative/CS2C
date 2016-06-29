@@ -31,8 +31,10 @@ namespace LibCS2C.Generators
             Dictionary<string, EqualsValueClauseSyntax> nonStaticFields = new Dictionary<string, EqualsValueClauseSyntax>();
             Dictionary<string, TypeSyntax> staticFieldTypes = new Dictionary<string, TypeSyntax>();
             Dictionary<string, TypeSyntax> nonStaticFieldTypes = new Dictionary<string, TypeSyntax>();
-            Dictionary<string, TypeSyntax> propertyTypes = new Dictionary<string, TypeSyntax>();
-            Dictionary<string, EqualsValueClauseSyntax> propertyInitialValues = new Dictionary<string, EqualsValueClauseSyntax>();
+            Dictionary<string, TypeSyntax> propertyTypesNonStatic = new Dictionary<string, TypeSyntax>();
+            Dictionary<string, EqualsValueClauseSyntax> propertyInitialValuesNonStatic = new Dictionary<string, EqualsValueClauseSyntax>();
+            Dictionary<string, TypeSyntax> propertyTypesStatic = new Dictionary<string, TypeSyntax>();
+            Dictionary<string, EqualsValueClauseSyntax> propertyInitialValuesStatic = new Dictionary<string, EqualsValueClauseSyntax>();
 
             // Loop through the children to find the fields
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
@@ -82,17 +84,36 @@ namespace LibCS2C.Generators
                 {
                     PropertyDeclarationSyntax propertyDeclaration = childNode as PropertyDeclarationSyntax;
                     string identifier = propertyDeclaration.Identifier.ToString();
-                    
-                    propertyTypes.Add(identifier, propertyDeclaration.Type);
-                    propertyInitialValues.Add(identifier, propertyDeclaration.Initializer);
+
+                    bool isStatic = false;
+                    IEnumerable<SyntaxToken> tokens = propertyDeclaration.ChildTokens();
+                    foreach(SyntaxToken token in tokens)
+                    {
+                        if(token.Kind() == SyntaxKind.StaticKeyword)
+                        {
+                            isStatic = true;
+                            break;
+                        }
+                    }
+
+                    if(!isStatic)
+                    {
+                        propertyTypesNonStatic.Add(identifier, propertyDeclaration.Type);
+                        propertyInitialValuesNonStatic.Add(identifier, propertyDeclaration.Initializer);
+                    }
+                    else
+                    {
+                        propertyTypesStatic.Add(identifier, propertyDeclaration.Type);
+                        propertyInitialValuesStatic.Add(identifier, propertyDeclaration.Initializer);
+                    }
                 }
             }
 
             // Other generators
-            ClassStructGenerator structGen = new ClassStructGenerator(m_context, nonStaticFieldTypes, propertyTypes);
-            ClassStaticStructGenerator staticStructGen = new ClassStaticStructGenerator(m_context, staticFieldTypes);
-            ClassCctorGenerator cctorGen = new ClassCctorGenerator(m_context, staticFields);
-            ClassInitGenerator classInitGen = new ClassInitGenerator(m_context, nonStaticFields, propertyInitialValues);
+            ClassStructGenerator structGen = new ClassStructGenerator(m_context, nonStaticFieldTypes, propertyTypesNonStatic);
+            ClassStaticStructGenerator staticStructGen = new ClassStaticStructGenerator(m_context, staticFieldTypes, propertyTypesStatic);
+            ClassCctorGenerator cctorGen = new ClassCctorGenerator(m_context, staticFields, propertyInitialValuesStatic);
+            ClassInitGenerator classInitGen = new ClassInitGenerator(m_context, nonStaticFields, propertyInitialValuesNonStatic);
 
             structGen.Generate(node);
             staticStructGen.Generate(node);

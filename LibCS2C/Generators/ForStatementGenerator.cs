@@ -34,10 +34,9 @@ namespace LibCS2C.Generators
             m_context.Writer.Append("for(");
 
             if(node.Declaration != null)
-            {
                 m_variableGen.Generate(node.Declaration);
-            }
-            m_context.Writer.Append(";");
+            else
+                m_context.Writer.Append(";");
 
             if(node.Condition != null)
             {

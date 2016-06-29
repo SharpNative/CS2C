@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class ExpressionGenerator : GeneratorBase<ExpressionSyntax>
+    class ExpressionGenerator : GeneratorBase<SyntaxNode>
     {
         private InvocationGenerator m_invocationGen;
         private SimpleAssignmentGenerator m_simpleAssignmentGen;
@@ -65,12 +65,12 @@ namespace LibCS2C.Generators
         /// Generates the expression code
         /// </summary>
         /// <param name="node">The expression node</param>
-        public override void Generate(ExpressionSyntax node)
+        public override void Generate(SyntaxNode node)
         {
             switch (node.Kind())
             {
                 case SyntaxKind.SimpleMemberAccessExpression:
-                    m_simpleMemberAccessGen.Generate(node);
+                    m_simpleMemberAccessGen.Generate(node as ExpressionSyntax);
                     break;
 
                 case SyntaxKind.ObjectCreationExpression:
@@ -78,11 +78,11 @@ namespace LibCS2C.Generators
                     break;
 
                 case SyntaxKind.SimpleAssignmentExpression:
-                    m_simpleAssignmentGen.Generate(node);
+                    m_simpleAssignmentGen.Generate(node as ExpressionSyntax);
                     break;
 
                 case SyntaxKind.InvocationExpression:
-                    m_invocationGen.Generate(node);
+                    m_invocationGen.Generate(node as ExpressionSyntax);
                     break;
 
                 case SyntaxKind.LeftShiftAssignmentExpression:
@@ -125,6 +125,7 @@ namespace LibCS2C.Generators
                 case SyntaxKind.SubtractExpression:
                 case SyntaxKind.MultiplyExpression:
                 case SyntaxKind.DivideExpression:
+                case SyntaxKind.ParenthesizedExpression:
                     ChildSyntaxList children = node.ChildNodesAndTokens();
                     foreach (SyntaxNodeOrToken child in children)
                     {
@@ -136,22 +137,7 @@ namespace LibCS2C.Generators
                         }
                         else
                         {
-                            if (childKind == SyntaxKind.IdentifierName)
-                            {
-                                IdentifierNameSyntax name = child.AsNode() as IdentifierNameSyntax;
-                                m_context.Writer.Append(m_context.ConvertVariableName(name));
-                            }
-                            else if(childKind == SyntaxKind.AddExpression ||
-                                    childKind == SyntaxKind.SubtractExpression ||
-                                    childKind == SyntaxKind.MultiplyExpression ||
-                                    childKind == SyntaxKind.DivideExpression)
-                            {
-                                Generate(child.AsNode() as ExpressionSyntax);
-                            }
-                            else
-                            {
-                                m_context.Writer.Append(child.ToString());
-                            }
+                            Generate(child.AsNode());
                         }
                     }
                     break;

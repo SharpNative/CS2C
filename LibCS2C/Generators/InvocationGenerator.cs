@@ -44,20 +44,7 @@ namespace LibCS2C.Generators
             {
                 ISymbol symbol = m_context.Model.GetSymbolInfo(first).Symbol;
                 MemberAccessExpressionSyntax name = first as MemberAccessExpressionSyntax;
-
-                // Static
-                if (symbol.IsStatic)
-                {
-                    /*symbol.ContainingType
-                    memberName = name.ToString().Replace(".", "_");*/
-                }
-                // Belongs to class
-                else
-                {
-                    needsObjReference = true;
-                    
-                }
-
+                needsObjReference = !symbol.IsStatic;
                 memberName = string.Format("{0}_{1}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
             }
             else

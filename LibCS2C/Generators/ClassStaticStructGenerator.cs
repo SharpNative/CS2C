@@ -10,15 +10,17 @@ namespace LibCS2C.Generators
     class ClassStaticStructGenerator : GeneratorBase<ClassDeclarationSyntax>
     {
         private Dictionary<string, TypeSyntax> m_staticFieldTypes;
+        private Dictionary<string, TypeSyntax> m_staticPropertyTypes;
 
         /// <summary>
         /// Class struct generator
         /// </summary>
         /// <param name="context">The walker context</param>
-        public ClassStaticStructGenerator(WalkerContext context, Dictionary<string, TypeSyntax> staticFieldTypes)
+        public ClassStaticStructGenerator(WalkerContext context, Dictionary<string, TypeSyntax> staticFieldTypes, Dictionary<string, TypeSyntax> staticPropertyTypes)
         {
             m_context = context;
             m_staticFieldTypes = staticFieldTypes;
+            m_staticPropertyTypes = staticPropertyTypes;
         }
 
         /// <summary>
@@ -36,6 +38,12 @@ namespace LibCS2C.Generators
             {
                 m_context.Writer.AppendLine("\t/* Static Field: " + pair.Key + " */");
                 m_context.Writer.AppendLine(string.Format("\t{0} {1};", m_context.ConvertTypeName(pair.Value), pair.Key));
+            }
+
+            foreach (KeyValuePair<string, TypeSyntax> pair in m_staticPropertyTypes)
+            {
+                m_context.Writer.AppendLine("\t/* Static Property: " + pair.Key + " */");
+                m_context.Writer.AppendLine(string.Format("\t{0} prop_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
 
             m_context.Writer.Append("}");

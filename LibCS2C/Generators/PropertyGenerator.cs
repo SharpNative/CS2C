@@ -26,15 +26,20 @@ namespace LibCS2C.Generators
         /// <param name="node"></param>
         public override void Generate(PropertyDeclarationSyntax node)
         {
-            IEnumerable<SyntaxNode> children = node.ChildNodes();
+            ChildSyntaxList children = node.ChildNodesAndTokens();
 
-            foreach (SyntaxNode child in children)
+            bool isStatic = false;
+            foreach (SyntaxNodeOrToken child in children)
             {
                 SyntaxKind childKind = child.Kind();
 
-                if (childKind == SyntaxKind.AccessorList)
+                if(childKind == SyntaxKind.StaticKeyword)
                 {
-                    AccessorListSyntax accessors = child as AccessorListSyntax;
+                    isStatic = true;
+                }
+                else if (childKind == SyntaxKind.AccessorList)
+                {
+                    AccessorListSyntax accessors = child.AsNode() as AccessorListSyntax;
                     SyntaxList<AccessorDeclarationSyntax> accessorDeclarations = accessors.Accessors;
 
                     AccessorDeclarationSyntax getAccessor = (from a in accessorDeclarations
@@ -52,7 +57,10 @@ namespace LibCS2C.Generators
 
                         if(getAccessor.Body == null)
                         {
-                            m_context.Writer.AppendLine(string.Format("\treturn obj->prop_{0};", node.Identifier));
+                            if(isStatic)
+                                m_context.Writer.AppendLine(string.Format("\treturn classStatics_{0}.prop_{1};", m_context.CurrentClassNameFormatted, node.Identifier));
+                            else
+                                m_context.Writer.AppendLine(string.Format("\treturn obj->prop_{0};", node.Identifier));
                         }
                         else
                         {
@@ -70,7 +78,10 @@ namespace LibCS2C.Generators
 
                         if(setAccessor.Body == null)
                         {
-                            m_context.Writer.AppendLine(string.Format("\tobj->prop_{0} = value;", node.Identifier));
+                            if (isStatic)
+                                m_context.Writer.AppendLine(string.Format("\tclassStatics_{0}.prop_{1} = value;", m_context.CurrentClassNameFormatted, node.Identifier));
+                            else
+                                m_context.Writer.AppendLine(string.Format("\tobj->prop_{0} = value;", node.Identifier));
                         }
                         else
                         {

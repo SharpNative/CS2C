@@ -9,6 +9,8 @@ namespace LibCS2C.Generators
     class SimpleAssignmentGenerator : GeneratorBase<ExpressionSyntax>
     {
         private SimpleMemberAccessGenerator m_simpleMemberAccessGen;
+        private ElementAccessGenerator m_elementAccessGen;
+        private CastExpressionGenerator m_castExpressionGen;
 
         /// <summary>
         /// Simple assignment generator
@@ -18,6 +20,8 @@ namespace LibCS2C.Generators
         {
             m_context = context;
             m_simpleMemberAccessGen = new SimpleMemberAccessGenerator(m_context);
+            m_elementAccessGen = new ElementAccessGenerator(m_context);
+            m_castExpressionGen = new CastExpressionGenerator(m_context);
         }
 
         /// <summary>
@@ -42,7 +46,7 @@ namespace LibCS2C.Generators
             foreach (SyntaxNodeOrToken child in nodes)
             {
                 SyntaxKind kind = child.Kind();
-
+                
                 if (kind == SyntaxKind.IdentifierName)
                 {
                     // Skip the first identifier if it's a property
@@ -52,10 +56,18 @@ namespace LibCS2C.Generators
                         m_context.Writer.Append(m_context.ConvertVariableName(child.AsNode()));
                     }
                 }
+                else if (kind == SyntaxKind.ElementAccessExpression)
+                {
+                    m_elementAccessGen.Generate(child.AsNode() as ElementAccessExpressionSyntax);
+                }
                 else if (kind == SyntaxKind.EqualsToken)
                 {
                     if (!isProperty)
                         m_context.Writer.Append(" = ");
+                }
+                else if (kind == SyntaxKind.CastExpression)
+                {
+                    m_castExpressionGen.Generate(child.AsNode() as CastExpressionSyntax);
                 }
                 else if (kind == SyntaxKind.SimpleMemberAccessExpression)
                 {

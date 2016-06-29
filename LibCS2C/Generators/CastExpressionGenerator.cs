@@ -26,6 +26,7 @@ namespace LibCS2C.Generators
         /// <param name="node">The cast</param>
         public override void Generate(CastExpressionSyntax node)
         {
+            Console.WriteLine(node.Type + "->" + m_context.ConvertTypeName(node.Type));
             m_context.Writer.Append(string.Format("({0})", m_context.ConvertTypeName(node.Type)));
 
             ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);

@@ -11,6 +11,8 @@ namespace LibCS2C.Generators
 {
     class ReturnStatementGenerator : GeneratorBase<ReturnStatementSyntax>
     {
+        private ExpressionGenerator m_expressionGen;
+
         /// <summary>
         /// Return statement generator
         /// </summary>
@@ -18,6 +20,7 @@ namespace LibCS2C.Generators
         public ReturnStatementGenerator(WalkerContext context)
         {
             m_context = context;
+            m_expressionGen = new ExpressionGenerator(m_context);
         }
 
         /// <summary>
@@ -27,21 +30,7 @@ namespace LibCS2C.Generators
         public override void Generate(ReturnStatementSyntax node)
         {
             m_context.Writer.Append("return ");
-
-            IEnumerable<SyntaxNode> nodes = node.ChildNodes();
-            foreach(SyntaxNode childNode in nodes)
-            {
-                SyntaxKind kind = childNode.Kind();
-                if(kind == SyntaxKind.IdentifierName)
-                {
-                    m_context.Writer.Append(m_context.ConvertVariableName(childNode));
-                }
-                else
-                {
-                    m_context.Writer.Append(childNode.ToString());
-                }
-            }
-
+            m_expressionGen.Generate(node.Expression);
             m_context.Writer.AppendLine(";");
         }
     }

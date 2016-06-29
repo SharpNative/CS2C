@@ -141,6 +141,13 @@ namespace LibCS2C.Generators
                                 IdentifierNameSyntax name = child.AsNode() as IdentifierNameSyntax;
                                 m_context.Writer.Append(m_context.ConvertVariableName(name));
                             }
+                            else if(childKind == SyntaxKind.AddExpression ||
+                                    childKind == SyntaxKind.SubtractExpression ||
+                                    childKind == SyntaxKind.MultiplyExpression ||
+                                    childKind == SyntaxKind.DivideExpression)
+                            {
+                                Generate(child.AsNode() as ExpressionSyntax);
+                            }
                             else
                             {
                                 m_context.Writer.Append(child.ToString());

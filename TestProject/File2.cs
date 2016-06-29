@@ -83,7 +83,7 @@ namespace TestProject.OtherNameSpace
 
         public int getNonStaticTest()
         {
-            return nonStaticTest;
+            return nonStaticTest + 5 - testing;
         }
     }
 }

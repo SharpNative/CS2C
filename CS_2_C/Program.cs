@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.MSBuild;
 using LibCS2C;
 
 namespace CS_2_C

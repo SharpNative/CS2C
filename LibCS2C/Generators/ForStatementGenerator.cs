@@ -52,7 +52,6 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine(")");
 
             m_context.Writer.AppendLine("{");
-            m_context.Writer.Indent();
 
             IEnumerable<SyntaxNode> children = node.ChildNodes();
             foreach (SyntaxNode child in children)
@@ -64,8 +63,7 @@ namespace LibCS2C.Generators
                     break;
                 }
             }
-
-            m_context.Writer.UnIndent();
+            
             m_context.Writer.AppendLine("}");
         }
     }

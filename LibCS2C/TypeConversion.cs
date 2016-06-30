@@ -17,6 +17,8 @@ namespace LibCS2C
             { "void", "void" },
 
             { "bool", "int32_t" },
+            { "long", "int64_t" },
+            { "ulong", "uint64_t" },
             { "int", "int32_t" },
             { "uint", "uint32_t" },
             { "short", "int16_t" },

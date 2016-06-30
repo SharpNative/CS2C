@@ -11,6 +11,8 @@ namespace LibCS2C.Generators
 {
     class SimpleMemberAccessGenerator : GeneratorBase<ExpressionSyntax>
     {
+        private ElementAccessGenerator m_elementAccessGen;
+
         /// <summary>
         /// Member access generator generator
         /// </summary>
@@ -19,6 +21,7 @@ namespace LibCS2C.Generators
         public SimpleMemberAccessGenerator(WalkerContext context)
         {
             m_context = context;
+            m_elementAccessGen = new ElementAccessGenerator(m_context);
         }
 
         /// <summary>
@@ -27,52 +30,44 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression of the member access</param>
         public override void Generate(ExpressionSyntax node)
         {
-            bool hasThis = true;
-            bool first = true;
-
             ITypeSymbol symbol = m_context.Model.GetTypeInfo(node).Type;
             SyntaxNodeOrToken[] children = node.ChildNodesAndTokens().ToArray();
-            
-            // enum
+
+            // Enum
             if (symbol.TypeKind == TypeKind.Enum)
             {
                 IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
                 m_context.Writer.Append("enum_" + symbol.ToString().Replace(".", "_") + "_" + name.Identifier);
             }
+            // Normal member access
             else
             {
-                // TODO: simplify this
-                
-                for (int i = 0, l = children.Length; i < l; i++)
+                // children: (this / object) (dot) (identifier)
+                SyntaxNode first = children[0].AsNode();
+                SyntaxKind firstKind = first.Kind();
+
+                if (firstKind == SyntaxKind.ThisExpression)
                 {
-                    SyntaxNodeOrToken child = children[i];
-                    SyntaxKind kind = child.Kind();
-
-                    if (kind == SyntaxKind.ThisExpression)
-                    {
-                        hasThis = true;
-                    }
-                    else if (kind == SyntaxKind.IdentifierName)
-                    {
-                        IdentifierNameSyntax name = child.AsNode() as IdentifierNameSyntax;
-
-                        if (hasThis && !first)
-                            m_context.Writer.Append(string.Format("field_{0}", name.Identifier));
-                        else
-                            m_context.Writer.Append(m_context.ConvertVariableName(name));
-
-                        first = false;
-                    }
-                    else if (kind == SyntaxKind.DotToken)
-                    {
-                        if (!hasThis || !first)
-                            m_context.Writer.Append("->");
-                    }
-                    else
-                    {
-                        m_context.Writer.Append(child.ToString());
-                    }
+                    m_context.Writer.Append("obj");
                 }
+                else if (firstKind == SyntaxKind.IdentifierName)
+                {
+                    IdentifierNameSyntax identifier = first as IdentifierNameSyntax;
+                    m_context.Writer.Append(identifier.Identifier.ToString());
+                }
+                else if (firstKind == SyntaxKind.ElementAccessExpression)
+                {
+                    m_elementAccessGen.Generate(first as ElementAccessExpressionSyntax);
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+
+                m_context.Writer.Append("->");
+
+                IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
+                m_context.Writer.Append(m_context.ConvertVariableName(name));
             }
         }
     }

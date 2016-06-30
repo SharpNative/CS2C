@@ -90,6 +90,11 @@ namespace LibCS2C
                 PointerTypeSyntax ptr = type as PointerTypeSyntax;
                 typeNameConverted = ConvertTypeName(ptr.ElementType) + "*";
             }
+            else if (type is ArrayTypeSyntax)
+            {
+                ArrayTypeSyntax array = type as ArrayTypeSyntax;
+                typeNameConverted = ConvertTypeName(array.ElementType) + "*";
+            }
             else
             {
                 ITypeSymbol typeSymbol = Model.GetTypeInfo(type).Type;
@@ -120,11 +125,11 @@ namespace LibCS2C
         {
             string typeNameConverted = "";
             ISymbol symbol = Model.GetSymbolInfo(node).Symbol;
-            
+
             // Property
             if (symbol.Kind == SymbolKind.Property)
             {
-                if(symbol.IsStatic)
+                if (symbol.IsStatic)
                     typeNameConverted = string.Format("{0}_{1}_getter(NULL)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
                 else
                     typeNameConverted = string.Format("{0}_{1}_getter(obj)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
@@ -142,7 +147,7 @@ namespace LibCS2C
             // Field
             else
             {
-                typeNameConverted = string.Format("obj->field_{0}", symbol.Name);
+                typeNameConverted = string.Format("field_{0}", symbol.Name);
             }
 
             return typeNameConverted;

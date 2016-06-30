@@ -32,7 +32,7 @@ namespace LibCS2C.Generators
         {
             // The first node will be an identifier
             // Check its type, if it's a property, that means we need to use the setter
-            
+
             ISymbol symbol = m_context.Model.GetSymbolInfo(node.ChildNodes().First()).Symbol;
             bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);
 
@@ -49,14 +49,21 @@ namespace LibCS2C.Generators
             foreach (SyntaxNodeOrToken child in nodes)
             {
                 SyntaxKind kind = child.Kind();
-                
+
                 if (kind == SyntaxKind.IdentifierName)
                 {
                     // Skip the first identifier if it's a property
                     // because we already emitted the code for the setter
                     if (!isProperty || !first)
                     {
-                        m_context.Writer.Append(m_context.ConvertVariableName(child.AsNode()));
+                        SyntaxNode childNode = child.AsNode();
+                        ISymbol identifierSymbol = m_context.Model.GetSymbolInfo(childNode).Symbol;
+                        string converted = m_context.ConvertVariableName(childNode);
+
+                        if (identifierSymbol.Kind == SymbolKind.Field)
+                            m_context.Writer.Append("obj->" + converted);
+                        else
+                            m_context.Writer.Append(converted);
                     }
                 }
                 else if (kind == SyntaxKind.ElementAccessExpression)

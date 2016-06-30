@@ -121,29 +121,23 @@ namespace LibCS2C.Generators
                 m_context.Writer.AppendLine(string.Format("\t{0} field_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
 
-            // Usage count for garbage collector
-            // To the end because the struct can be used to read data,
-            // if we would put in it the front, the data will be incorrect
-            m_context.Writer.AppendLine("\tint32_t usage_count;");
-
+            // Attributes
             if(packed)
                 m_context.Writer.AppendLine("} __attribute__((packed));");
             else
                 m_context.Writer.AppendLine("};");
+
             m_context.Writer.AppendLine("");
 
             // Init code
-            m_context.Writer.AppendLine(string.Format("struct struct_{0}* structInit_{0}(void)", structName));
+            m_context.Writer.AppendLine(string.Format("struct struct_{0} structInit_{0}(void)", structName));
             m_context.Writer.AppendLine("{");
-            m_context.Writer.AppendLine(string.Format("\tstruct struct_{0}* object = malloc(sizeof(struct struct_{0}));", structName));
-            m_context.Writer.AppendLine("\tif(!object)");
-            m_context.Writer.AppendLine("\t\treturn NULL;");
-            m_context.Writer.AppendLine("\tobject->usage_count = 1;");
+            m_context.Writer.AppendLine(string.Format("\tstruct struct_{0} object;", structName));
 
             // Loop through the fields and initialize them
             foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in fields)
             {
-                m_context.Writer.Append(string.Format("\tobject->field_{0} = ", pair.Key));
+                m_context.Writer.Append(string.Format("\tobject.field_{0} = ", pair.Key));
                 ExpressionSyntax expression = pair.Value.Value;
                 m_expressionGen.Generate(expression);
                 m_context.Writer.AppendLine(";");

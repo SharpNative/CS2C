@@ -30,6 +30,8 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression of the member access</param>
         public override void Generate(ExpressionSyntax node)
         {
+            Console.WriteLine("simple member access: " + node);
+
             ITypeSymbol symbol = m_context.Model.GetTypeInfo(node).Type;
             SyntaxNodeOrToken[] children = node.ChildNodesAndTokens().ToArray();
 
@@ -52,8 +54,7 @@ namespace LibCS2C.Generators
                 }
                 else if (firstKind == SyntaxKind.IdentifierName)
                 {
-                    IdentifierNameSyntax identifier = first as IdentifierNameSyntax;
-                    m_context.Writer.Append(identifier.Identifier.ToString());
+                    m_context.Writer.Append(m_context.ConvertVariableName(first as IdentifierNameSyntax));
                 }
                 else if (firstKind == SyntaxKind.ElementAccessExpression)
                 {
@@ -64,7 +65,11 @@ namespace LibCS2C.Generators
                     throw new NotImplementedException();
                 }
 
-                m_context.Writer.Append("->");
+                ITypeSymbol type = m_context.Model.GetTypeInfo(first).Type;
+                if(type.TypeKind == TypeKind.Struct)
+                    m_context.Writer.Append(".");
+                else
+                    m_context.Writer.Append("->");
 
                 IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
                 m_context.Writer.Append(m_context.ConvertVariableName(name));

@@ -13,10 +13,19 @@ namespace LibCS2C
         /// </summary>
         public TypeConversion TypeConvert { get; private set; } = new TypeConversion();
 
+        /// <summary>
+        /// List of static constructors
+        /// </summary>
         public List<string> CctorList { get; private set; } = new List<string>();
 
+        /// <summary>
+        /// List of all the method prototypes
+        /// </summary>
         public List<string> MethodPrototypes { get; private set; } = new List<string>();
 
+        /// <summary>
+        /// List of the enums
+        /// </summary>
         public Dictionary<string, string> Enums { get; private set; } = new Dictionary<string, string>();
 
         /// <summary>
@@ -72,18 +81,18 @@ namespace LibCS2C
         {
             return CurrentNamespaceFormatted + "_" + identifier;
         }
-
+        
         /// <summary>
         /// Converts the C# type to a C type name
         /// </summary>
         /// <param name="type">The C# type</param>
         /// <returns>The C type name</returns>
-        public string ConvertTypeName(TypeSyntax type)
+        public string ConvertTypeName(SyntaxNode type)
         {
             string typeNameConverted;
-            if (TypeConvert.IsGeneric(type))
+            if (TypeConvert.IsGeneric(type as TypeSyntax))
             {
-                typeNameConverted = TypeConvert.Convert(type);
+                typeNameConverted = TypeConvert.Convert(type as TypeSyntax);
             }
             else if (type is PointerTypeSyntax)
             {
@@ -107,9 +116,9 @@ namespace LibCS2C
                 else
                 {
                     if (typeSymbol.ContainingType == null)
-                        typeNameConverted = string.Format("struct struct_{0}_{1}*", nameSpace, type.ToString());
+                        typeNameConverted = string.Format("struct struct_{0}_{1}", nameSpace, type.ToString());
                     else
-                        typeNameConverted = string.Format("struct struct_{0}_{1}*", typeSymbol.ContainingType.ToString().Replace(".", "_"), type.ToString());
+                        typeNameConverted = string.Format("struct struct_{0}_{1}", typeSymbol.ContainingType.ToString().Replace(".", "_"), type.ToString());
                 }
             }
 
@@ -125,7 +134,7 @@ namespace LibCS2C
         {
             string typeNameConverted = "";
             ISymbol symbol = Model.GetSymbolInfo(node).Symbol;
-
+            
             // Property
             if (symbol.Kind == SymbolKind.Property)
             {
@@ -161,6 +170,7 @@ namespace LibCS2C
         public bool IsSubExpression(SyntaxKind kind)
         {
             return kind == SyntaxKind.AddExpression ||
+                   kind == SyntaxKind.CastExpression ||
                    kind == SyntaxKind.SubtractExpression ||
                    kind == SyntaxKind.MultiplyExpression ||
                    kind == SyntaxKind.DivideExpression ||
@@ -168,11 +178,16 @@ namespace LibCS2C
                    kind == SyntaxKind.BitwiseNotExpression ||
                    kind == SyntaxKind.BitwiseOrExpression ||
                    kind == SyntaxKind.EqualsExpression ||
+                   kind == SyntaxKind.ElementAccessExpression ||
                    kind == SyntaxKind.LessThanExpression ||
-                   kind == SyntaxKind.GreaterThanExpression ||
                    kind == SyntaxKind.LessThanOrEqualExpression ||
+                   kind == SyntaxKind.GreaterThanExpression ||
                    kind == SyntaxKind.GreaterThanOrEqualExpression ||
-                   kind == SyntaxKind.ParenthesizedExpression;
+                   kind == SyntaxKind.ParenthesizedExpression ||
+                   kind == SyntaxKind.SimpleMemberAccessExpression ||
+                   kind == SyntaxKind.SimpleAssignmentExpression ||
+                   kind == SyntaxKind.ObjectCreationExpression ||
+                   kind == SyntaxKind.ArrayCreationExpression;
         }
     }
 }

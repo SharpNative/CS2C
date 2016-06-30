@@ -16,6 +16,9 @@ namespace LibCS2C.Generators
         private SimpleMemberAccessGenerator m_simpleMemberAccessGen;
         private ObjectCreationExpressionGenerator m_objectCreationGen;
         private CastExpressionGenerator m_castExpressionGen;
+        private SizeofExpressionGenerator m_sizeofExpressionGen;
+        private ArrayCreationExpressionGenerator m_arrayCreationExpressionGen;
+        private ElementAccessGenerator m_elementAccessGen;
 
         private AssignmentGenerator m_leftShiftAssignmentGen;
         private AssignmentGenerator m_rightShiftAssignmentGen;
@@ -44,6 +47,9 @@ namespace LibCS2C.Generators
             m_simpleMemberAccessGen = new SimpleMemberAccessGenerator(m_context);
             m_objectCreationGen = new ObjectCreationExpressionGenerator(m_context);
             m_castExpressionGen = new CastExpressionGenerator(m_context);
+            m_sizeofExpressionGen = new SizeofExpressionGenerator(m_context);
+            m_arrayCreationExpressionGen = new ArrayCreationExpressionGenerator(m_context);
+            m_elementAccessGen = new ElementAccessGenerator(m_context);
 
             m_leftShiftAssignmentGen = new AssignmentGenerator(m_context, AssignmentGenerator.AssignmentType.LeftShift);
             m_rightShiftAssignmentGen = new AssignmentGenerator(m_context, AssignmentGenerator.AssignmentType.RightShift);
@@ -69,6 +75,14 @@ namespace LibCS2C.Generators
         {
             switch (node.Kind())
             {
+                case SyntaxKind.ArrayCreationExpression:
+                    m_arrayCreationExpressionGen.Generate(node as ArrayCreationExpressionSyntax);
+                    break;
+
+                case SyntaxKind.ElementAccessExpression:
+                    m_elementAccessGen.Generate(node as ElementAccessExpressionSyntax);
+                    break;
+
                 case SyntaxKind.SimpleMemberAccessExpression:
                     m_simpleMemberAccessGen.Generate(node as ExpressionSyntax);
                     break;
@@ -156,6 +170,10 @@ namespace LibCS2C.Generators
 
                 case SyntaxKind.CastExpression:
                     m_castExpressionGen.Generate(node as CastExpressionSyntax);
+                    break;
+
+                case SyntaxKind.SizeOfExpression:
+                    m_sizeofExpressionGen.Generate(node as SizeOfExpressionSyntax);
                     break;
 
                 case SyntaxKind.PostDecrementExpression:

@@ -18,6 +18,7 @@ namespace LibCS2C.Generators
         private IfStatementGenerator m_ifStatementGen;
         private ForStatementGenerator m_forStatementGen;
         private WhileStatementGenerator m_whileStatementGen;
+        private FixedStatementGenerator m_fixedStatementGen;
 
         /// <summary>
         /// Block generator
@@ -33,6 +34,61 @@ namespace LibCS2C.Generators
             m_ifStatementGen = new IfStatementGenerator(m_context);
             m_forStatementGen = new ForStatementGenerator(m_context);
             m_whileStatementGen = new WhileStatementGenerator(m_context);
+            m_fixedStatementGen = new FixedStatementGenerator(m_context);
+        }
+
+        /// <summary>
+        /// Generate the child node
+        /// </summary>
+        /// <param name="childNode">The child node</param>
+        public void GenerateChildren(SyntaxNode childNode)
+        {
+            switch (childNode.Kind())
+            {
+                case SyntaxKind.VariableDeclaration:
+                    m_variableGen.Generate(childNode as VariableDeclarationSyntax);
+                    break;
+
+                case SyntaxKind.ReturnStatement:
+                    m_returnStatementGen.Generate(childNode as ReturnStatementSyntax);
+                    break;
+
+                case SyntaxKind.ExpressionStatement:
+                    m_expressionStatementGen.Generate(childNode as ExpressionStatementSyntax);
+                    break;
+
+                case SyntaxKind.LocalDeclarationStatement:
+                    m_localDeclarationGen.Generate(childNode as LocalDeclarationStatementSyntax);
+                    break;
+
+                case SyntaxKind.IfStatement:
+                    m_ifStatementGen.Generate(childNode as IfStatementSyntax);
+                    break;
+
+                case SyntaxKind.ForStatement:
+                    m_forStatementGen.Generate(childNode as ForStatementSyntax);
+                    break;
+
+                case SyntaxKind.WhileStatement:
+                    m_whileStatementGen.Generate(childNode as WhileStatementSyntax);
+                    break;
+
+                case SyntaxKind.FixedStatement:
+                    m_fixedStatementGen.Generate(childNode as FixedStatementSyntax);
+                    break;
+
+                case SyntaxKind.Block:
+                    m_context.Writer.AppendLine("{");
+                    Generate(childNode as BlockSyntax);
+                    m_context.Writer.AppendLine("}");
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            // At the end of the line
+            m_context.Writer.AppendLine(";");
         }
 
         /// <summary>
@@ -46,44 +102,7 @@ namespace LibCS2C.Generators
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
             foreach (SyntaxNode childNode in nodes)
             {
-                SyntaxKind kind = childNode.Kind();
-
-                switch (kind)
-                {
-                    case SyntaxKind.VariableDeclaration:
-                        m_variableGen.Generate(childNode as VariableDeclarationSyntax);
-                        break;
-
-                    case SyntaxKind.ReturnStatement:
-                        m_returnStatementGen.Generate(childNode as ReturnStatementSyntax);
-                        break;
-
-                    case SyntaxKind.ExpressionStatement:
-                        m_expressionStatementGen.Generate(childNode as ExpressionStatementSyntax);
-                        break;
-
-                    case SyntaxKind.LocalDeclarationStatement:
-                        m_localDeclarationGen.Generate(childNode as LocalDeclarationStatementSyntax);
-                        break;
-
-                    case SyntaxKind.IfStatement:
-                        m_ifStatementGen.Generate(childNode as IfStatementSyntax);
-                        break;
-
-                    case SyntaxKind.ForStatement:
-                        m_forStatementGen.Generate(childNode as ForStatementSyntax);
-                        break;
-
-                    case SyntaxKind.WhileStatement:
-                        m_whileStatementGen.Generate(childNode as WhileStatementSyntax);
-                        break;
-
-                    default:
-                        throw new NotImplementedException();
-                }
-
-                // At the end of the line
-                m_context.Writer.AppendLine(";");
+                GenerateChildren(childNode);
             }
 
             m_context.Writer.UnIndent();

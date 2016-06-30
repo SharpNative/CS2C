@@ -31,7 +31,6 @@ namespace LibCS2C.Generators
         {
             m_context.Writer.Append("return ");
             m_expressionGen.Generate(node.Expression);
-            m_context.Writer.AppendLine(";");
         }
     }
 }

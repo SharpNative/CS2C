@@ -97,6 +97,10 @@ namespace LibCS2C
             base.VisitPropertyDeclaration(node);
         }
 
+        /// <summary>
+        /// Visits an enum declaration
+        /// </summary>
+        /// <param name="node">The enum node</param>
         public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
             m_enumGen.Generate(node);
@@ -114,18 +118,12 @@ namespace LibCS2C
             base.VisitNamespaceDeclaration(node);
         }
 
+        /// <summary>
+        /// Appends code for prototypes, enums and the init method
+        /// </summary>
         public void Finish()
         {
-            m_context.Writer.AppendLine("void init(void)");
-            m_context.Writer.AppendLine("{");
-
-            foreach(string cctor in m_context.CctorList)
-            {
-                m_context.Writer.AppendLine(string.Format("\t{0}();", cctor));
-            }
-
-            m_context.Writer.AppendLine("}");
-            
+            // Prototypes and enums
             string begin = "";
             begin += "/* Method prototypes */\r\n";
             foreach (string prototype in m_context.MethodPrototypes)
@@ -141,6 +139,17 @@ namespace LibCS2C
 
             begin += "\r\n";
             m_context.Writer.Prepend(begin);
+
+            // Initialization method
+            m_context.Writer.AppendLine("void init(void)");
+            m_context.Writer.AppendLine("{");
+
+            foreach(string cctor in m_context.CctorList)
+            {
+                m_context.Writer.AppendLine(string.Format("\t{0}();", cctor));
+            }
+
+            m_context.Writer.AppendLine("}");
         }
     }
 }

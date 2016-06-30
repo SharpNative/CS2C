@@ -8,10 +8,6 @@ namespace LibCS2C.Generators
 {
     class SimpleAssignmentGenerator : GeneratorBase<ExpressionSyntax>
     {
-        private SimpleMemberAccessGenerator m_simpleMemberAccessGen;
-        private ElementAccessGenerator m_elementAccessGen;
-        private CastExpressionGenerator m_castExpressionGen;
-
         /// <summary>
         /// Simple assignment generator
         /// </summary>
@@ -19,9 +15,6 @@ namespace LibCS2C.Generators
         public SimpleAssignmentGenerator(WalkerContext context)
         {
             m_context = context;
-            m_simpleMemberAccessGen = new SimpleMemberAccessGenerator(m_context);
-            m_elementAccessGen = new ElementAccessGenerator(m_context);
-            m_castExpressionGen = new CastExpressionGenerator(m_context);
         }
 
         /// <summary>
@@ -60,28 +53,16 @@ namespace LibCS2C.Generators
                         ISymbol identifierSymbol = m_context.Model.GetSymbolInfo(childNode).Symbol;
                         string converted = m_context.ConvertVariableName(childNode);
 
-                        if (identifierSymbol.Kind == SymbolKind.Field)
+                        if (identifierSymbol.Kind == SymbolKind.Field && !identifierSymbol.IsStatic)
                             m_context.Writer.Append("obj->" + converted);
                         else
                             m_context.Writer.Append(converted);
                     }
                 }
-                else if (kind == SyntaxKind.ElementAccessExpression)
-                {
-                    m_elementAccessGen.Generate(child.AsNode() as ElementAccessExpressionSyntax);
-                }
                 else if (kind == SyntaxKind.EqualsToken)
                 {
                     if (!isProperty)
                         m_context.Writer.Append(" = ");
-                }
-                else if (kind == SyntaxKind.CastExpression)
-                {
-                    m_castExpressionGen.Generate(child.AsNode() as CastExpressionSyntax);
-                }
-                else if (kind == SyntaxKind.SimpleMemberAccessExpression)
-                {
-                    m_simpleMemberAccessGen.Generate(child.AsNode() as ExpressionSyntax);
                 }
                 else if (m_context.IsSubExpression(kind))
                 {

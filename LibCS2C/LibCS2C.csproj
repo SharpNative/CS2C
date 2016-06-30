@@ -105,6 +105,9 @@
     <Compile Include="Generators\ArgumentListGenerator.cs" />
     <Compile Include="Generators\ElementAccessGenerator.cs" />
     <Compile Include="Generators\EnumGenerator.cs" />
+    <Compile Include="Generators\FixedStatementGenerator.cs" />
+    <Compile Include="Generators\ArrayCreationExpressionGenerator.cs" />
+    <Compile Include="Generators\SizeofExpressionGenerator.cs" />
     <Compile Include="Generators\WhileStatementGenerator.cs" />
     <Compile Include="Generators\ForStatementGenerator.cs" />
     <Compile Include="Generators\StructGenerator.cs" />

@@ -39,6 +39,7 @@ namespace LibCS2C.Generators
                 }
                 else if (kind == SyntaxKind.BracketedArgumentList)
                 {
+                    Console.WriteLine("element access bracketed argument list: "+node);
                     BracketedArgumentListSyntax args = child as BracketedArgumentListSyntax;
                     IEnumerable<SyntaxNode> children = args.ChildNodes();
 
@@ -46,10 +47,15 @@ namespace LibCS2C.Generators
 
                     foreach (ArgumentSyntax childNode in children)
                     {
+                        Console.WriteLine("  " + childNode);
                         expressionGen.Generate(childNode.Expression);
                     }
 
                     m_context.Writer.Append("]");
+                }
+                else
+                {
+                    throw new NotImplementedException();
                 }
             }
         }

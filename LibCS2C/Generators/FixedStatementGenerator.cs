@@ -26,12 +26,18 @@ namespace LibCS2C.Generators
         /// <param name="node">The fixed statement</param>
         public override void Generate(FixedStatementSyntax node)
         {
+            m_context.Writer.AppendLine("{");
+            m_context.Writer.Indent();
+
             BlockGenerator blockGen = new BlockGenerator(m_context);
             IEnumerable<SyntaxNode> children = node.ChildNodes();
             foreach (SyntaxNode child in children)
             {
                 blockGen.GenerateChildren(child);
             }
+
+            m_context.Writer.UnIndent();
+            m_context.Writer.AppendLine("}");
         }
     }
 }

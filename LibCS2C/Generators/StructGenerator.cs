@@ -40,9 +40,9 @@ namespace LibCS2C.Generators
                 {
                     IdentifierNameSyntax name = attrib.ChildNodes().First() as IdentifierNameSyntax;
                     string identifier = name.Identifier.ToString();
-
+                    
                     // Defines layout of the struct
-                    if(identifier.Equals("StructLayoutAttribute"))
+                    if(identifier.Equals("StructLayoutAttribute") || identifier.Equals("StructLayout"))
                     {
                         SeparatedSyntaxList<AttributeArgumentSyntax> argsList = attrib.ArgumentList.Arguments;
                         foreach(AttributeArgumentSyntax arg in argsList)

@@ -187,7 +187,8 @@ namespace LibCS2C
                    kind == SyntaxKind.SimpleMemberAccessExpression ||
                    kind == SyntaxKind.SimpleAssignmentExpression ||
                    kind == SyntaxKind.ObjectCreationExpression ||
-                   kind == SyntaxKind.ArrayCreationExpression;
+                   kind == SyntaxKind.ArrayCreationExpression ||
+                   kind == SyntaxKind.AddressOfExpression;
         }
     }
 }

@@ -30,8 +30,6 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression of the member access</param>
         public override void Generate(ExpressionSyntax node)
         {
-            Console.WriteLine("simple member access: " + node);
-
             ITypeSymbol symbol = m_context.Model.GetTypeInfo(node).Type;
             SyntaxNodeOrToken[] children = node.ChildNodesAndTokens().ToArray();
 

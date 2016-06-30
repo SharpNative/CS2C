@@ -48,31 +48,61 @@ namespace Sharpen
         private static GDT_Entry[] m_entries;
         private static GDT_Pointer m_ptr;
 
+        /// <summary>
+        /// Converts descriptor type
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         private static int DescriptorType(int a)
         {
             return (a << 0x04);
         }
 
+        /// <summary>
+        /// Converts privilege level
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         private static int Privilege(int a)
         {
             return (a << 0x05);
         }
 
+        /// <summary>
+        /// Converts present
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         private static int Present(int a)
         {
             return (a << 0x07);
         }
 
+        /// <summary>
+        /// Converts available
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         private static int Available(int a)
         {
             return (a << 0x0C);
         }
 
+        /// <summary>
+        /// Converts size
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         private static int Size(int a)
         {
             return (a << 0x06);
         }
 
+        /// <summary>
+        /// Converts granularity
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         private static int Granularity(int a)
         {
             return (a << 0x07);
@@ -111,8 +141,6 @@ namespace Sharpen
             m_entries = new GDT_Entry[3];
             m_ptr = new GDT_Pointer();
 
-            int[] test = new int[44];
-            
             // Set GDT table pointer
             m_ptr.limit = (ushort)((3 * sizeof(GDT_Entry)) - 1);
             fixed (GDT_Entry* ptr = m_entries)
@@ -128,6 +156,20 @@ namespace Sharpen
 
             // Kernel data segment
             SetEntry(2, 0, 0xFFFFFFFF, (byte)((int)GDT_Data.RW | DescriptorType(1) | Privilege(0) | Present(1)), (byte)(Size(1) | Granularity(1)));
+
+            // Flush GDT
+            fixed (GDT_Pointer* ptr = &m_ptr)
+            {
+                FlushGDT(ptr);
+            }
+
+            Console.WriteLine("GDT Installed");
         }
+
+        /// <summary>
+        /// Flushes the GDT table
+        /// </summary>
+        /// <param name="ptr">The pointer to the table</param>
+        private static extern unsafe void FlushGDT(GDT_Pointer* ptr);
     }
 }

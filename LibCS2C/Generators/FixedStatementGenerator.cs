@@ -28,7 +28,7 @@ namespace LibCS2C.Generators
         {
             m_context.Writer.AppendLine("{");
             m_context.Writer.Indent();
-
+            
             BlockGenerator blockGen = new BlockGenerator(m_context);
             IEnumerable<SyntaxNode> children = node.ChildNodes();
             foreach (SyntaxNode child in children)

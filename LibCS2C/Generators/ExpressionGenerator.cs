@@ -17,6 +17,7 @@ namespace LibCS2C.Generators
         private ObjectCreationExpressionGenerator m_objectCreationGen;
         private CastExpressionGenerator m_castExpressionGen;
         private SizeofExpressionGenerator m_sizeofExpressionGen;
+        private AddressOfExpressionGenerator m_addressOfExpressionGen;
         private ArrayCreationExpressionGenerator m_arrayCreationExpressionGen;
         private ElementAccessGenerator m_elementAccessGen;
 
@@ -48,6 +49,7 @@ namespace LibCS2C.Generators
             m_objectCreationGen = new ObjectCreationExpressionGenerator(m_context);
             m_castExpressionGen = new CastExpressionGenerator(m_context);
             m_sizeofExpressionGen = new SizeofExpressionGenerator(m_context);
+            m_addressOfExpressionGen = new AddressOfExpressionGenerator(m_context);
             m_arrayCreationExpressionGen = new ArrayCreationExpressionGenerator(m_context);
             m_elementAccessGen = new ElementAccessGenerator(m_context);
 
@@ -77,6 +79,10 @@ namespace LibCS2C.Generators
             {
                 case SyntaxKind.ArrayCreationExpression:
                     m_arrayCreationExpressionGen.Generate(node as ArrayCreationExpressionSyntax);
+                    break;
+
+                case SyntaxKind.AddressOfExpression:
+                    m_addressOfExpressionGen.Generate(node as PrefixUnaryExpressionSyntax);
                     break;
 
                 case SyntaxKind.ElementAccessExpression:

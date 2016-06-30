@@ -108,5 +108,15 @@ namespace TestProject.OtherNameSpace
         {
             return nonStaticTest + 5 - testing;
         }
+
+        public void whileTest()
+        {
+            while(getNonStaticTest() > 5)
+            {
+                Console.WriteLine(">5");
+            }
+
+            Console.WriteLine("outside while");
+        }
     }
 }

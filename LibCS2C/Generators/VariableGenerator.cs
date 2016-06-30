@@ -38,7 +38,7 @@ namespace LibCS2C.Generators
 
                 ExpressionSyntax expression = variable.Initializer.Value;
                 m_expressionGen.Generate(expression);
-                m_context.Writer.AppendLine(";");
+                //m_context.Writer.AppendLine(";");
             }
         }
     }

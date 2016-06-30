@@ -29,22 +29,22 @@ namespace LibCS2C.Generators
             ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);
 
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
-            foreach(SyntaxNode child in nodes)
+            foreach (SyntaxNode child in nodes)
             {
                 SyntaxKind kind = child.Kind();
 
-                if(kind == SyntaxKind.IdentifierName)
+                if (kind == SyntaxKind.IdentifierName)
                 {
                     m_context.Writer.Append(m_context.ConvertVariableName(child));
                 }
-                else if(kind == SyntaxKind.BracketedArgumentList)
+                else if (kind == SyntaxKind.BracketedArgumentList)
                 {
                     BracketedArgumentListSyntax args = child as BracketedArgumentListSyntax;
                     IEnumerable<SyntaxNode> children = args.ChildNodes();
 
                     m_context.Writer.Append("[");
 
-                    foreach(ArgumentSyntax childNode in children)
+                    foreach (ArgumentSyntax childNode in children)
                     {
                         expressionGen.Generate(childNode.Expression);
                     }

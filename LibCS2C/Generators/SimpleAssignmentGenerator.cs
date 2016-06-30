@@ -94,7 +94,7 @@ namespace LibCS2C.Generators
                 m_context.Writer.Append(")");
             }
 
-            m_context.Writer.AppendLine(";");
+            //m_context.Writer.AppendLine(";");
         }
     }
 }

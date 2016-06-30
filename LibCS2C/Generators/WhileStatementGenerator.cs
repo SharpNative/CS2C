@@ -9,62 +9,46 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class ForStatementGenerator : GeneratorBase<ForStatementSyntax>
+    class WhileStatementGenerator : GeneratorBase<WhileStatementSyntax>
     {
         private ExpressionGenerator m_expressionGen;
-        private VariableGenerator m_variableGen;
-
+        
         /// <summary>
-        /// For statement generator
+        /// While statement generator
         /// </summary>
         /// <param name="context">The walker context</param>
-        public ForStatementGenerator(WalkerContext context)
+        public WhileStatementGenerator(WalkerContext context)
         {
             m_context = context;
             m_expressionGen = new ExpressionGenerator(m_context);
-            m_variableGen = new VariableGenerator(m_context);
         }
-
+        
         /// <summary>
-        /// Generates a for statement
+        /// Generates a while statement
         /// </summary>
-        /// <param name="node">The for statement</param>
-        public override void Generate(ForStatementSyntax node)
+        /// <param name="node">The while statement</param>
+        public override void Generate(WhileStatementSyntax node)
         {
-            m_context.Writer.Append("for(");
+            m_context.Writer.Append("while(");
 
-            if (node.Declaration != null)
-                m_variableGen.Generate(node.Declaration);
-            
-            m_context.Writer.Append(";");
-
-            if (node.Condition != null)
-                m_expressionGen.Generate(node.Condition);
-
-            m_context.Writer.Append(";");
-
-            SeparatedSyntaxList<ExpressionSyntax> nodes = node.Incrementors;
-            foreach (ExpressionSyntax expression in nodes)
-            {
-                m_expressionGen.Generate(expression);
-            }
+            m_expressionGen.Generate(node.Condition);
 
             m_context.Writer.AppendLine(")");
-
+            
             m_context.Writer.AppendLine("{");
             m_context.Writer.Indent();
 
             IEnumerable<SyntaxNode> children = node.ChildNodes();
-            foreach (SyntaxNode child in children)
+            foreach(SyntaxNode child in children)
             {
-                if (child.Kind() == SyntaxKind.Block)
+                if(child.Kind() == SyntaxKind.Block)
                 {
                     BlockGenerator blockGen = new BlockGenerator(m_context);
                     blockGen.Generate(child as BlockSyntax);
                     break;
                 }
             }
-
+            
             m_context.Writer.UnIndent();
             m_context.Writer.AppendLine("}");
         }

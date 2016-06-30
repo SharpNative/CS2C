@@ -29,16 +29,7 @@ namespace LibCS2C
         {
             m_tabs += "\t";
         }
-
-        public void RemoveLastChars(int times = 1)
-        {
-            string str = m_sb.ToString();
-            str = str.Substring(0, str.Length - times);
-
-            m_sb = new StringBuilder(str);
-        }
-
-
+        
         /// <summary>
         /// Removes a tab
         /// </summary>
@@ -89,7 +80,10 @@ namespace LibCS2C
             m_alreadyIndented = false;
         }
 
-
+        /// <summary>
+        /// Append text at the start
+        /// </summary>
+        /// <param name="text">The text</param>
         public void Prepend(string text)
         {
             m_sb.Insert(0, text);

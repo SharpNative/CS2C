@@ -17,6 +17,7 @@ namespace LibCS2C.Generators
         private LocalDeclarationGenerator m_localDeclarationGen;
         private IfStatementGenerator m_ifStatementGen;
         private ForStatementGenerator m_forStatementGen;
+        private WhileStatementGenerator m_whileStatementGen;
 
         /// <summary>
         /// Block generator
@@ -31,6 +32,7 @@ namespace LibCS2C.Generators
             m_localDeclarationGen = new LocalDeclarationGenerator(m_context);
             m_ifStatementGen = new IfStatementGenerator(m_context);
             m_forStatementGen = new ForStatementGenerator(m_context);
+            m_whileStatementGen = new WhileStatementGenerator(m_context);
         }
 
         /// <summary>
@@ -40,41 +42,48 @@ namespace LibCS2C.Generators
         public override void Generate(BlockSyntax node)
         {
             m_context.Writer.Indent();
-            
-            IEnumerable<SyntaxNode> nodes = node.ChildNodes();
 
-            foreach(SyntaxNode childNode in nodes)
+            IEnumerable<SyntaxNode> nodes = node.ChildNodes();
+            foreach (SyntaxNode childNode in nodes)
             {
                 SyntaxKind kind = childNode.Kind();
 
-                if(kind == SyntaxKind.VariableDeclaration)
+                switch (kind)
                 {
-                    m_variableGen.Generate(childNode as VariableDeclarationSyntax);
+                    case SyntaxKind.VariableDeclaration:
+                        m_variableGen.Generate(childNode as VariableDeclarationSyntax);
+                        break;
+
+                    case SyntaxKind.ReturnStatement:
+                        m_returnStatementGen.Generate(childNode as ReturnStatementSyntax);
+                        break;
+
+                    case SyntaxKind.ExpressionStatement:
+                        m_expressionStatementGen.Generate(childNode as ExpressionStatementSyntax);
+                        break;
+
+                    case SyntaxKind.LocalDeclarationStatement:
+                        m_localDeclarationGen.Generate(childNode as LocalDeclarationStatementSyntax);
+                        break;
+
+                    case SyntaxKind.IfStatement:
+                        m_ifStatementGen.Generate(childNode as IfStatementSyntax);
+                        break;
+
+                    case SyntaxKind.ForStatement:
+                        m_forStatementGen.Generate(childNode as ForStatementSyntax);
+                        break;
+
+                    case SyntaxKind.WhileStatement:
+                        m_whileStatementGen.Generate(childNode as WhileStatementSyntax);
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
                 }
-                else if(kind == SyntaxKind.ReturnStatement)
-                {
-                    m_returnStatementGen.Generate(childNode as ReturnStatementSyntax);
-                }
-                else if (kind == SyntaxKind.ExpressionStatement)
-                {
-                    m_expressionStatementGen.Generate(childNode as ExpressionStatementSyntax);
-                }
-                else if(kind == SyntaxKind.LocalDeclarationStatement)
-                {
-                    m_localDeclarationGen.Generate(childNode as LocalDeclarationStatementSyntax);
-                }
-                else if(kind == SyntaxKind.IfStatement)
-                {
-                    m_ifStatementGen.Generate(childNode as IfStatementSyntax);
-                }
-                else if(kind == SyntaxKind.ForStatement)
-                {
-                    m_forStatementGen.Generate(childNode as ForStatementSyntax);
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
+
+                // At the end of the line
+                m_context.Writer.AppendLine(";");
             }
 
             m_context.Writer.UnIndent();

@@ -89,7 +89,7 @@ namespace LibCS2C.Generators
             }
             
             expressionGen.Generate(node.Right);
-            m_context.Writer.AppendLine(";");
+            //m_context.Writer.AppendLine(";");
         }
     }
 }

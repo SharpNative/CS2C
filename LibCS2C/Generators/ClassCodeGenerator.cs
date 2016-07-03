@@ -115,8 +115,10 @@ namespace LibCS2C.Generators
             ClassCctorGenerator cctorGen = new ClassCctorGenerator(m_context, staticFields, propertyInitialValuesStatic);
             ClassInitGenerator classInitGen = new ClassInitGenerator(m_context, nonStaticFields, propertyInitialValuesNonStatic);
 
+            m_context.CurrentDestination = WriterDestination.ClassStructs;
             structGen.Generate(node);
             staticStructGen.Generate(node);
+            
             cctorGen.Generate(node);
             classInitGen.Generate(node);
         }

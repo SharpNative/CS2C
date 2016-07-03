@@ -6,6 +6,15 @@ using System.Collections.Generic;
 
 namespace LibCS2C
 {
+    public enum WriterDestination
+    {
+        Enums,
+        Structs,
+        ClassStructs,
+        MethodPrototypes,
+        MethodDeclarations,
+    }
+
     public class WalkerContext
     {
         /// <summary>
@@ -17,17 +26,7 @@ namespace LibCS2C
         /// List of static constructors
         /// </summary>
         public List<string> CctorList { get; private set; } = new List<string>();
-
-        /// <summary>
-        /// List of all the method prototypes
-        /// </summary>
-        public List<string> MethodPrototypes { get; private set; } = new List<string>();
-
-        /// <summary>
-        /// List of the enums
-        /// </summary>
-        public Dictionary<string, string> Enums { get; private set; } = new Dictionary<string, string>();
-
+        
         /// <summary>
         /// The current class
         /// </summary>
@@ -54,6 +53,48 @@ namespace LibCS2C
         public FormattedStringBuilder Writer { get; private set; }
 
         /// <summary>
+        /// Current destionation of the writer, this is because a destination depends on the structure of the code
+        /// Therefor, we cannot assume one generator is one writer
+        /// </summary>
+        public WriterDestination CurrentDestination
+        {
+            get
+            {
+                return m_currentDestination;
+            }
+
+            set
+            {
+                m_currentDestination = value;
+                switch (value)
+                {
+                    case WriterDestination.Enums:
+                        Writer = SbEnums;
+                        break;
+
+                    case WriterDestination.Structs:
+                        Writer = SbStructs;
+                        break;
+
+                    case WriterDestination.ClassStructs:
+                        Writer = SbClassStructs;
+                        break;
+
+                    case WriterDestination.MethodPrototypes:
+                        Writer = SbMethodPrototypes;
+                        break;
+
+                    case WriterDestination.MethodDeclarations:
+                        Writer = SbMethodDeclarations;
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the semantic Model
         /// </summary>
         public SemanticModel Model { get; set; }
@@ -68,16 +109,24 @@ namespace LibCS2C
         /// </summary>
         public AllGenerators Generators { get; private set; }
 
+        // String builders
+        public FormattedStringBuilder SbEnums { get; private set; } = new FormattedStringBuilder();
+        public FormattedStringBuilder SbStructs { get; private set; } = new FormattedStringBuilder();
+        public FormattedStringBuilder SbClassStructs { get; private set; } = new FormattedStringBuilder();
+        public FormattedStringBuilder SbMethodPrototypes { get; private set; } = new FormattedStringBuilder();
+        public FormattedStringBuilder SbMethodDeclarations { get; private set; } = new FormattedStringBuilder();
+
+        private WriterDestination m_currentDestination;
+
         /// <summary>
         /// Contextwalker
         /// </summary>
         /// <param name="sb">The formatted string builder</param>
-        public WalkerContext(FormattedStringBuilder sb)
+        public WalkerContext()
         {
-            Writer = sb;
             Generators = new AllGenerators(this);
         }
-
+        
         /// <summary>
         /// Convert class name to a formatted name
         /// </summary>

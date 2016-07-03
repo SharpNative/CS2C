@@ -126,15 +126,18 @@ namespace LibCS2C.Generators
             }
 
             sb.Append(")");
-            
+
             // Append to properties
-            m_context.MethodPrototypes.Add(sb.ToString());
+            m_context.CurrentDestination = WriterDestination.MethodPrototypes;
+            m_context.Writer.Append(sb.ToString());
+            m_context.Writer.AppendLine(";");
 
             // If this has no body, we only generate the prototype
             if (node.Body == null)
                 return;
 
             // Append the declaration so we can add contents
+            m_context.CurrentDestination = WriterDestination.MethodDeclarations;
             m_context.Writer.AppendLine(sb.ToString());
 
             // Block containing the code of the method

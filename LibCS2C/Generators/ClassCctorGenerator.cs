@@ -30,12 +30,20 @@ namespace LibCS2C.Generators
         public override void Generate(ClassDeclarationSyntax node)
         {
             string convertedClassName = m_context.ConvertClassName(node.Identifier.ToString());
+            string methodName = string.Format("classCctor_{0}", convertedClassName);
+            string methodPrototype = string.Format("void {0}(void)", methodName);
 
-            string functionName = string.Format("classCctor_{0}", convertedClassName);
+            // Add to .cctor list so we can call it on initialization
+            m_context.CctorList.Add(methodName);
 
-            m_context.CctorList.Add(functionName);
+            // Prototype
+            m_context.CurrentDestination = WriterDestination.MethodPrototypes;
+            m_context.Writer.Append(methodPrototype);
+            m_context.Writer.AppendLine(";");
 
-            m_context.Writer.AppendLine(string.Format("void {0}(void)", functionName));
+            // Declaration
+            m_context.CurrentDestination = WriterDestination.MethodDeclarations;
+            m_context.Writer.AppendLine(methodPrototype);
             m_context.Writer.AppendLine("{");
 
             foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_staticFields)
@@ -55,7 +63,6 @@ namespace LibCS2C.Generators
             }
 
             m_context.Writer.AppendLine("}");
-            m_context.Writer.AppendLine("");
         }
     }
 }

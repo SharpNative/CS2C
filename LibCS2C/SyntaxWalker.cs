@@ -4,22 +4,20 @@ using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Text;
 
 namespace LibCS2C
 {
     public class SyntaxWalker : CSharpSyntaxWalker
     {
-        private FormattedStringBuilder m_sb;
         private WalkerContext m_context;
         
         /// <summary>
         /// Walks through the syntax and outputs C code to a <see cref="FormattedStringBuilder">FormattedStringBuilder</see>
         /// </summary>
-        /// <param name="sb">The formatted string builder</param>
-        public SyntaxWalker(FormattedStringBuilder sb) : base(SyntaxWalkerDepth.Node)
+        public SyntaxWalker() : base(SyntaxWalkerDepth.Node)
         {
-            m_sb = sb;
-            m_context = new WalkerContext(sb);
+            m_context = new WalkerContext();
         }
 
         /// <summary>
@@ -37,7 +35,8 @@ namespace LibCS2C
         /// <param name="node">The struct declaration node</param>
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            m_sb.AppendLine("/* Struct <" + node.Identifier + "> */");
+            m_context.CurrentDestination = WriterDestination.Structs;
+            m_context.Writer.AppendLine("/* Struct <" + node.Identifier + "> */");
             m_context.Generators.Struct.Generate(node);
             base.VisitStructDeclaration(node);
         }
@@ -48,7 +47,8 @@ namespace LibCS2C
         /// <param name="node">The class declaration node</param>
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            m_sb.AppendLine("/* Class <" + node.Identifier + "> */");
+            m_context.CurrentDestination = WriterDestination.ClassStructs;
+            m_context.Writer.AppendLine("/* Class <" + node.Identifier + "> */");
             m_context.CurrentClass = node;
             m_context.Generators.ClassCode.Generate(node);
             base.VisitClassDeclaration(node);
@@ -101,42 +101,36 @@ namespace LibCS2C
         public override void VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
         {
             m_context.CurrentNamespace = node;
-            m_sb.AppendLine("/* Namespace <" + node.Name + "> */");
             base.VisitNamespaceDeclaration(node);
         }
 
         /// <summary>
-        /// Appends code for prototypes, enums and the init method
+        /// Outputs the code in a string
         /// </summary>
-        public void Finish()
+        /// <returns>The code</returns>
+        public override string ToString()
         {
-            // Prototypes and enums
-            string begin = "";
-            begin += "/* Method prototypes */\r\n";
-            foreach (string prototype in m_context.MethodPrototypes)
-            {
-                begin += prototype + ";\r\n";
-            }
-
-            begin += "/* Enums */\r\n";
-            foreach (KeyValuePair<string, string> pair in m_context.Enums)
-            {
-                begin += string.Format("#define enum_{0} ({1})\r\n", pair.Key, pair.Value);
-            }
-
-            begin += "\r\n";
-            m_context.Writer.Prepend(begin);
+            // Add the code in the correct order
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine(m_context.SbEnums.ToString());
+            sb.AppendLine(m_context.SbStructs.ToString());
+            sb.AppendLine(m_context.SbClassStructs.ToString());
+            sb.AppendLine(m_context.SbMethodPrototypes.ToString());
+            sb.AppendLine(m_context.SbMethodDeclarations.ToString());
 
             // Initialization method
-            m_context.Writer.AppendLine("void init(void)");
-            m_context.Writer.AppendLine("{");
+            sb.AppendLine("void init(void)");
+            sb.AppendLine("{");
 
             foreach(string cctor in m_context.CctorList)
             {
-                m_context.Writer.AppendLine(string.Format("\t{0}();", cctor));
+                sb.AppendLine(string.Format("\t{0}();", cctor));
             }
 
-            m_context.Writer.AppendLine("}");
+            sb.AppendLine("}");
+
+            // Convert everything to a string
+            return sb.ToString();
         }
     }
 }

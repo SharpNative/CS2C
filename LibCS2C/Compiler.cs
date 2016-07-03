@@ -25,9 +25,7 @@ namespace LibCS2C
             Console.WriteLine("-------------");
 
             // Buffer that holds all the output code
-            FormattedStringBuilder sb = new FormattedStringBuilder();
-
-            SyntaxWalker walker = new SyntaxWalker(sb);
+            SyntaxWalker walker = new SyntaxWalker();
 
             // Loop through each file of the project
             foreach (Document document in project.Documents)
@@ -44,10 +42,8 @@ namespace LibCS2C
                 Console.WriteLine("End of file: " + document.Name);
                 Console.WriteLine("------------");
             }
-
-            walker.Finish();
-
-            return sb.ToString();
+            
+            return walker.ToString();
         }
     }
 }

@@ -26,6 +26,9 @@ namespace LibCS2C.Generators
         /// <param name="node">The enum</param>
         public override void Generate(EnumDeclarationSyntax node)
         {
+            WriterDestination destination = m_context.CurrentDestination;
+            m_context.CurrentDestination = WriterDestination.Enums;
+
             bool insideClass = (node.Parent is ClassDeclarationSyntax);
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
 
@@ -35,10 +38,12 @@ namespace LibCS2C.Generators
                 string value = child.EqualsValue.Value.ToString();
 
                 if(insideClass)
-                    m_context.Enums.Add(string.Format("{0}_{1}_{2}", m_context.CurrentClassNameFormatted, node.Identifier.ToString(), identifier), value);
+                    m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2} ({3})", m_context.CurrentClassNameFormatted, node.Identifier, identifier, value));
                 else
-                    m_context.Enums.Add(string.Format("{0}_{1}_{2}", m_context.CurrentNamespaceFormatted, node.Identifier.ToString(), identifier), value);
+                    m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2}", m_context.CurrentNamespaceFormatted, node.Identifier, identifier, value));
             }
+
+            m_context.CurrentDestination = destination;
         }
     }
 }

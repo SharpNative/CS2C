@@ -37,7 +37,7 @@ namespace LibCS2C.Generators
                     break;
 
                 case SyntaxKind.ExpressionStatement:
-                    m_context.Generators.Expression.Generate(childNode as ExpressionStatementSyntax);
+                    m_context.Generators.ExpressionStatement.Generate(childNode as ExpressionStatementSyntax);
                     break;
 
                 case SyntaxKind.LocalDeclarationStatement:

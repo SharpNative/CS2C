@@ -248,7 +248,8 @@ namespace LibCS2C
                    kind == SyntaxKind.InvocationExpression ||
                    kind == SyntaxKind.LogicalAndExpression ||
                    kind == SyntaxKind.LogicalNotExpression ||
-                   kind == SyntaxKind.LogicalOrExpression;
+                   kind == SyntaxKind.LogicalOrExpression ||
+                   kind == SyntaxKind.ConditionalExpression;
         }
     }
 }

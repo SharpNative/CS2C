@@ -109,6 +109,7 @@ namespace LibCS2C.Generators
                 case SyntaxKind.LogicalAndExpression:
                 case SyntaxKind.LogicalNotExpression:
                 case SyntaxKind.LogicalOrExpression:
+                case SyntaxKind.ConditionalExpression:
                     ChildSyntaxList children = node.ChildNodesAndTokens();
                     foreach (SyntaxNodeOrToken child in children)
                     {

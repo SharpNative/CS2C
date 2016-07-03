@@ -116,6 +116,12 @@ namespace TestProject.OtherNameSpace
                 Console.WriteLine(">5");
             }
 
+            do
+            {
+                Console.WriteLine("do while test");
+            }
+            while (getNonStaticTest() < 5);
+
             Console.WriteLine("outside while");
         }
     }

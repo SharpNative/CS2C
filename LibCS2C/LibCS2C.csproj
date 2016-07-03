@@ -109,6 +109,7 @@
     <Compile Include="Generators\ArrayCreationExpressionGenerator.cs" />
     <Compile Include="Generators\AddressOfExpressionGenerator.cs" />
     <Compile Include="Generators\SizeofExpressionGenerator.cs" />
+    <Compile Include="Generators\DoStatementGenerator.cs" />
     <Compile Include="Generators\WhileStatementGenerator.cs" />
     <Compile Include="Generators\ForStatementGenerator.cs" />
     <Compile Include="Generators\StructGenerator.cs" />

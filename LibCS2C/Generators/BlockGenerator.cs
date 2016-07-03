@@ -19,6 +19,7 @@ namespace LibCS2C.Generators
         private ForStatementGenerator m_forStatementGen;
         private WhileStatementGenerator m_whileStatementGen;
         private FixedStatementGenerator m_fixedStatementGen;
+        private DoStatementGenerator m_doStatementGen;
 
         /// <summary>
         /// Block generator
@@ -35,6 +36,7 @@ namespace LibCS2C.Generators
             m_forStatementGen = new ForStatementGenerator(m_context);
             m_whileStatementGen = new WhileStatementGenerator(m_context);
             m_fixedStatementGen = new FixedStatementGenerator(m_context);
+            m_doStatementGen = new DoStatementGenerator(m_context);
         }
 
         /// <summary>
@@ -81,6 +83,10 @@ namespace LibCS2C.Generators
                     m_context.Writer.AppendLine("{");
                     Generate(childNode as BlockSyntax);
                     m_context.Writer.AppendLine("}");
+                    break;
+
+                case SyntaxKind.DoStatement:
+                    m_doStatementGen.Generate(childNode as DoStatementSyntax);
                     break;
 
                 default:

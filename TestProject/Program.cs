@@ -25,10 +25,13 @@ namespace TestProject
             TestClass nein = new TestClass(44);
             nein.TestPointer();
             
-
             TestStruct at = new TestStruct();
             at.lol = 23;
+
+            Consoles.testjen = 4;
+            Consoles.Attribute = 0x05;
         }
+
 
         static void Method2(int a, int b, int c)
         {

@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using LibCS2C.Generators;
-using System.Collections.Generic;
 
 namespace LibCS2C
 {

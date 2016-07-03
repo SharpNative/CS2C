@@ -145,7 +145,7 @@ namespace LibCS2C
             if (symbol.Kind == SymbolKind.Property)
             {
                 if (symbol.IsStatic)
-                    typeNameConverted = string.Format("{0}_{1}_getter(NULL)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+                    typeNameConverted = string.Format("{0}_{1}_getter()", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
                 else
                     typeNameConverted = string.Format("{0}_{1}_getter(obj)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
             }

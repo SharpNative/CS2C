@@ -33,7 +33,7 @@ namespace LibCS2C.Generators
             {
                 SyntaxKind childKind = child.Kind();
 
-                if(childKind == SyntaxKind.StaticKeyword)
+                if (childKind == SyntaxKind.StaticKeyword)
                 {
                     isStatic = true;
                 }
@@ -52,12 +52,16 @@ namespace LibCS2C.Generators
 
                     if (getAccessor != default(AccessorDeclarationSyntax))
                     {
-                        m_context.Writer.AppendLine(string.Format("{0} {1}_{2}_getter({3}* obj)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier, m_context.CurrentClassStructName));
+                        if (isStatic)
+                            m_context.Writer.AppendLine(string.Format("{0} {1}_{2}_getter(void)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier));
+                        else
+                            m_context.Writer.AppendLine(string.Format("{0} {1}_{2}_getter({3}* obj)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier, m_context.CurrentClassStructName));
+
                         m_context.Writer.AppendLine("{");
 
-                        if(getAccessor.Body == null)
+                        if (getAccessor.Body == null)
                         {
-                            if(isStatic)
+                            if (isStatic)
                                 m_context.Writer.AppendLine(string.Format("\treturn classStatics_{0}.prop_{1};", m_context.CurrentClassNameFormatted, node.Identifier));
                             else
                                 m_context.Writer.AppendLine(string.Format("\treturn obj->prop_{0};", node.Identifier));
@@ -66,16 +70,20 @@ namespace LibCS2C.Generators
                         {
                             m_context.Generators.Block.Generate(getAccessor.Body);
                         }
-                        
+
                         m_context.Writer.AppendLine("}");
                     }
 
                     if (setAccessor != default(AccessorDeclarationSyntax))
                     {
-                        m_context.Writer.AppendLine(string.Format("{0} {1}_{2}_setter({3}* obj, {0} value)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier, m_context.CurrentClassStructName));
+                        if (isStatic)
+                            m_context.Writer.AppendLine(string.Format("{0} {1}_{2}_setter({0} value)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier));
+                        else
+                            m_context.Writer.AppendLine(string.Format("{0} {1}_{2}_setter({3}* obj, {0} value)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier, m_context.CurrentClassStructName));
+
                         m_context.Writer.AppendLine("{");
 
-                        if(setAccessor.Body == null)
+                        if (setAccessor.Body == null)
                         {
                             if (isStatic)
                                 m_context.Writer.AppendLine(string.Format("\tclassStatics_{0}.prop_{1} = value;", m_context.CurrentClassNameFormatted, node.Identifier));

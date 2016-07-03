@@ -32,7 +32,7 @@ namespace LibCS2C.Generators
             if (isProperty)
             {
                 if (symbol.IsStatic)
-                    m_context.Writer.Append(string.Format("{0}_{1}_setter(NULL, ", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
+                    m_context.Writer.Append(string.Format("{0}_{1}_setter(", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
                 else
                     m_context.Writer.Append(string.Format("{0}_{1}_setter(obj, ", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
             }
@@ -63,6 +63,12 @@ namespace LibCS2C.Generators
                 {
                     if (!isProperty)
                         m_context.Writer.Append(" = ");
+                }
+                else if (kind == SyntaxKind.SimpleMemberAccessExpression)
+                {
+                    // Ignore if property because we would get an getter here
+                    if (!isProperty)
+                        m_context.Generators.Expression.Generate(child.AsNode());
                 }
                 else if (m_context.IsSubExpression(kind))
                 {

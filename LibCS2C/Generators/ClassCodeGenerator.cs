@@ -99,12 +99,16 @@ namespace LibCS2C.Generators
                     if(!isStatic)
                     {
                         propertyTypesNonStatic.Add(identifier, propertyDeclaration.Type);
-                        propertyInitialValuesNonStatic.Add(identifier, propertyDeclaration.Initializer);
+
+                        if (propertyDeclaration.Initializer != null)
+                            propertyInitialValuesNonStatic.Add(identifier, propertyDeclaration.Initializer);
                     }
                     else
                     {
                         propertyTypesStatic.Add(identifier, propertyDeclaration.Type);
-                        propertyInitialValuesStatic.Add(identifier, propertyDeclaration.Initializer);
+
+                        if (propertyDeclaration.Initializer != null)
+                            propertyInitialValuesStatic.Add(identifier, propertyDeclaration.Initializer);
                     }
                 }
             }

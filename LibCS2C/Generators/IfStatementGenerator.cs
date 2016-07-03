@@ -32,27 +32,9 @@ namespace LibCS2C.Generators
             {
                 SyntaxKind kind = childNode.Kind();
 
-                if (kind == SyntaxKind.EqualsExpression)
+                if(m_context.IsSubExpression(kind))
                 {
-                    m_context.Generators.Expression.Generate(childNode as ExpressionSyntax);
-                }
-                else if (kind == SyntaxKind.LogicalAndExpression ||
-                         kind == SyntaxKind.LogicalOrExpression ||
-                         kind == SyntaxKind.LogicalNotExpression)
-                {
-                    ChildSyntaxList children = childNode.ChildNodesAndTokens();
-                    foreach (SyntaxNodeOrToken child in children)
-                    {
-                        SyntaxKind childKind = child.Kind();
-                        if (childKind == SyntaxKind.EqualsExpression)
-                        {
-                            m_context.Generators.Expression.Generate(child.AsNode() as ExpressionSyntax);
-                        }
-                        else
-                        {
-                            m_context.Writer.Append(child.ToString() + " ");
-                        }
-                    }
+                    m_context.Generators.Expression.Generate(childNode);
                 }
                 else if (kind == SyntaxKind.ElseClause)
                 {

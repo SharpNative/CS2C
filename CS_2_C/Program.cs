@@ -14,7 +14,7 @@ namespace CS_2_C
         static void Main(string[] args)
         {
             string output = Compiler.CompileProject("../../../TestProject/TestProject.csproj");
-            
+
             File.WriteAllText("output.c", output);
             Console.ReadLine();
         }

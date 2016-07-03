@@ -97,6 +97,7 @@ namespace LibCS2C.Generators
                 case SyntaxKind.LessThanOrEqualExpression:
                 case SyntaxKind.GreaterThanOrEqualExpression:
                 case SyntaxKind.EqualsExpression:
+                case SyntaxKind.NotEqualsExpression:
                 case SyntaxKind.AddExpression:
                 case SyntaxKind.SubtractExpression:
                 case SyntaxKind.MultiplyExpression:
@@ -105,6 +106,9 @@ namespace LibCS2C.Generators
                 case SyntaxKind.BitwiseAndExpression:
                 case SyntaxKind.BitwiseNotExpression:
                 case SyntaxKind.BitwiseOrExpression:
+                case SyntaxKind.LogicalAndExpression:
+                case SyntaxKind.LogicalNotExpression:
+                case SyntaxKind.LogicalOrExpression:
                     ChildSyntaxList children = node.ChildNodesAndTokens();
                     foreach (SyntaxNodeOrToken child in children)
                     {

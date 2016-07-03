@@ -51,7 +51,7 @@ namespace LibCS2C
         /// <returns>The C type</returns>
         public string Convert(TypeSyntax type)
         {
-            return m_convert[type.ToFullString().Trim()];
+            return m_convert[type.ToString().Trim()];
         }
     }
 }

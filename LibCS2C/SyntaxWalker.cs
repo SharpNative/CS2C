@@ -48,7 +48,6 @@ namespace LibCS2C
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
             m_context.CurrentDestination = WriterDestination.ClassStructs;
-            m_context.Writer.AppendLine("/* Class <" + node.Identifier + "> */");
             m_context.CurrentClass = node;
             m_context.Generators.ClassCode.Generate(node);
             base.VisitClassDeclaration(node);

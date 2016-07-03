@@ -26,8 +26,13 @@ namespace LibCS2C.Generators
         /// <param name="node">The return statement</param>
         public override void Generate(ReturnStatementSyntax node)
         {
-            m_context.Writer.Append("return ");
-            m_context.Generators.Expression.Generate(node.Expression);
+            m_context.Writer.Append("return");
+
+            if (node.Expression != null)
+            {
+                m_context.Writer.Append(" ");
+                m_context.Generators.Expression.Generate(node.Expression);
+            }
         }
     }
 }

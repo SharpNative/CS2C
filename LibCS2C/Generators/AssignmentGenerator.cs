@@ -25,7 +25,7 @@ namespace LibCS2C.Generators
     public class AssignmentGenerator : GeneratorBase<AssignmentExpressionSyntax>
     {
         private AssignmentType m_assignmentType;
-        
+
         /// <summary>
         /// Assignment generator
         /// </summary>
@@ -43,51 +43,68 @@ namespace LibCS2C.Generators
         /// <param name="node">The assignment</param>
         public override void Generate(AssignmentExpressionSyntax node)
         {
-            m_context.Generators.Expression.Generate(node.Left);
+            ISymbol symbol = m_context.Model.GetSymbolInfo(node.Left).Symbol;
 
-            switch(m_assignmentType)
+            string assignmentSymbol = "";
+            switch (m_assignmentType)
             {
                 case AssignmentType.BinaryAnd:
-                    m_context.Writer.Append(" &= ");
+                    assignmentSymbol = "&";
                     break;
 
                 case AssignmentType.BinaryOr:
-                    m_context.Writer.Append(" |= ");
+                    assignmentSymbol = "|";
                     break;
 
                 case AssignmentType.LeftShift:
-                    m_context.Writer.Append(" <<= ");
+                    assignmentSymbol = "<<";
                     break;
 
                 case AssignmentType.RightShift:
-                    m_context.Writer.Append(" >>= ");
+                    assignmentSymbol = ">>";
                     break;
 
                 case AssignmentType.ExclusiveOr:
-                    m_context.Writer.Append(" ^= ");
+                    assignmentSymbol = "^";
                     break;
 
                 case AssignmentType.Add:
-                    m_context.Writer.Append(" += ");
+                    assignmentSymbol = "+";
                     break;
 
                 case AssignmentType.Substract:
-                    m_context.Writer.Append(" -= ");
+                    assignmentSymbol = "-";
                     break;
 
                 case AssignmentType.Multiply:
-                    m_context.Writer.Append(" *= ");
+                    assignmentSymbol = "*";
                     break;
 
                 case AssignmentType.Divide:
-                    m_context.Writer.Append(" /= ");
-                    break;
-
-                default:
+                    assignmentSymbol = "/";
                     break;
             }
 
-            m_context.Generators.Expression.Generate(node.Right);
+            // Property (getter/setter required)
+            if (symbol.Kind == SymbolKind.Property)
+            {
+                if (symbol.IsStatic)
+                    m_context.Writer.Append(string.Format("{0}_{1}_setter(", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
+                else
+                    m_context.Writer.Append(string.Format("{0}_{1}_setter(obj, ", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
+
+                m_context.Generators.Expression.Generate(node.Left);
+                m_context.Writer.Append(string.Format(" {0} ", assignmentSymbol));
+                m_context.Generators.Expression.Generate(node.Right);
+                m_context.Writer.Append(")");
+            }
+            // Normal variable / field
+            else
+            {
+                m_context.Generators.Expression.Generate(node.Left);
+                m_context.Writer.Append(string.Format(" {0}= ", assignmentSymbol));
+                m_context.Generators.Expression.Generate(node.Right);
+            }
         }
     }
 }

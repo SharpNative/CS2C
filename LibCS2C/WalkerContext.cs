@@ -233,6 +233,7 @@ namespace LibCS2C
                    kind == SyntaxKind.BitwiseNotExpression ||
                    kind == SyntaxKind.BitwiseOrExpression ||
                    kind == SyntaxKind.EqualsExpression ||
+                   kind == SyntaxKind.NotEqualsExpression ||
                    kind == SyntaxKind.ElementAccessExpression ||
                    kind == SyntaxKind.LessThanExpression ||
                    kind == SyntaxKind.LessThanOrEqualExpression ||
@@ -243,7 +244,11 @@ namespace LibCS2C
                    kind == SyntaxKind.SimpleAssignmentExpression ||
                    kind == SyntaxKind.ObjectCreationExpression ||
                    kind == SyntaxKind.ArrayCreationExpression ||
-                   kind == SyntaxKind.AddressOfExpression;
+                   kind == SyntaxKind.AddressOfExpression ||
+                   kind == SyntaxKind.InvocationExpression ||
+                   kind == SyntaxKind.LogicalAndExpression ||
+                   kind == SyntaxKind.LogicalNotExpression ||
+                   kind == SyntaxKind.LogicalOrExpression;
         }
     }
 }

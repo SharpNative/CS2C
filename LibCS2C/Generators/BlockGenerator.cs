@@ -70,6 +70,14 @@ namespace LibCS2C.Generators
                     m_context.Generators.DoStatement.Generate(childNode as DoStatementSyntax);
                     break;
 
+                case SyntaxKind.ContinueStatement:
+                    m_context.Writer.Append("continue");
+                    break;
+
+                case SyntaxKind.BreakStatement:
+                    m_context.Writer.Append("break");
+                    break;
+
                 default:
                     throw new NotImplementedException();
             }

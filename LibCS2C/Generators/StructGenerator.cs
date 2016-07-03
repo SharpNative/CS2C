@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class StructGenerator : GeneratorBase<StructDeclarationSyntax>
+    public class StructGenerator : GeneratorBase<StructDeclarationSyntax>
     {
-        private ExpressionGenerator m_expressionGen;
-
         /// <summary>
         /// struct generator
         /// </summary>
@@ -20,7 +18,6 @@ namespace LibCS2C.Generators
         public StructGenerator(WalkerContext context)
         {
             m_context = context;
-            m_expressionGen = new ExpressionGenerator(m_context);
         }
 
         /// <summary>
@@ -139,7 +136,7 @@ namespace LibCS2C.Generators
             {
                 m_context.Writer.Append(string.Format("\tobject.field_{0} = ", pair.Key));
                 ExpressionSyntax expression = pair.Value.Value;
-                m_expressionGen.Generate(expression);
+                m_context.Generators.Expression.Generate(expression);
                 m_context.Writer.AppendLine(";");
             }
 

@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class WhileStatementGenerator : GeneratorBase<WhileStatementSyntax>
+    public class WhileStatementGenerator : GeneratorBase<WhileStatementSyntax>
     {
-        private ExpressionGenerator m_expressionGen;
-        
         /// <summary>
         /// While statement generator
         /// </summary>
@@ -20,7 +18,6 @@ namespace LibCS2C.Generators
         public WhileStatementGenerator(WalkerContext context)
         {
             m_context = context;
-            m_expressionGen = new ExpressionGenerator(m_context);
         }
         
         /// <summary>
@@ -31,7 +28,7 @@ namespace LibCS2C.Generators
         {
             m_context.Writer.Append("while(");
 
-            m_expressionGen.Generate(node.Condition);
+            m_context.Generators.Expression.Generate(node.Condition);
 
             m_context.Writer.AppendLine(")");
             m_context.Writer.AppendLine("{");
@@ -41,8 +38,7 @@ namespace LibCS2C.Generators
             {
                 if(child.Kind() == SyntaxKind.Block)
                 {
-                    BlockGenerator blockGen = new BlockGenerator(m_context);
-                    blockGen.Generate(child as BlockSyntax);
+                    m_context.Generators.Block.Generate(child as BlockSyntax);
                     break;
                 }
             }

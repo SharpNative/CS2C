@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class ArrayCreationExpressionGenerator : GeneratorBase<ArrayCreationExpressionSyntax>
+    public class ArrayCreationExpressionGenerator : GeneratorBase<ArrayCreationExpressionSyntax>
     {
         /// <summary>
         /// Sizeof statement generator
@@ -35,8 +35,7 @@ namespace LibCS2C.Generators
             ExpressionSyntax sizeExpression = rank.Sizes.First();
 
             m_context.Writer.Append(string.Format("malloc(sizeof({0}) * (", m_context.ConvertTypeName(first)));
-            ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);
-            expressionGen.Generate(sizeExpression);
+            m_context.Generators.Expression.Generate(sizeExpression);
             m_context.Writer.Append("))");
         }
     }

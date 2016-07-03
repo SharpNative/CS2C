@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class SimpleMemberAccessGenerator : GeneratorBase<ExpressionSyntax>
+    public class SimpleMemberAccessGenerator : GeneratorBase<ExpressionSyntax>
     {
-        private ElementAccessGenerator m_elementAccessGen;
-
         /// <summary>
         /// Member access generator generator
         /// </summary>
@@ -21,7 +19,6 @@ namespace LibCS2C.Generators
         public SimpleMemberAccessGenerator(WalkerContext context)
         {
             m_context = context;
-            m_elementAccessGen = new ElementAccessGenerator(m_context);
         }
 
         /// <summary>
@@ -56,7 +53,7 @@ namespace LibCS2C.Generators
                 }
                 else if (firstKind == SyntaxKind.ElementAccessExpression)
                 {
-                    m_elementAccessGen.Generate(first as ElementAccessExpressionSyntax);
+                    m_context.Generators.ElementAccess.Generate(first as ElementAccessExpressionSyntax);
                 }
                 else
                 {

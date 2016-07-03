@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class PropertyGenerator : GeneratorBase<PropertyDeclarationSyntax>
+    public class PropertyGenerator : GeneratorBase<PropertyDeclarationSyntax>
     {
         /// <summary>
         /// Property generator
@@ -64,8 +64,7 @@ namespace LibCS2C.Generators
                         }
                         else
                         {
-                            BlockGenerator block = new BlockGenerator(m_context);
-                            block.Generate(getAccessor.Body);
+                            m_context.Generators.Block.Generate(getAccessor.Body);
                         }
                         
                         m_context.Writer.AppendLine("}");
@@ -85,8 +84,7 @@ namespace LibCS2C.Generators
                         }
                         else
                         {
-                            BlockGenerator block = new BlockGenerator(m_context);
-                            block.Generate(setAccessor.Body);
+                            m_context.Generators.Block.Generate(setAccessor.Body);
                         }
 
                         m_context.Writer.AppendLine("\treturn value;");

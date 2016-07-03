@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace LibCS2C.Generators
 {
-    class SimpleAssignmentGenerator : GeneratorBase<ExpressionSyntax>
+    public class SimpleAssignmentGenerator : GeneratorBase<ExpressionSyntax>
     {
         /// <summary>
         /// Simple assignment generator
@@ -66,8 +66,7 @@ namespace LibCS2C.Generators
                 }
                 else if (m_context.IsSubExpression(kind))
                 {
-                    ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);
-                    expressionGen.Generate(child.AsNode() as ExpressionSyntax);
+                    m_context.Generators.Expression.Generate(child.AsNode());
                 }
                 else
                 {

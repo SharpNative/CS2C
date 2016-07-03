@@ -9,11 +9,8 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class IfStatementGenerator : GeneratorBase<IfStatementSyntax>
+    public class IfStatementGenerator : GeneratorBase<IfStatementSyntax>
     {
-        private ExpressionGenerator m_expressionGen;
-
-
         /// <summary>
         /// If statement generator
         /// </summary>
@@ -21,7 +18,6 @@ namespace LibCS2C.Generators
         public IfStatementGenerator(WalkerContext context)
         {
             m_context = context;
-            m_expressionGen = new ExpressionGenerator(m_context);
         }
 
         /// <summary>
@@ -38,7 +34,7 @@ namespace LibCS2C.Generators
 
                 if (kind == SyntaxKind.EqualsExpression)
                 {
-                    m_expressionGen.Generate(childNode as ExpressionSyntax);
+                    m_context.Generators.Expression.Generate(childNode as ExpressionSyntax);
                 }
                 else if (kind == SyntaxKind.LogicalAndExpression ||
                          kind == SyntaxKind.LogicalOrExpression ||
@@ -50,7 +46,7 @@ namespace LibCS2C.Generators
                         SyntaxKind childKind = child.Kind();
                         if (childKind == SyntaxKind.EqualsExpression)
                         {
-                            m_expressionGen.Generate(child.AsNode() as ExpressionSyntax);
+                            m_context.Generators.Expression.Generate(child.AsNode() as ExpressionSyntax);
                         }
                         else
                         {
@@ -75,17 +71,14 @@ namespace LibCS2C.Generators
                         m_context.Writer.AppendLine("else");
                         m_context.Writer.AppendLine("{");
 
-                        BlockGenerator blockGen = new BlockGenerator(m_context);
-                        blockGen.Generate(childNode.ChildNodes().First() as BlockSyntax);
+                        m_context.Generators.Block.Generate(childNode.ChildNodes().First() as BlockSyntax);
                     }
                 }
                 else if (kind == SyntaxKind.Block)
                 {
                     m_context.Writer.AppendLine(")");
-
                     m_context.Writer.AppendLine("{");
-                    BlockGenerator blockGen = new BlockGenerator(m_context);
-                    blockGen.Generate(childNode as BlockSyntax);
+                    m_context.Generators.Block.Generate(childNode as BlockSyntax);
                 }
             }
             

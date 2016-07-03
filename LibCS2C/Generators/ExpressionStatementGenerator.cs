@@ -2,10 +2,8 @@
 
 namespace LibCS2C.Generators
 {
-    class ExpressionStatementGenerator : GeneratorBase<ExpressionStatementSyntax>
+    public class ExpressionStatementGenerator : GeneratorBase<ExpressionStatementSyntax>
     {
-        private ExpressionGenerator expressionGen;
-
         /// <summary>
         /// Expression generator
         /// </summary>
@@ -13,7 +11,6 @@ namespace LibCS2C.Generators
         public ExpressionStatementGenerator(WalkerContext context)
         {
             m_context = context;
-            expressionGen = new ExpressionGenerator(context);
         }
 
         /// <summary>
@@ -22,7 +19,7 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression statement node</param>
         public override void Generate(ExpressionStatementSyntax node)
         {
-            expressionGen.Generate(node.Expression);
+            m_context.Generators.Expression.Generate(node.Expression);
         }
     }
 }

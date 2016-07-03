@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace LibCS2C.Generators
 {
-    class ObjectCreationExpressionGenerator : GeneratorBase<ObjectCreationExpressionSyntax>
+    public class ObjectCreationExpressionGenerator : GeneratorBase<ObjectCreationExpressionSyntax>
     {
         /// <summary>
         /// Object creation expression generator
@@ -43,8 +43,7 @@ namespace LibCS2C.Generators
                 if (argCount > 0)
                     m_context.Writer.Append(", ");
 
-                ArgumentListGenerator argGen = new ArgumentListGenerator(m_context);
-                argGen.Generate(args);
+                m_context.Generators.ArgumentList.Generate(args);
 
                 m_context.Writer.Append(")");
             }

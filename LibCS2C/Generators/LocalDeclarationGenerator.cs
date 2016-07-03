@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class LocalDeclarationGenerator : GeneratorBase<LocalDeclarationStatementSyntax>
+    public class LocalDeclarationGenerator : GeneratorBase<LocalDeclarationStatementSyntax>
     {
-        private VariableGenerator m_variableGen;
-
         /// <summary>
         /// Local declaration generator
         /// </summary>
@@ -20,7 +18,6 @@ namespace LibCS2C.Generators
         public LocalDeclarationGenerator(WalkerContext context)
         {
             m_context = context;
-            m_variableGen = new VariableGenerator(m_context);
         }
 
         /// <summary>
@@ -32,7 +29,7 @@ namespace LibCS2C.Generators
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
             foreach (VariableDeclarationSyntax child in nodes)
             {
-                m_variableGen.Generate(child);
+                m_context.Generators.Variable.Generate(child);
             }
         }
     }

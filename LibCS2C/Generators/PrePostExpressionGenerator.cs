@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class PrePostExpressionGenerator : GeneratorBase<ExpressionSyntax>
+    public enum ExpressionType
     {
-        public enum ExpressionType
-        {
-            PreIncrement,
-            PreDecrement,
-            PostIncrement,
-            PostDecrement
-        }
+        PreIncrement,
+        PreDecrement,
+        PostIncrement,
+        PostDecrement
+    }
 
+    public class PrePostExpressionGenerator : GeneratorBase<ExpressionSyntax>
+    {
         private ExpressionType m_expressionType;
 
         /// <summary>
@@ -38,8 +38,6 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression</param>
         public override void Generate(ExpressionSyntax node)
         {
-            ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);
-
             IdentifierNameSyntax name = node.ChildNodes().First() as IdentifierNameSyntax;
             ISymbol symbol = m_context.Model.GetSymbolInfo(name).Symbol;
             bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);

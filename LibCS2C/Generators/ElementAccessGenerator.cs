@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class ElementAccessGenerator : GeneratorBase<ElementAccessExpressionSyntax>
+    public class ElementAccessGenerator : GeneratorBase<ElementAccessExpressionSyntax>
     {
         /// <summary>
         /// Element access expression generator
@@ -26,8 +26,6 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression</param>
         public override void Generate(ElementAccessExpressionSyntax node)
         {
-            ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);
-
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
             foreach (SyntaxNode child in nodes)
             {
@@ -46,7 +44,7 @@ namespace LibCS2C.Generators
 
                     foreach (ArgumentSyntax childNode in children)
                     {
-                        expressionGen.Generate(childNode.Expression);
+                        m_context.Generators.Expression.Generate(childNode.Expression);
                     }
 
                     m_context.Writer.Append("]");

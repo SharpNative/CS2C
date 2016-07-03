@@ -10,7 +10,7 @@ namespace LibCS2C
     /// <summary>
     /// Contains the native / generic type conversions
     /// </summary>
-    class TypeConversion
+    public class TypeConversion
     {
         private Dictionary<string, string> m_convert = new Dictionary<string, string>()
         {

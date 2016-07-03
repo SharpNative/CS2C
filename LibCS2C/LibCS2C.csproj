@@ -102,6 +102,7 @@
   <ItemGroup>
     <Compile Include="Compiler.cs" />
     <Compile Include="FormattedStringBuilder.cs" />
+    <Compile Include="AllGenerators.cs" />
     <Compile Include="Generators\ArgumentListGenerator.cs" />
     <Compile Include="Generators\ElementAccessGenerator.cs" />
     <Compile Include="Generators\EnumGenerator.cs" />

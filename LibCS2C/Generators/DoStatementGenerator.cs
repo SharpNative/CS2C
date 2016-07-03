@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class DoStatementGenerator : GeneratorBase<DoStatementSyntax>
+    public class DoStatementGenerator : GeneratorBase<DoStatementSyntax>
     {
-        private ExpressionGenerator m_expressionGen;
-        
         /// <summary>
         /// Do statement generator
         /// </summary>
@@ -20,7 +18,6 @@ namespace LibCS2C.Generators
         public DoStatementGenerator(WalkerContext context)
         {
             m_context = context;
-            m_expressionGen = new ExpressionGenerator(m_context);
         }
         
         /// <summary>
@@ -41,7 +38,7 @@ namespace LibCS2C.Generators
 
             m_context.Writer.AppendLine("}");
             m_context.Writer.Append("while(");
-            m_expressionGen.Generate(node.Condition);
+            m_context.Generators.Expression.Generate(node.Condition);
             m_context.Writer.Append(")");
         }
     }

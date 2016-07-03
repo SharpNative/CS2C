@@ -9,18 +9,8 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class BlockGenerator : GeneratorBase<BlockSyntax>
+    public class BlockGenerator : GeneratorBase<BlockSyntax>
     {
-        private VariableGenerator m_variableGen;
-        private ReturnStatementGenerator m_returnStatementGen;
-        private ExpressionStatementGenerator m_expressionStatementGen;
-        private LocalDeclarationGenerator m_localDeclarationGen;
-        private IfStatementGenerator m_ifStatementGen;
-        private ForStatementGenerator m_forStatementGen;
-        private WhileStatementGenerator m_whileStatementGen;
-        private FixedStatementGenerator m_fixedStatementGen;
-        private DoStatementGenerator m_doStatementGen;
-
         /// <summary>
         /// Block generator
         /// </summary>
@@ -28,15 +18,6 @@ namespace LibCS2C.Generators
         public BlockGenerator(WalkerContext context)
         {
             m_context = context;
-            m_variableGen = new VariableGenerator(m_context);
-            m_returnStatementGen = new ReturnStatementGenerator(m_context);
-            m_expressionStatementGen = new ExpressionStatementGenerator(m_context);
-            m_localDeclarationGen = new LocalDeclarationGenerator(m_context);
-            m_ifStatementGen = new IfStatementGenerator(m_context);
-            m_forStatementGen = new ForStatementGenerator(m_context);
-            m_whileStatementGen = new WhileStatementGenerator(m_context);
-            m_fixedStatementGen = new FixedStatementGenerator(m_context);
-            m_doStatementGen = new DoStatementGenerator(m_context);
         }
 
         /// <summary>
@@ -48,35 +29,35 @@ namespace LibCS2C.Generators
             switch (childNode.Kind())
             {
                 case SyntaxKind.VariableDeclaration:
-                    m_variableGen.Generate(childNode as VariableDeclarationSyntax);
+                    m_context.Generators.Variable.Generate(childNode as VariableDeclarationSyntax);
                     break;
 
                 case SyntaxKind.ReturnStatement:
-                    m_returnStatementGen.Generate(childNode as ReturnStatementSyntax);
+                    m_context.Generators.ReturnStatement.Generate(childNode as ReturnStatementSyntax);
                     break;
 
                 case SyntaxKind.ExpressionStatement:
-                    m_expressionStatementGen.Generate(childNode as ExpressionStatementSyntax);
+                    m_context.Generators.Expression.Generate(childNode as ExpressionStatementSyntax);
                     break;
 
                 case SyntaxKind.LocalDeclarationStatement:
-                    m_localDeclarationGen.Generate(childNode as LocalDeclarationStatementSyntax);
+                    m_context.Generators.LocalDeclaration.Generate(childNode as LocalDeclarationStatementSyntax);
                     break;
 
                 case SyntaxKind.IfStatement:
-                    m_ifStatementGen.Generate(childNode as IfStatementSyntax);
+                    m_context.Generators.IfStatement.Generate(childNode as IfStatementSyntax);
                     break;
 
                 case SyntaxKind.ForStatement:
-                    m_forStatementGen.Generate(childNode as ForStatementSyntax);
+                    m_context.Generators.ForStatement.Generate(childNode as ForStatementSyntax);
                     break;
 
                 case SyntaxKind.WhileStatement:
-                    m_whileStatementGen.Generate(childNode as WhileStatementSyntax);
+                    m_context.Generators.WhileStatement.Generate(childNode as WhileStatementSyntax);
                     break;
 
                 case SyntaxKind.FixedStatement:
-                    m_fixedStatementGen.Generate(childNode as FixedStatementSyntax);
+                    m_context.Generators.FixedStatement.Generate(childNode as FixedStatementSyntax);
                     break;
 
                 case SyntaxKind.Block:
@@ -86,7 +67,7 @@ namespace LibCS2C.Generators
                     break;
 
                 case SyntaxKind.DoStatement:
-                    m_doStatementGen.Generate(childNode as DoStatementSyntax);
+                    m_context.Generators.DoStatement.Generate(childNode as DoStatementSyntax);
                     break;
 
                 default:

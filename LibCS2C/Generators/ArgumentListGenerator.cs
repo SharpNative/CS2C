@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class ArgumentListGenerator : GeneratorBase<ArgumentListSyntax>
+    public class ArgumentListGenerator : GeneratorBase<ArgumentListSyntax>
     {
-        private ExpressionGenerator m_expressionGen;
-
         /// <summary>
         /// Argument list generator
         /// </summary>
@@ -20,7 +18,6 @@ namespace LibCS2C.Generators
         public ArgumentListGenerator(WalkerContext context)
         {
             m_context = context;
-            m_expressionGen = new ExpressionGenerator(m_context);
         }
 
         /// <summary>
@@ -35,7 +32,7 @@ namespace LibCS2C.Generators
                 IEnumerable<SyntaxNode> children = argument.ChildNodes();
                 foreach(ExpressionSyntax child in children)
                 {
-                    m_expressionGen.Generate(child);
+                    m_context.Generators.Expression.Generate(child);
                 }
 
                 // A comma if it's not the last argument

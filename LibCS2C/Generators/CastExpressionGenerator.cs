@@ -6,7 +6,7 @@ using System.Text;
 
 namespace LibCS2C.Generators
 {
-    class CastExpressionGenerator : GeneratorBase<CastExpressionSyntax>
+    public class CastExpressionGenerator : GeneratorBase<CastExpressionSyntax>
     {
         /// <summary>
         /// Cast expression generator
@@ -24,9 +24,7 @@ namespace LibCS2C.Generators
         public override void Generate(CastExpressionSyntax node)
         {
             m_context.Writer.Append(string.Format("({0})", m_context.ConvertTypeName(node.Type)));
-
-            ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);
-            expressionGen.Generate(node.Expression);
+            m_context.Generators.Expression.Generate(node.Expression);
         }
     }
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class InvocationGenerator : GeneratorBase<ExpressionSyntax>
+    public class InvocationGenerator : GeneratorBase<ExpressionSyntax>
     {
         /// <summary>
         /// Invocation generator
@@ -57,7 +57,6 @@ namespace LibCS2C.Generators
             m_context.Writer.Append(string.Format("{0}(", memberName));
 
             // Arguments
-            ArgumentListGenerator argGen = new ArgumentListGenerator(m_context);
             ArgumentListSyntax argsList = (from a in nodes
                                            where a.Kind() == SyntaxKind.ArgumentList
                                            select a).FirstOrDefault() as ArgumentListSyntax;
@@ -73,7 +72,7 @@ namespace LibCS2C.Generators
                     m_context.Writer.Append(objName + ", ");
             }
 
-            argGen.Generate(argsList);
+            m_context.Generators.ArgumentList.Generate(argsList);
 
             m_context.Writer.Append(")");
         }

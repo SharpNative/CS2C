@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace LibCS2C
 {
-    class WalkerContext
+    public class WalkerContext
     {
         /// <summary>
         /// Type conversion helper
@@ -64,12 +64,18 @@ namespace LibCS2C
         public string CurrentNamespaceFormatted { get { return CurrentNamespace.Name.ToString().Replace(".", "_"); } }
 
         /// <summary>
+        /// A list with all the generators
+        /// </summary>
+        public AllGenerators Generators { get; private set; }
+
+        /// <summary>
         /// Contextwalker
         /// </summary>
         /// <param name="sb">The formatted string builder</param>
         public WalkerContext(FormattedStringBuilder sb)
         {
             Writer = sb;
+            Generators = new AllGenerators(this);
         }
 
         /// <summary>

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class FixedStatementGenerator : GeneratorBase<FixedStatementSyntax>
+    public class FixedStatementGenerator : GeneratorBase<FixedStatementSyntax>
     {
         /// <summary>
         /// Fixed statement generator
@@ -29,11 +29,10 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine("{");
             m_context.Writer.Indent();
             
-            BlockGenerator blockGen = new BlockGenerator(m_context);
             IEnumerable<SyntaxNode> children = node.ChildNodes();
             foreach (SyntaxNode child in children)
             {
-                blockGen.GenerateChildren(child);
+                m_context.Generators.Block.GenerateChildren(child);
             }
 
             m_context.Writer.UnIndent();

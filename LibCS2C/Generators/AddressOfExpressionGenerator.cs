@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class AddressOfExpressionGenerator : GeneratorBase<PrefixUnaryExpressionSyntax>
+    public class AddressOfExpressionGenerator : GeneratorBase<PrefixUnaryExpressionSyntax>
     {
         /// <summary>
         /// Address of expression generator
@@ -27,8 +27,7 @@ namespace LibCS2C.Generators
         public override void Generate(PrefixUnaryExpressionSyntax node)
         {
             m_context.Writer.Append("&");
-            ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);
-            expressionGen.Generate(node.Operand);
+            m_context.Generators.Expression.Generate(node.Operand);
         }
     }
 }

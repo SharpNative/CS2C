@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class VariableGenerator : GeneratorBase<VariableDeclarationSyntax>
+    public class VariableGenerator : GeneratorBase<VariableDeclarationSyntax>
     {
-        private ExpressionGenerator m_expressionGen;
-
         /// <summary>
         /// Variable declaration generator
         /// </summary>
@@ -20,7 +18,6 @@ namespace LibCS2C.Generators
         public VariableGenerator(WalkerContext context)
         {
             m_context = context;
-            m_expressionGen = new ExpressionGenerator(m_context);
         }
 
         /// <summary>
@@ -37,7 +34,7 @@ namespace LibCS2C.Generators
                 m_context.Writer.Append(string.Format("{0} {1} = ", typeName, variable.Identifier));
 
                 ExpressionSyntax expression = variable.Initializer.Value;
-                m_expressionGen.Generate(expression);
+                m_context.Generators.Expression.Generate(expression);
             }
         }
     }

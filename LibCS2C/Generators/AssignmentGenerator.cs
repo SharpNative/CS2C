@@ -9,21 +9,21 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class AssignmentGenerator : GeneratorBase<AssignmentExpressionSyntax>
+    public enum AssignmentType
     {
-        public enum AssignmentType
-        {
-            LeftShift,
-            RightShift,
-            BinaryOr,
-            ExclusiveOr,
-            BinaryAnd,
-            Add,
-            Substract,
-            Multiply,
-            Divide
-        }
+        LeftShift,
+        RightShift,
+        BinaryOr,
+        ExclusiveOr,
+        BinaryAnd,
+        Add,
+        Substract,
+        Multiply,
+        Divide
+    }
 
+    public class AssignmentGenerator : GeneratorBase<AssignmentExpressionSyntax>
+    {
         private AssignmentType m_assignmentType;
         
         /// <summary>
@@ -43,8 +43,7 @@ namespace LibCS2C.Generators
         /// <param name="node">The assignment</param>
         public override void Generate(AssignmentExpressionSyntax node)
         {
-            ExpressionGenerator expressionGen = new ExpressionGenerator(m_context);
-            expressionGen.Generate(node.Left);
+            m_context.Generators.Expression.Generate(node.Left);
 
             switch(m_assignmentType)
             {
@@ -87,8 +86,8 @@ namespace LibCS2C.Generators
                 default:
                     break;
             }
-            
-            expressionGen.Generate(node.Right);
+
+            m_context.Generators.Expression.Generate(node.Right);
         }
     }
 }

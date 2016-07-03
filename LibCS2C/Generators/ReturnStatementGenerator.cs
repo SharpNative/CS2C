@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class ReturnStatementGenerator : GeneratorBase<ReturnStatementSyntax>
+    public class ReturnStatementGenerator : GeneratorBase<ReturnStatementSyntax>
     {
-        private ExpressionGenerator m_expressionGen;
-
         /// <summary>
         /// Return statement generator
         /// </summary>
@@ -20,7 +18,6 @@ namespace LibCS2C.Generators
         public ReturnStatementGenerator(WalkerContext context)
         {
             m_context = context;
-            m_expressionGen = new ExpressionGenerator(m_context);
         }
 
         /// <summary>
@@ -30,7 +27,7 @@ namespace LibCS2C.Generators
         public override void Generate(ReturnStatementSyntax node)
         {
             m_context.Writer.Append("return ");
-            m_expressionGen.Generate(node.Expression);
+            m_context.Generators.Expression.Generate(node.Expression);
         }
     }
 }

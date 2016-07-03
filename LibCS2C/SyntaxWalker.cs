@@ -13,14 +13,7 @@ namespace LibCS2C
     {
         private FormattedStringBuilder m_sb;
         private WalkerContext m_context;
-
-        private MethodGenerator m_methodGen;
-        private MethodGenerator m_constructorGen;
-        private ClassCodeGenerator m_classFieldGen;
-        private PropertyGenerator m_propertyGen;
-        private StructGenerator m_structGen;
-        private EnumGenerator m_enumGen;
-
+        
         /// <summary>
         /// Walks through the syntax and outputs C code to a <see cref="FormattedStringBuilder">FormattedStringBuilder</see>
         /// </summary>
@@ -29,16 +22,12 @@ namespace LibCS2C
         {
             m_sb = sb;
             m_context = new WalkerContext(sb);
-
-            // Generators
-            m_methodGen = new MethodGenerator(m_context, MethodGeneratorType.Method);
-            m_constructorGen = new MethodGenerator(m_context, MethodGeneratorType.Constructor);
-            m_classFieldGen = new ClassCodeGenerator(m_context);
-            m_propertyGen = new PropertyGenerator(m_context);
-            m_structGen = new StructGenerator(m_context);
-            m_enumGen = new EnumGenerator(m_context);
         }
 
+        /// <summary>
+        /// Sets the current document
+        /// </summary>
+        /// <param name="doc">The document</param>
         public void SetDocument(Document doc)
         {
             m_context.Model = doc.GetSemanticModelAsync().Result;
@@ -51,7 +40,7 @@ namespace LibCS2C
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
             m_sb.AppendLine("/* Struct <" + node.Identifier + "> */");
-            m_structGen.Generate(node);
+            m_context.Generators.Struct.Generate(node);
             base.VisitStructDeclaration(node);
         }
 
@@ -63,7 +52,7 @@ namespace LibCS2C
         {
             m_sb.AppendLine("/* Class <" + node.Identifier + "> */");
             m_context.CurrentClass = node;
-            m_classFieldGen.Generate(node);
+            m_context.Generators.ClassCode.Generate(node);
             base.VisitClassDeclaration(node);
         }
 
@@ -73,7 +62,7 @@ namespace LibCS2C
         /// <param name="node">The constructor declaration node</param>
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
         {
-            m_constructorGen.Generate(node);
+            m_context.Generators.ConstructorDeclaration.Generate(node);
             base.VisitConstructorDeclaration(node);
         }
 
@@ -83,7 +72,7 @@ namespace LibCS2C
         /// <param name="node">The method declaration node</param>
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
-            m_methodGen.Generate(node);
+            m_context.Generators.MethodDeclaration.Generate(node);
             base.VisitMethodDeclaration(node);
         }
 
@@ -93,7 +82,7 @@ namespace LibCS2C
         /// <param name="node">The property node</param>
         public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
-            m_propertyGen.Generate(node);
+            m_context.Generators.Property.Generate(node);
             base.VisitPropertyDeclaration(node);
         }
 
@@ -103,7 +92,7 @@ namespace LibCS2C
         /// <param name="node">The enum node</param>
         public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
-            m_enumGen.Generate(node);
+            m_context.Generators.Enum.Generate(node);
             base.VisitEnumDeclaration(node);
         }
 

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class EnumGenerator : GeneratorBase<EnumDeclarationSyntax>
+    public class EnumGenerator : GeneratorBase<EnumDeclarationSyntax>
     {
         /// <summary>
         /// Enum statement generator

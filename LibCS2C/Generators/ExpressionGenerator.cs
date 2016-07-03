@@ -9,33 +9,8 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class ExpressionGenerator : GeneratorBase<SyntaxNode>
+    public class ExpressionGenerator : GeneratorBase<SyntaxNode>
     {
-        private InvocationGenerator m_invocationGen;
-        private SimpleAssignmentGenerator m_simpleAssignmentGen;
-        private SimpleMemberAccessGenerator m_simpleMemberAccessGen;
-        private ObjectCreationExpressionGenerator m_objectCreationGen;
-        private CastExpressionGenerator m_castExpressionGen;
-        private SizeofExpressionGenerator m_sizeofExpressionGen;
-        private AddressOfExpressionGenerator m_addressOfExpressionGen;
-        private ArrayCreationExpressionGenerator m_arrayCreationExpressionGen;
-        private ElementAccessGenerator m_elementAccessGen;
-
-        private AssignmentGenerator m_leftShiftAssignmentGen;
-        private AssignmentGenerator m_rightShiftAssignmentGen;
-        private AssignmentGenerator m_binaryOrAssignmentGen;
-        private AssignmentGenerator m_exclusiveOrAssignmentGen;
-        private AssignmentGenerator m_binaryAndAssignmentGen;
-        private AssignmentGenerator m_addAssignmentGen;
-        private AssignmentGenerator m_substractAssignmentGen;
-        private AssignmentGenerator m_multiplyAssignmentGen;
-        private AssignmentGenerator m_divideAssignmentGen;
-
-        private PrePostExpressionGenerator m_preIncrementExpressionGen;
-        private PrePostExpressionGenerator m_preDecrementExpressionGen;
-        private PrePostExpressionGenerator m_postIncrementExpressionGen;
-        private PrePostExpressionGenerator m_postDecrementExpressionGen;
-
         /// <summary>
         /// Expression generator
         /// </summary>
@@ -43,30 +18,6 @@ namespace LibCS2C.Generators
         public ExpressionGenerator(WalkerContext context)
         {
             m_context = context;
-            m_simpleAssignmentGen = new SimpleAssignmentGenerator(m_context);
-            m_invocationGen = new InvocationGenerator(m_context);
-            m_simpleMemberAccessGen = new SimpleMemberAccessGenerator(m_context);
-            m_objectCreationGen = new ObjectCreationExpressionGenerator(m_context);
-            m_castExpressionGen = new CastExpressionGenerator(m_context);
-            m_sizeofExpressionGen = new SizeofExpressionGenerator(m_context);
-            m_addressOfExpressionGen = new AddressOfExpressionGenerator(m_context);
-            m_arrayCreationExpressionGen = new ArrayCreationExpressionGenerator(m_context);
-            m_elementAccessGen = new ElementAccessGenerator(m_context);
-
-            m_leftShiftAssignmentGen = new AssignmentGenerator(m_context, AssignmentGenerator.AssignmentType.LeftShift);
-            m_rightShiftAssignmentGen = new AssignmentGenerator(m_context, AssignmentGenerator.AssignmentType.RightShift);
-            m_binaryOrAssignmentGen = new AssignmentGenerator(m_context, AssignmentGenerator.AssignmentType.BinaryOr);
-            m_exclusiveOrAssignmentGen = new AssignmentGenerator(m_context, AssignmentGenerator.AssignmentType.ExclusiveOr);
-            m_binaryAndAssignmentGen = new AssignmentGenerator(m_context, AssignmentGenerator.AssignmentType.BinaryAnd);
-            m_addAssignmentGen = new AssignmentGenerator(m_context, AssignmentGenerator.AssignmentType.Add);
-            m_substractAssignmentGen = new AssignmentGenerator(m_context, AssignmentGenerator.AssignmentType.Substract);
-            m_multiplyAssignmentGen = new AssignmentGenerator(m_context, AssignmentGenerator.AssignmentType.Multiply);
-            m_divideAssignmentGen = new AssignmentGenerator(m_context, AssignmentGenerator.AssignmentType.Divide);
-
-            m_preIncrementExpressionGen = new PrePostExpressionGenerator(m_context, PrePostExpressionGenerator.ExpressionType.PreIncrement);
-            m_preDecrementExpressionGen = new PrePostExpressionGenerator(m_context, PrePostExpressionGenerator.ExpressionType.PreDecrement);
-            m_postIncrementExpressionGen = new PrePostExpressionGenerator(m_context, PrePostExpressionGenerator.ExpressionType.PostIncrement);
-            m_postDecrementExpressionGen = new PrePostExpressionGenerator(m_context, PrePostExpressionGenerator.ExpressionType.PostDecrement);
         }
 
         /// <summary>
@@ -78,67 +29,67 @@ namespace LibCS2C.Generators
             switch (node.Kind())
             {
                 case SyntaxKind.ArrayCreationExpression:
-                    m_arrayCreationExpressionGen.Generate(node as ArrayCreationExpressionSyntax);
+                    m_context.Generators.ArrayCreationExpression.Generate(node as ArrayCreationExpressionSyntax);
                     break;
 
                 case SyntaxKind.AddressOfExpression:
-                    m_addressOfExpressionGen.Generate(node as PrefixUnaryExpressionSyntax);
+                    m_context.Generators.AddressOfExpression.Generate(node as PrefixUnaryExpressionSyntax);
                     break;
 
                 case SyntaxKind.ElementAccessExpression:
-                    m_elementAccessGen.Generate(node as ElementAccessExpressionSyntax);
+                    m_context.Generators.ElementAccess.Generate(node as ElementAccessExpressionSyntax);
                     break;
 
                 case SyntaxKind.SimpleMemberAccessExpression:
-                    m_simpleMemberAccessGen.Generate(node as ExpressionSyntax);
+                    m_context.Generators.SimpleMemberAccess.Generate(node as ExpressionSyntax);
                     break;
 
                 case SyntaxKind.ObjectCreationExpression:
-                    m_objectCreationGen.Generate(node as ObjectCreationExpressionSyntax);
+                    m_context.Generators.ObjectCreationExpression.Generate(node as ObjectCreationExpressionSyntax);
                     break;
 
                 case SyntaxKind.SimpleAssignmentExpression:
-                    m_simpleAssignmentGen.Generate(node as ExpressionSyntax);
+                    m_context.Generators.SimpleAssignment.Generate(node as ExpressionSyntax);
                     break;
 
                 case SyntaxKind.InvocationExpression:
-                    m_invocationGen.Generate(node as ExpressionSyntax);
+                    m_context.Generators.Invocation.Generate(node as ExpressionSyntax);
                     break;
 
                 case SyntaxKind.LeftShiftAssignmentExpression:
-                    m_leftShiftAssignmentGen.Generate(node as AssignmentExpressionSyntax);
+                    m_context.Generators.LeftShiftAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
 
                 case SyntaxKind.RightShiftAssignmentExpression:
-                    m_rightShiftAssignmentGen.Generate(node as AssignmentExpressionSyntax);
+                    m_context.Generators.RightShiftAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
 
                 case SyntaxKind.OrAssignmentExpression:
-                    m_binaryOrAssignmentGen.Generate(node as AssignmentExpressionSyntax);
+                    m_context.Generators.BinaryOrAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
 
                 case SyntaxKind.AndAssignmentExpression:
-                    m_binaryAndAssignmentGen.Generate(node as AssignmentExpressionSyntax);
+                    m_context.Generators.BinaryAndAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
 
                 case SyntaxKind.ExclusiveOrAssignmentExpression:
-                    m_exclusiveOrAssignmentGen.Generate(node as AssignmentExpressionSyntax);
+                    m_context.Generators.ExclusiveOrAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
 
                 case SyntaxKind.AddAssignmentExpression:
-                    m_addAssignmentGen.Generate(node as AssignmentExpressionSyntax);
+                    m_context.Generators.AddAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
 
                 case SyntaxKind.SubtractAssignmentExpression:
-                    m_substractAssignmentGen.Generate(node as AssignmentExpressionSyntax);
+                    m_context.Generators.SubstractAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
                     
                 case SyntaxKind.MultiplyAssignmentExpression:
-                    m_multiplyAssignmentGen.Generate(node as AssignmentExpressionSyntax);
+                    m_context.Generators.MultiplyAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
 
                 case SyntaxKind.DivideAssignmentExpression:
-                    m_divideAssignmentGen.Generate(node as AssignmentExpressionSyntax);
+                    m_context.Generators.DivideAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
 
                 case SyntaxKind.LessThanExpression:
@@ -175,27 +126,27 @@ namespace LibCS2C.Generators
                     break;
 
                 case SyntaxKind.CastExpression:
-                    m_castExpressionGen.Generate(node as CastExpressionSyntax);
+                    m_context.Generators.CastExpression.Generate(node as CastExpressionSyntax);
                     break;
 
                 case SyntaxKind.SizeOfExpression:
-                    m_sizeofExpressionGen.Generate(node as SizeOfExpressionSyntax);
+                    m_context.Generators.SizeOfExpression.Generate(node as SizeOfExpressionSyntax);
                     break;
 
                 case SyntaxKind.PostDecrementExpression:
-                    m_postDecrementExpressionGen.Generate(node as ExpressionSyntax);
+                    m_context.Generators.PostDecrementExpression.Generate(node as ExpressionSyntax);
                     break;
 
                 case SyntaxKind.PostIncrementExpression:
-                    m_postIncrementExpressionGen.Generate(node as ExpressionSyntax);
+                    m_context.Generators.PostIncrementExpression.Generate(node as ExpressionSyntax);
                     break;
 
                 case SyntaxKind.PreDecrementExpression:
-                    m_preDecrementExpressionGen.Generate(node as ExpressionSyntax);
+                    m_context.Generators.PreDecrementExpression.Generate(node as ExpressionSyntax);
                     break;
 
                 case SyntaxKind.PreIncrementExpression:
-                    m_preIncrementExpressionGen.Generate(node as ExpressionSyntax);
+                    m_context.Generators.PreIncrementExpression.Generate(node as ExpressionSyntax);
                     break;
                     
                 default:

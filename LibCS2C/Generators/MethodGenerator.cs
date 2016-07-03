@@ -9,16 +9,15 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    enum MethodGeneratorType
+    public enum MethodGeneratorType
     {
         Method = 0,
         Constructor = 1
     }
 
-    class MethodGenerator: GeneratorBase<BaseMethodDeclarationSyntax>
+    public class MethodGenerator: GeneratorBase<BaseMethodDeclarationSyntax>
     {
         private MethodGeneratorType m_type;
-        private BlockGenerator m_blockGen;
 
         /// <summary>
         /// Method declaration generator
@@ -29,7 +28,6 @@ namespace LibCS2C.Generators
         {
             m_context = context;
             m_type = type;
-            m_blockGen = new BlockGenerator(m_context);
         }
 
         /// <summary>
@@ -141,8 +139,8 @@ namespace LibCS2C.Generators
 
             // Block containing the code of the method
             m_context.Writer.AppendLine("{");
-            
-            m_blockGen.Generate(node.Body);
+
+            m_context.Generators.Block.Generate(node.Body);
 
             // If the method is a constructor, we need to return the object
             if(m_type == MethodGeneratorType.Constructor)

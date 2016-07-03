@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class SizeofExpressionGenerator : GeneratorBase<SizeOfExpressionSyntax>
+    public class SizeofExpressionGenerator : GeneratorBase<SizeOfExpressionSyntax>
     {
         /// <summary>
         /// Sizeof statement generator

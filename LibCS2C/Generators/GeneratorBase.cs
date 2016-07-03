@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    abstract class GeneratorBase<T> : IGenerator<T> where T: class
+    public abstract class GeneratorBase<T> : IGenerator<T> where T: class
     {
         protected WalkerContext m_context;
 

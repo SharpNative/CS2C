@@ -11,8 +11,7 @@ namespace LibCS2C.Generators
     {
         private Dictionary<string, EqualsValueClauseSyntax> m_nonStaticFields;
         private Dictionary<string, EqualsValueClauseSyntax> m_propertyInitialValues;
-        private ExpressionGenerator m_expressionGen;
-
+        
         /// <summary>
         /// Class struct generator
         /// </summary>
@@ -22,7 +21,6 @@ namespace LibCS2C.Generators
             m_context = context;
             m_nonStaticFields = nonStaticFields;
             m_propertyInitialValues = propertyInitialValues;
-            m_expressionGen = new ExpressionGenerator(m_context);
         }
 
         /// <summary>
@@ -46,7 +44,7 @@ namespace LibCS2C.Generators
             {
                 m_context.Writer.Append(string.Format("\tobject->field_{0} = ", pair.Key));
                 ExpressionSyntax expression = pair.Value.Value;
-                m_expressionGen.Generate(expression);
+                m_context.Generators.Expression.Generate(expression);
                 m_context.Writer.AppendLine(";");
             }
 
@@ -55,7 +53,7 @@ namespace LibCS2C.Generators
             {
                 m_context.Writer.Append(string.Format("\tobject->prop_{0} = ", pair.Key));
                 ExpressionSyntax expression = pair.Value.Value;
-                m_expressionGen.Generate(expression);
+                m_context.Generators.Expression.Generate(expression);
                 m_context.Writer.AppendLine(";");
             }
 

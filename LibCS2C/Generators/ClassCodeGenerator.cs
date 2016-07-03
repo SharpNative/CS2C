@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    class ClassCodeGenerator : GeneratorBase<ClassDeclarationSyntax>
+    public class ClassCodeGenerator : GeneratorBase<ClassDeclarationSyntax>
     {
         /// <summary>
         /// Class field generator

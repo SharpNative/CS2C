@@ -11,7 +11,6 @@ namespace LibCS2C.Generators
     {
         private Dictionary<string, EqualsValueClauseSyntax> m_staticFields;
         private Dictionary<string, EqualsValueClauseSyntax> m_staticProperties;
-        private ExpressionGenerator m_expressionGen;
 
         /// <summary>
         /// Class .cctor generator
@@ -22,7 +21,6 @@ namespace LibCS2C.Generators
             m_context = context;
             m_staticFields = staticFields;
             m_staticProperties = staticProperties;
-            m_expressionGen = new ExpressionGenerator(m_context);
         }
 
         /// <summary>
@@ -44,7 +42,7 @@ namespace LibCS2C.Generators
             {
                 m_context.Writer.Append(string.Format("\tclassStatics_{0}.{1} = ", convertedClassName, pair.Key));
                 ExpressionSyntax expression = pair.Value.Value;
-                m_expressionGen.Generate(expression);
+                m_context.Generators.Expression.Generate(expression);
                 m_context.Writer.AppendLine(";");
             }
 
@@ -52,7 +50,7 @@ namespace LibCS2C.Generators
             {
                 m_context.Writer.Append(string.Format("\tclassStatics_{0}.prop_{1} = ", convertedClassName, pair.Key));
                 ExpressionSyntax expression = pair.Value.Value;
-                m_expressionGen.Generate(expression);
+                m_context.Generators.Expression.Generate(expression);
                 m_context.Writer.AppendLine(";");
             }
 

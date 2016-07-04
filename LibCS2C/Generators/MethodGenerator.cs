@@ -47,8 +47,6 @@ namespace LibCS2C.Generators
                 ConstructorDeclarationSyntax nodeTyped = node as ConstructorDeclarationSyntax;
                 identifier = nodeTyped.Identifier;
                 returnType = m_context.CurrentClassStructName + "*";
-
-                m_context.Writer.AppendLine("/* Constructor <" + identifier + "> */");
             }
             else if(m_type == MethodGeneratorType.Method)
             {
@@ -66,11 +64,6 @@ namespace LibCS2C.Generators
                         break;
                     }
                 }
-
-                if(isStatic)
-                    m_context.Writer.AppendLine("/* Static Method <" + identifier + "> */");
-                else
-                    m_context.Writer.AppendLine("/* Method <" + identifier + "> */");
             }
 
             string method = string.Format("{0} {1}_{2}", returnType, m_context.CurrentClassNameFormatted, identifier);

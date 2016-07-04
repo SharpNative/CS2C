@@ -52,11 +52,20 @@ namespace LibCS2C.Generators
 
                     if (getAccessor != default(AccessorDeclarationSyntax))
                     {
+                        string methodPrototype;
                         if (isStatic)
-                            m_context.Writer.AppendLine(string.Format("{0} {1}_{2}_getter(void)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier));
+                            methodPrototype = string.Format("{0} {1}_{2}_getter(void)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier);
                         else
-                            m_context.Writer.AppendLine(string.Format("{0} {1}_{2}_getter({3}* obj)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier, m_context.CurrentClassStructName));
+                            methodPrototype = string.Format("{0} {1}_{2}_getter({3}* obj)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier, m_context.CurrentClassStructName);
 
+                        // Method prototype
+                        m_context.CurrentDestination = WriterDestination.MethodPrototypes;
+                        m_context.Writer.Append(methodPrototype);
+                        m_context.Writer.AppendLine(";");
+
+                        // Method declaration
+                        m_context.CurrentDestination = WriterDestination.MethodDeclarations;
+                        m_context.Writer.AppendLine(methodPrototype);
                         m_context.Writer.AppendLine("{");
 
                         if (getAccessor.Body == null)
@@ -76,11 +85,20 @@ namespace LibCS2C.Generators
 
                     if (setAccessor != default(AccessorDeclarationSyntax))
                     {
+                        string methodPrototype;
                         if (isStatic)
-                            m_context.Writer.AppendLine(string.Format("{0} {1}_{2}_setter({0} value)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier));
+                            methodPrototype = string.Format("{0} {1}_{2}_setter({0} value)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier);
                         else
-                            m_context.Writer.AppendLine(string.Format("{0} {1}_{2}_setter({3}* obj, {0} value)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier, m_context.CurrentClassStructName));
+                            methodPrototype = string.Format("{0} {1}_{2}_setter({3}* obj, {0} value)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier, m_context.CurrentClassStructName);
 
+                        // Method prototype
+                        m_context.CurrentDestination = WriterDestination.MethodPrototypes;
+                        m_context.Writer.Append(methodPrototype);
+                        m_context.Writer.AppendLine(";");
+
+                        // Method declaration
+                        m_context.CurrentDestination = WriterDestination.MethodDeclarations;
+                        m_context.Writer.AppendLine(methodPrototype);
                         m_context.Writer.AppendLine("{");
 
                         if (setAccessor.Body == null)

@@ -25,22 +25,27 @@ namespace LibCS2C.Generators
         {
             // The first node will be an identifier
             // Check its type, if it's a property, that means we need to use the setter
-
-            //Console.WriteLine("simple ass: " + node);
-
+            ChildSyntaxList nodes = node.ChildNodesAndTokens();
             ISymbol symbol = m_context.Model.GetSymbolInfo(node.ChildNodes().First()).Symbol;
             bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);
 
             if (isProperty)
             {
-                if (symbol.IsStatic)
-                    m_context.Writer.Append(string.Format("{0}_{1}_setter(", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
-                else
-                    m_context.Writer.Append(string.Format("{0}_{1}_setter(obj, ", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
+                // If the first node is a memberaccess, we need to get the object name from that node
+                string objName = "obj";
+                SyntaxNode firstNode = nodes[0].AsNode();
+                if(firstNode is MemberAccessExpressionSyntax)
+                {
+                    IdentifierNameSyntax identifier = firstNode.ChildNodes().First() as IdentifierNameSyntax;
+                    objName = m_context.ConvertVariableName(identifier);
+                }
+
+                m_context.Writer.Append(string.Format("{0}_{1}_setter(", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
+                if (!symbol.IsStatic)
+                    m_context.Writer.Append(string.Format("{0}, ", objName));
             }
 
             bool first = true;
-            ChildSyntaxList nodes = node.ChildNodesAndTokens();
             foreach (SyntaxNodeOrToken child in nodes)
             {
                 SyntaxKind kind = child.Kind();

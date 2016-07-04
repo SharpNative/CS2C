@@ -9,30 +9,12 @@ namespace TestProject
 {
     class Program
     {
-        struct TestStruct
-        {
-            public int lol = 2;
-        }
-
         static void Main(string[] args)
         {
-            int a = 5;
-            int b = 3;
-            int c = a + b;
-            b = 2;
-            Method2(33, 44, 88);
-
             TestClass nein = new TestClass(44);
-            nein.TestPointer();
-            
-            TestStruct at = new TestStruct();
-            at.lol = 23;
-        }
-        
-        static void Method2(int a, int b, int c)
-        {
-            Console.WriteLine("Method2!");
-            string teststring = "lo";
+            nein.Test();
+
+            nein.TestProperty = 42;
         }
     }
 }

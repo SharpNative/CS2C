@@ -22,6 +22,32 @@ namespace LibCS2C.Generators
         }
 
         /// <summary>
+        /// Generates the object part
+        /// </summary>
+        /// <param name="node">The object node</param>
+        private void GenerateObjectPart(SyntaxNode node)
+        {
+            SyntaxKind firstKind = node.Kind();
+
+            if (firstKind == SyntaxKind.ThisExpression)
+            {
+                m_context.Writer.Append("obj");
+            }
+            else if (firstKind == SyntaxKind.IdentifierName)
+            {
+                m_context.Writer.Append(m_context.ConvertVariableName(node as IdentifierNameSyntax));
+            }
+            else if (firstKind == SyntaxKind.ElementAccessExpression)
+            {
+                m_context.Generators.ElementAccess.Generate(node as ElementAccessExpressionSyntax);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
         /// Generates a member access
         /// </summary>
         /// <param name="node">The expression of the member access</param>
@@ -29,7 +55,7 @@ namespace LibCS2C.Generators
         {
             ITypeSymbol symbolType = m_context.Model.GetTypeInfo(node).Type;
             SyntaxNodeOrToken[] children = node.ChildNodesAndTokens().ToArray();
-
+            
             // Enum
             if (symbolType.TypeKind == TypeKind.Enum)
             {
@@ -44,27 +70,12 @@ namespace LibCS2C.Generators
                 // If it's static, we don't need the first part (identifier)
                 // because the reference is already in the second part (identifier)
                 ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
-                if (!symbol.IsStatic)
-                {
-                    SyntaxNode first = children[0].AsNode();
-                    SyntaxKind firstKind = first.Kind();
+                SyntaxNode first = children[0].AsNode();
 
-                    if (firstKind == SyntaxKind.ThisExpression)
-                    {
-                        m_context.Writer.Append("obj");
-                    }
-                    else if (firstKind == SyntaxKind.IdentifierName)
-                    {
-                        m_context.Writer.Append(m_context.ConvertVariableName(first as IdentifierNameSyntax));
-                    }
-                    else if (firstKind == SyntaxKind.ElementAccessExpression)
-                    {
-                        m_context.Generators.ElementAccess.Generate(first as ElementAccessExpressionSyntax);
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
+                bool objectFirst = (!symbol.IsStatic || symbol.Kind != SymbolKind.Property);
+                if (objectFirst)
+                {
+                    GenerateObjectPart(first);
 
                     ITypeSymbol type = m_context.Model.GetTypeInfo(first).Type;
                     if (type.TypeKind == TypeKind.Struct)
@@ -75,6 +86,10 @@ namespace LibCS2C.Generators
                 
                 IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
                 m_context.Writer.Append(m_context.ConvertVariableName(name));
+                
+                m_context.Writer.Append("(");
+                GenerateObjectPart(first);
+                m_context.Writer.Append(")");
             }
         }
     }

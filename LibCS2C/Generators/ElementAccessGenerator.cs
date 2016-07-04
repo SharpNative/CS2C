@@ -49,6 +49,10 @@ namespace LibCS2C.Generators
 
                     m_context.Writer.Append("]");
                 }
+                else if (m_context.IsSubExpression(kind))
+                {
+                    m_context.Generators.Expression.Generate(child);
+                }
                 else
                 {
                     throw new NotImplementedException();

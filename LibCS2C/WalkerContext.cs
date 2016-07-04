@@ -193,7 +193,10 @@ namespace LibCS2C
             // Property
             if (symbol.Kind == SymbolKind.Property)
             {
-                typeNameConverted = string.Format("{0}_{1}_getter", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+                if (symbol.IsStatic)
+                    typeNameConverted = string.Format("{0}_{1}_getter()", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+                else
+                    typeNameConverted = string.Format("{0}_{1}_getter", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
             }
             // Static field
             else if (symbol.IsStatic)

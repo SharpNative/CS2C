@@ -55,7 +55,7 @@ namespace LibCS2C.Generators
         {
             ITypeSymbol symbolType = m_context.Model.GetTypeInfo(node).Type;
             SyntaxNodeOrToken[] children = node.ChildNodesAndTokens().ToArray();
-            
+
             // Enum
             if (symbolType.TypeKind == TypeKind.Enum)
             {
@@ -66,7 +66,7 @@ namespace LibCS2C.Generators
             else
             {
                 // children: (this / object) (dot) (identifier)
-                
+
                 // If it's static, we don't need the first part (identifier)
                 // because the reference is already in the second part (identifier)
                 ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
@@ -83,13 +83,16 @@ namespace LibCS2C.Generators
                     else
                         m_context.Writer.Append("->");
                 }
-                
+
                 IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
                 m_context.Writer.Append(m_context.ConvertVariableName(name));
-                
-                m_context.Writer.Append("(");
-                GenerateObjectPart(first);
-                m_context.Writer.Append(")");
+
+                if (!objectFirst && !symbol.IsStatic)
+                {
+                    m_context.Writer.Append("(");
+                    GenerateObjectPart(first);
+                    m_context.Writer.Append(")");
+                }
             }
         }
     }

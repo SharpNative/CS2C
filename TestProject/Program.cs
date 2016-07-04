@@ -15,6 +15,8 @@ namespace TestProject
             nein.Test();
 
             nein.TestProperty = 42;
+            short val = 42;
+            nein.Test(val);
         }
     }
 }

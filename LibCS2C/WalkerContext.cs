@@ -26,7 +26,7 @@ namespace LibCS2C
         /// List of static constructors
         /// </summary>
         public List<string> CctorList { get; private set; } = new List<string>();
-        
+
         /// <summary>
         /// The current class
         /// </summary>
@@ -126,7 +126,7 @@ namespace LibCS2C
         {
             Generators = new AllGenerators(this);
         }
-        
+
         /// <summary>
         /// Convert class name to a formatted name
         /// </summary>
@@ -136,7 +136,7 @@ namespace LibCS2C
         {
             return CurrentNamespaceFormatted + "_" + identifier;
         }
-        
+
         /// <summary>
         /// Converts the C# type to a C type name
         /// </summary>
@@ -189,14 +189,23 @@ namespace LibCS2C
         {
             string typeNameConverted = "";
             ISymbol symbol = Model.GetSymbolInfo(node).Symbol;
-            
+
             // Property
             if (symbol.Kind == SymbolKind.Property)
             {
                 if (symbol.IsStatic)
+                {
                     typeNameConverted = string.Format("{0}_{1}_getter()", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+                }
                 else
+                {
                     typeNameConverted = string.Format("{0}_{1}_getter", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+                    string currentClass = CurrentNamespace.Name + "." + CurrentClass.Identifier;
+                    if (currentClass == symbol.ContainingType.ToString())
+                    {
+                        typeNameConverted += "(obj)";
+                    }
+                }
             }
             // Static field
             else if (symbol.IsStatic)

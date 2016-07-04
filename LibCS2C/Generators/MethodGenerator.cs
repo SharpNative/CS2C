@@ -15,7 +15,7 @@ namespace LibCS2C.Generators
         Constructor = 1
     }
 
-    public class MethodGenerator: GeneratorBase<BaseMethodDeclarationSyntax>
+    public class MethodGenerator : GeneratorBase<BaseMethodDeclarationSyntax>
     {
         private MethodGeneratorType m_type;
 
@@ -37,28 +37,28 @@ namespace LibCS2C.Generators
         public override void Generate(BaseMethodDeclarationSyntax node)
         {
             SyntaxToken identifier = default(SyntaxToken);
-            string returnType = null;
+            string returnType;
 
             // Static methods don't require a reference to the object as parameter
             bool isStatic = false;
 
-            if(m_type == MethodGeneratorType.Constructor)
+            if (m_type == MethodGeneratorType.Constructor)
             {
                 ConstructorDeclarationSyntax nodeTyped = node as ConstructorDeclarationSyntax;
                 identifier = nodeTyped.Identifier;
                 returnType = m_context.CurrentClassStructName + "*";
             }
-            else if(m_type == MethodGeneratorType.Method)
+            else /* if (m_type == MethodGeneratorType.Method)*/
             {
                 MethodDeclarationSyntax nodeTyped = node as MethodDeclarationSyntax;
                 identifier = nodeTyped.Identifier;
                 returnType = m_context.ConvertTypeName(nodeTyped.ReturnType);
-                
+
                 // Check if the method is static
                 IEnumerable<SyntaxToken> tokens = nodeTyped.ChildTokens();
-                foreach(SyntaxToken token in tokens)
+                foreach (SyntaxToken token in tokens)
                 {
-                    if(token.Kind() == SyntaxKind.StaticKeyword)
+                    if (token.Kind() == SyntaxKind.StaticKeyword)
                     {
                         isStatic = true;
                         break;
@@ -66,63 +66,56 @@ namespace LibCS2C.Generators
                 }
             }
 
-            string method = string.Format("{0} {1}_{2}", returnType, m_context.CurrentClassNameFormatted, identifier);
-            
-            StringBuilder sb = new StringBuilder();
+            // Check for parameters
+            ParameterListSyntax param = (from a in node.ChildNodes()
+                                         where a.Kind() == SyntaxKind.ParameterList
+                                         select a).FirstOrDefault() as ParameterListSyntax;
+            IEnumerable<SyntaxNode> paramNodes = param.ChildNodes();
 
-            // namespaceName_className_methodName
-            sb.Append(string.Format("{0}(", method));
+            // Count parameters, non-static methods require an object reference
+            int paramCount = paramNodes.Count();
+            if (!isStatic)
+                paramCount++;
+
+
+            // Method name: namespaceName_className_methodName_PARAMCOUNT_PARAMTYPES
+            StringBuilder argumentBuilder = new StringBuilder();
+            StringBuilder paramTypeBuilder = new StringBuilder();
+            string methodPrototype = string.Format("{0} {1}_{2}_{3}", returnType, m_context.CurrentClassNameFormatted, identifier, paramCount);
 
             // Not static? Object reference is required as parameter
             if (!isStatic)
             {
-                sb.Append(string.Format("{0}* obj", m_context.CurrentClassStructName));
+                // paramTypeBuilder.Append("class_");
+                argumentBuilder.Append(string.Format("{0}* obj", m_context.CurrentClassStructName));
+                if (paramCount > 1)
+                    argumentBuilder.Append(", ");
             }
 
-            // Check for parameters
-            int paramCount = 0;
-            IEnumerable<SyntaxNode> nodes = node.ChildNodes();
-            foreach (SyntaxNode childNode in nodes)
+            // TODO: out and ref
+            foreach (ParameterSyntax paramNode in paramNodes)
             {
-                if (childNode.Kind() == SyntaxKind.ParameterList)
-                {
-                    // Get parameters
-                    ParameterListSyntax param = childNode as ParameterListSyntax;
-                    IEnumerable<SyntaxNode> paramNodes = param.ChildNodes();
-                    paramCount = paramNodes.Count();
+                string typeName = m_context.ConvertTypeName(paramNode.Type);
+                // paramTypeBuilder.Append(typeName.Replace(' ', '_').Replace('*', '_'));
+                // paramTypeBuilder.Append("_");
+                argumentBuilder.Append(string.Format("{0} {1}", typeName, paramNode.Identifier));
 
-                    if (paramCount > 0 && !isStatic)
-                        sb.Append(", ");
-                    
-                    // TODO: out and ref-+
-                    foreach (ParameterSyntax paramNode in paramNodes)
-                    {
-                        sb.Append(string.Format("{0} {1}", m_context.ConvertTypeName(paramNode.Type), paramNode.Identifier));
-
-                        // A comma if it's not the last parameter
-                        if (paramNode != paramNodes.Last())
-                            sb.Append(", ");
-                    }
-
-                    break;
-                }
+                // A comma if it's not the last parameter
+                if (paramNode != paramNodes.Last())
+                    argumentBuilder.Append(", ");
             }
-
-            // Object reference
-            if (!isStatic)
-                paramCount++;
 
             // Insert void if no parameters are found
             if (paramCount == 0)
             {
-                sb.Append("void");
+                argumentBuilder.Append("void");
             }
 
-            sb.Append(")");
+            methodPrototype += paramTypeBuilder.ToString() + "(" + argumentBuilder.ToString() + ")";
 
             // Append to properties
             m_context.CurrentDestination = WriterDestination.MethodPrototypes;
-            m_context.Writer.Append(sb.ToString());
+            m_context.Writer.Append(methodPrototype);
             m_context.Writer.AppendLine(";");
 
             // If this has no body, we only generate the prototype
@@ -131,7 +124,7 @@ namespace LibCS2C.Generators
 
             // Append the declaration so we can add contents
             m_context.CurrentDestination = WriterDestination.MethodDeclarations;
-            m_context.Writer.AppendLine(sb.ToString());
+            m_context.Writer.AppendLine(methodPrototype);
 
             // Block containing the code of the method
             m_context.Writer.AppendLine("{");
@@ -139,7 +132,7 @@ namespace LibCS2C.Generators
             m_context.Generators.Block.Generate(node.Body);
 
             // If the method is a constructor, we need to return the object
-            if(m_type == MethodGeneratorType.Constructor)
+            if (m_type == MethodGeneratorType.Constructor)
                 m_context.Writer.AppendLine("\treturn obj;");
 
             m_context.Writer.AppendLine("}");

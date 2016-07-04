@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    public class InvocationGenerator : GeneratorBase<ExpressionSyntax>
+    public class InvocationGenerator : GeneratorBase<InvocationExpressionSyntax>
     {
         /// <summary>
         /// Invocation generator
@@ -24,7 +24,7 @@ namespace LibCS2C.Generators
         /// Generates an invocation
         /// </summary>
         /// <param name="node">The expression</param>
-        public override void Generate(ExpressionSyntax node)
+        public override void Generate(InvocationExpressionSyntax node)
         {
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
             SyntaxNode first = nodes.First();
@@ -33,11 +33,14 @@ namespace LibCS2C.Generators
             string memberName = "";
             bool needsObjReference = false;
 
+            // Arguments
+            ArgumentListSyntax argsList = node.ArgumentList;
+
             // Own class
             if (firstKind == SyntaxKind.IdentifierName)
             {
                 IdentifierNameSyntax name = first as IdentifierNameSyntax;
-                memberName = string.Format("{0}_{1}", m_context.CurrentClassNameFormatted, name.Identifier);
+                memberName = string.Format("{0}_{1}_{2}", m_context.CurrentClassNameFormatted, name.Identifier, argsList.ChildNodes().Count());
             }
             // Another class
             else if (firstKind == SyntaxKind.SimpleMemberAccessExpression)
@@ -47,7 +50,7 @@ namespace LibCS2C.Generators
                 ITypeSymbol symbolParent = m_context.Model.GetTypeInfo(name).Type;
                 
                 needsObjReference = (symbolParent != null && !symbolParent.IsStatic);
-                memberName = string.Format("{0}_{1}_{2}", symbol.ContainingSymbol.ToString().Replace(".", "_"), symbol.Name, name.Name);
+                memberName = string.Format("{0}_{1}_{2}_{3}", symbol.ContainingSymbol.ToString().Replace(".", "_"), symbol.Name, name.Name, argsList.ChildNodes().Count());
             }
             else
             {
@@ -55,12 +58,7 @@ namespace LibCS2C.Generators
             }
             
             m_context.Writer.Append(string.Format("{0}(", memberName));
-
-            // Arguments
-            ArgumentListSyntax argsList = (from a in nodes
-                                           where a.Kind() == SyntaxKind.ArgumentList
-                                           select a).FirstOrDefault() as ArgumentListSyntax;
-
+            
             // Reference to the object if needed
             if (needsObjReference)
             {

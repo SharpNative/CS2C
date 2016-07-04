@@ -53,7 +53,7 @@ namespace LibCS2C.Generators
                     break;
 
                 case SyntaxKind.InvocationExpression:
-                    m_context.Generators.Invocation.Generate(node as ExpressionSyntax);
+                    m_context.Generators.Invocation.Generate(node as InvocationExpressionSyntax);
                     break;
 
                 case SyntaxKind.LeftShiftAssignmentExpression:

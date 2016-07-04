@@ -19,5 +19,10 @@ namespace TestProject.OtherNameSpace
         {
             TestProperty = 22;
         }
+
+        public void Test(int a)
+        {
+            TestProperty = a * 5 - TestProperty;
+        }
     }
 }

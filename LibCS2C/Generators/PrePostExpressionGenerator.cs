@@ -38,8 +38,9 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression</param>
         public override void Generate(ExpressionSyntax node)
         {
-            IdentifierNameSyntax name = node.ChildNodes().First() as IdentifierNameSyntax;
+            SyntaxNode name = node.ChildNodes().First();
             ISymbol symbol = m_context.Model.GetSymbolInfo(name).Symbol;
+            
             bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);
 
             string type = "";

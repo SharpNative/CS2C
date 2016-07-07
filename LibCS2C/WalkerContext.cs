@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LibCS2C
 {
@@ -202,7 +203,7 @@ namespace LibCS2C
         /// <returns>The converted variable name</returns>
         public string ConvertVariableName(SyntaxNode node)
         {
-            string typeNameConverted = "";
+            string typeNameConverted;
             ISymbol symbol = Model.GetSymbolInfo(node).Symbol;
 
             // Property
@@ -221,6 +222,13 @@ namespace LibCS2C
                         typeNameConverted += "(obj)";
                     }
                 }
+            }
+            // Method
+            else if(symbol.Kind == SymbolKind.Method)
+            {
+                MethodDeclarationSyntax reference = symbol.DeclaringSyntaxReferences[0].GetSyntax() as MethodDeclarationSyntax;
+                ParameterListSyntax paramList = reference.ParameterList;
+                typeNameConverted = string.Format("{0}_{1}_{2}", symbol.ContainingSymbol.ToString().Replace(".", "_"), symbol.Name, paramList.ChildNodes().Count());
             }
             // Static field
             else if (symbol.IsStatic)

@@ -153,6 +153,10 @@ namespace LibCS2C.Generators
                 case SyntaxKind.PreIncrementExpression:
                     m_context.Generators.PreIncrementExpression.Generate(node as ExpressionSyntax);
                     break;
+
+                case SyntaxKind.ConditionalAccessExpression:
+                    m_context.Generators.ConditionalAccessExpression.Generate(node as ConditionalAccessExpressionSyntax);
+                    break;
                     
                 default:
                     m_context.Writer.Append(node.ToString());

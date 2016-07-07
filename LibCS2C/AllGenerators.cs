@@ -18,7 +18,9 @@ namespace LibCS2C
         public ArrayCreationExpressionGenerator ArrayCreationExpression { get; private set; }
         public BlockGenerator Block { get; private set; }
         public CastExpressionGenerator CastExpression { get; private set; }
+        public ConditionalAccessExpressionGenerator ConditionalAccessExpression { get; private set; }
         public ClassCodeGenerator ClassCode { get; private set; }
+        public DelegateDeclarationGenerator DelegateDeclaration { get; private set; }
         public DoStatementGenerator DoStatement { get; private set; }
         public ElementAccessGenerator ElementAccess { get; private set; }
         public EnumGenerator Enum { get; private set; }
@@ -65,7 +67,9 @@ namespace LibCS2C
             ArrayCreationExpression = new ArrayCreationExpressionGenerator(context);
             Block = new BlockGenerator(context);
             CastExpression = new CastExpressionGenerator(context);
+            ConditionalAccessExpression = new ConditionalAccessExpressionGenerator(context);
             ClassCode = new ClassCodeGenerator(context);
+            DelegateDeclaration = new DelegateDeclarationGenerator(context);
             DoStatement = new DoStatementGenerator(context);
             ElementAccess = new ElementAccessGenerator(context);
             Enum = new EnumGenerator(context);

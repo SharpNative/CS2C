@@ -12,6 +12,7 @@ namespace LibCS2C
         Enums,
         Structs,
         ClassStructs,
+        Delegates,
         MethodPrototypes,
         MethodDeclarations,
     }
@@ -81,6 +82,10 @@ namespace LibCS2C
                         Writer = SbClassStructs;
                         break;
 
+                    case WriterDestination.Delegates:
+                        Writer = SbDelegates;
+                        break;
+
                     case WriterDestination.MethodPrototypes:
                         Writer = SbMethodPrototypes;
                         break;
@@ -114,6 +119,7 @@ namespace LibCS2C
         public FormattedStringBuilder SbEnums { get; private set; } = new FormattedStringBuilder();
         public FormattedStringBuilder SbStructs { get; private set; } = new FormattedStringBuilder();
         public FormattedStringBuilder SbClassStructs { get; private set; } = new FormattedStringBuilder();
+        public FormattedStringBuilder SbDelegates { get; private set; } = new FormattedStringBuilder();
         public FormattedStringBuilder SbMethodPrototypes { get; private set; } = new FormattedStringBuilder();
         public FormattedStringBuilder SbMethodDeclarations { get; private set; } = new FormattedStringBuilder();
 
@@ -179,8 +185,12 @@ namespace LibCS2C
             {
                 ITypeSymbol typeSymbol = Model.GetTypeInfo(type).Type;
                 string nameSpace = typeSymbol.ContainingNamespace.ToString().Replace(".", "_");
-
-                if (typeSymbol.TypeKind == TypeKind.Class)
+                
+                if(typeSymbol.TypeKind == TypeKind.Delegate)
+                {
+                    typeNameConverted = string.Format("delegate_{0}_{1}", typeSymbol.ContainingType.ToString().Replace(".", "_"), type.ToString());
+                }
+                else if (typeSymbol.TypeKind == TypeKind.Class)
                 {
                     typeNameConverted = string.Format("struct class_{0}_{1}*", nameSpace, type.ToString());
                 }

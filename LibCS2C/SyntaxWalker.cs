@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Text;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Text;
 
 namespace LibCS2C
 {
@@ -104,6 +102,16 @@ namespace LibCS2C
         }
 
         /// <summary>
+        /// Visits a delegate declaration
+        /// </summary>
+        /// <param name="node">The delegate declaration node</param>
+        public override void VisitDelegateDeclaration(DelegateDeclarationSyntax node)
+        {
+            m_context.Generators.DelegateDeclaration.Generate(node);
+            base.VisitDelegateDeclaration(node);
+        }
+
+        /// <summary>
         /// Outputs the code in a string
         /// </summary>
         /// <returns>The code</returns>
@@ -113,6 +121,7 @@ namespace LibCS2C
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(m_context.SbEnums.ToString());
             sb.AppendLine(m_context.SbStructs.ToString());
+            sb.AppendLine(m_context.SbDelegates.ToString());
             sb.AppendLine(m_context.SbClassStructs.ToString());
             sb.AppendLine(m_context.SbMethodPrototypes.ToString());
             sb.AppendLine(m_context.SbMethodDeclarations.ToString());

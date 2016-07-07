@@ -71,8 +71,8 @@ namespace LibCS2C.Generators
                 // because the reference is already in the second part (identifier)
                 ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
                 SyntaxNode first = children[0].AsNode();
-
-                bool objectFirst = (!symbol.IsStatic || symbol.Kind != SymbolKind.Property);
+                
+                bool objectFirst = (!symbol.IsStatic && symbol.Kind != SymbolKind.Property);
                 if (objectFirst)
                 {
                     GenerateObjectPart(first);
@@ -87,7 +87,7 @@ namespace LibCS2C.Generators
                 IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
                 m_context.Writer.Append(m_context.ConvertVariableName(name));
 
-                if (!objectFirst && !symbol.IsStatic)
+                if (symbol.Kind == SymbolKind.Property && !symbol.IsStatic)
                 {
                     m_context.Writer.Append("(");
                     GenerateObjectPart(first);

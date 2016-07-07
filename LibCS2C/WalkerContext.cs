@@ -149,6 +149,21 @@ namespace LibCS2C
             {
                 typeNameConverted = TypeConvert.Convert(type as TypeSyntax);
             }
+            else if (type is QualifiedNameSyntax)
+            {
+                ITypeSymbol typeSymbol = Model.GetTypeInfo(type).Type;
+                string containingType = typeSymbol.ContainingType.ToString().Replace('.', '_');
+                string typeName = typeSymbol.Name;
+
+                if (typeSymbol.TypeKind == TypeKind.Class)
+                {
+                    typeNameConverted = string.Format("struct class_{0}_{1}*", containingType, typeName);
+                }
+                else
+                {
+                    typeNameConverted = string.Format("struct struct_{0}_{1}", containingType, typeName);
+                }
+            }
             else if (type is PointerTypeSyntax)
             {
                 PointerTypeSyntax ptr = type as PointerTypeSyntax;

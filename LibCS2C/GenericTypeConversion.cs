@@ -10,7 +10,7 @@ namespace LibCS2C
     /// <summary>
     /// Contains the native / generic type conversions
     /// </summary>
-    public class TypeConversion
+    public class GenericTypeConversion
     {
         private Dictionary<string, string> m_convert = new Dictionary<string, string>()
         {
@@ -31,7 +31,8 @@ namespace LibCS2C
 
             { "char", "char" },
             { "string", "char*" },
-            { "string[]", "char**" }
+
+            { "Action", "void*" }
         };
 
         /// <summary>

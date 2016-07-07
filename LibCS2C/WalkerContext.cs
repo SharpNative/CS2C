@@ -20,7 +20,7 @@ namespace LibCS2C
         /// <summary>
         /// Type conversion helper
         /// </summary>
-        public TypeConversion TypeConvert { get; private set; } = new TypeConversion();
+        public GenericTypeConversion TypeConvert { get; private set; } = new GenericTypeConversion();
 
         /// <summary>
         /// List of static constructors

@@ -37,9 +37,9 @@ namespace LibCS2C.Generators
             {
                 m_context.Writer.Append(m_context.ConvertVariableName(node as IdentifierNameSyntax));
             }
-            else if (firstKind == SyntaxKind.ElementAccessExpression)
+            else if (m_context.IsSubExpression(firstKind))
             {
-                m_context.Generators.ElementAccess.Generate(node as ElementAccessExpressionSyntax);
+                m_context.Generators.Expression.Generate(node);
             }
             else
             {

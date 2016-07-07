@@ -9,18 +9,36 @@ namespace LibCS2C.Generators
 {
     class ClassCctorGenerator : GeneratorBase<ClassDeclarationSyntax>
     {
-        private Dictionary<string, EqualsValueClauseSyntax> m_staticFields;
-        private Dictionary<string, EqualsValueClauseSyntax> m_staticProperties;
+        private ClassCodeData m_classCode;
 
         /// <summary>
         /// Class .cctor generator
         /// </summary>
         /// <param name="context">The walker context</param>
-        public ClassCctorGenerator(WalkerContext context, Dictionary<string, EqualsValueClauseSyntax> staticFields, Dictionary<string, EqualsValueClauseSyntax> staticProperties)
+        /// <param name="classCode">Class code</param>
+        public ClassCctorGenerator(WalkerContext context, ClassCodeData classCode)
         {
             m_context = context;
-            m_staticFields = staticFields;
-            m_staticProperties = staticProperties;
+            m_classCode = classCode;
+        }
+
+        /// <summary>
+        /// Generates the initializer
+        /// </summary>
+        /// <param name="className">The converted class name</param>
+        /// <param name="name">The name of the member</param>
+        /// <param name="value">The value</param>
+        private void GenerateInitializer(string className, string name, EqualsValueClauseSyntax value)
+        {
+            ExpressionSyntax expression = value.Value;
+
+            // If it's a literal expression, it is already in the struct initializer
+            if (!m_context.IsLiteralExpression(expression.Kind()))
+            {
+                m_context.Writer.Append(string.Format("\tclassStatics_{0}.{1} = ", className, name));
+                m_context.Generators.Expression.Generate(expression);
+                m_context.Writer.AppendLine(";");
+            }
         }
 
         /// <summary>
@@ -46,20 +64,14 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine(methodPrototype);
             m_context.Writer.AppendLine("{");
 
-            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_staticFields)
+            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_classCode.staticFields)
             {
-                m_context.Writer.Append(string.Format("\tclassStatics_{0}.{1} = ", convertedClassName, pair.Key));
-                ExpressionSyntax expression = pair.Value.Value;
-                m_context.Generators.Expression.Generate(expression);
-                m_context.Writer.AppendLine(";");
+                GenerateInitializer(convertedClassName, pair.Key, pair.Value);
             }
 
-            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_staticProperties)
+            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_classCode.propertyInitialValuesStatic)
             {
-                m_context.Writer.Append(string.Format("\tclassStatics_{0}.prop_{1} = ", convertedClassName, pair.Key));
-                ExpressionSyntax expression = pair.Value.Value;
-                m_context.Generators.Expression.Generate(expression);
-                m_context.Writer.AppendLine(";");
+                GenerateInitializer(convertedClassName, "prop_" + pair.Key, pair.Value);
             }
 
             m_context.Writer.AppendLine("}");

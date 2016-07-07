@@ -27,14 +27,7 @@ namespace LibCS2C.Generators
         public override void Generate(ClassDeclarationSyntax node)
         {
             // Temporarily hold all the fields/properties so we can put them in the initialization method
-            Dictionary<string, EqualsValueClauseSyntax> staticFields = new Dictionary<string, EqualsValueClauseSyntax>();
-            Dictionary<string, EqualsValueClauseSyntax> nonStaticFields = new Dictionary<string, EqualsValueClauseSyntax>();
-            Dictionary<string, TypeSyntax> staticFieldTypes = new Dictionary<string, TypeSyntax>();
-            Dictionary<string, TypeSyntax> nonStaticFieldTypes = new Dictionary<string, TypeSyntax>();
-            Dictionary<string, TypeSyntax> propertyTypesNonStatic = new Dictionary<string, TypeSyntax>();
-            Dictionary<string, EqualsValueClauseSyntax> propertyInitialValuesNonStatic = new Dictionary<string, EqualsValueClauseSyntax>();
-            Dictionary<string, TypeSyntax> propertyTypesStatic = new Dictionary<string, TypeSyntax>();
-            Dictionary<string, EqualsValueClauseSyntax> propertyInitialValuesStatic = new Dictionary<string, EqualsValueClauseSyntax>();
+            ClassCodeData classCode = new ClassCodeData();
 
             // Loop through the children to find the fields
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
@@ -65,16 +58,16 @@ namespace LibCS2C.Generators
                             if (isStatic)
                             {
                                 if (variable.Initializer != null)
-                                    staticFields.Add(identifier, variable.Initializer);
+                                    classCode.staticFields.Add(identifier, variable.Initializer);
 
-                                staticFieldTypes.Add(identifier, fieldNodeChild.Type);
+                                classCode.staticFieldTypes.Add(identifier, fieldNodeChild.Type);
                             }
                             else
                             {
                                 if (variable.Initializer != null)
-                                    nonStaticFields.Add(identifier, variable.Initializer);
+                                    classCode.nonStaticFields.Add(identifier, variable.Initializer);
 
-                                nonStaticFieldTypes.Add(identifier, fieldNodeChild.Type);
+                                classCode.nonStaticFieldTypes.Add(identifier, fieldNodeChild.Type);
                             }
                         }
                     }
@@ -98,33 +91,32 @@ namespace LibCS2C.Generators
 
                     if(!isStatic)
                     {
-                        propertyTypesNonStatic.Add(identifier, propertyDeclaration.Type);
+                        classCode.propertyTypesNonStatic.Add(identifier, propertyDeclaration.Type);
 
                         if (propertyDeclaration.Initializer != null)
-                            propertyInitialValuesNonStatic.Add(identifier, propertyDeclaration.Initializer);
+                            classCode.propertyInitialValuesNonStatic.Add(identifier, propertyDeclaration.Initializer);
                     }
                     else
                     {
-                        propertyTypesStatic.Add(identifier, propertyDeclaration.Type);
+                        classCode.propertyTypesStatic.Add(identifier, propertyDeclaration.Type);
 
                         if (propertyDeclaration.Initializer != null)
-                            propertyInitialValuesStatic.Add(identifier, propertyDeclaration.Initializer);
+                            classCode.propertyInitialValuesStatic.Add(identifier, propertyDeclaration.Initializer);
                     }
                 }
             }
 
             // Other generators
-            ClassStructGenerator structGen = new ClassStructGenerator(m_context, nonStaticFieldTypes, propertyTypesNonStatic);
-            ClassStaticStructGenerator staticStructGen = new ClassStaticStructGenerator(m_context, staticFieldTypes, propertyTypesStatic);
-            ClassCctorGenerator cctorGen = new ClassCctorGenerator(m_context, staticFields, propertyInitialValuesStatic);
-            ClassInitGenerator classInitGen = new ClassInitGenerator(m_context, nonStaticFields, propertyInitialValuesNonStatic);
+            ClassStructGenerator structGen = new ClassStructGenerator(m_context, classCode);
+            ClassStaticStructGenerator staticStructGen = new ClassStaticStructGenerator(m_context, classCode);
+            ClassInitGenerator classInitGen = new ClassInitGenerator(m_context, classCode);
+            ClassCctorGenerator classCctorGen = new ClassCctorGenerator(m_context, classCode);
 
             m_context.CurrentDestination = WriterDestination.ClassStructs;
             structGen.Generate(node);
             staticStructGen.Generate(node);
-            
-            cctorGen.Generate(node);
             classInitGen.Generate(node);
+            classCctorGen.Generate(node);
         }
     }
 }

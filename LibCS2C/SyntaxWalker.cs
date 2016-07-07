@@ -11,7 +11,7 @@ namespace LibCS2C
     public class SyntaxWalker : CSharpSyntaxWalker
     {
         private WalkerContext m_context;
-        
+
         /// <summary>
         /// Walks through the syntax and outputs C code to a <see cref="FormattedStringBuilder">FormattedStringBuilder</see>
         /// </summary>
@@ -109,7 +109,7 @@ namespace LibCS2C
         /// <returns>The code</returns>
         public override string ToString()
         {
-            // Add the code in the correct order
+            // Append all the code
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(m_context.SbEnums.ToString());
             sb.AppendLine(m_context.SbStructs.ToString());
@@ -117,18 +117,16 @@ namespace LibCS2C
             sb.AppendLine(m_context.SbMethodPrototypes.ToString());
             sb.AppendLine(m_context.SbMethodDeclarations.ToString());
 
-            // Initialization method
+            // Add .cctor calls in init method
             sb.AppendLine("void init(void)");
             sb.AppendLine("{");
-
-            foreach(string cctor in m_context.CctorList)
+            foreach (string cctor in m_context.CctorList)
             {
-                sb.AppendLine(string.Format("\t{0}();", cctor));
+                sb.AppendLine("\t" + cctor + "();");
             }
-
             sb.AppendLine("}");
 
-            // Convert everything to a string
+            // Output string
             return sb.ToString();
         }
     }

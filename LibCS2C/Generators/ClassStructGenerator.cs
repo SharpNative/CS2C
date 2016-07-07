@@ -10,18 +10,17 @@ namespace LibCS2C.Generators
 {
     class ClassStructGenerator : GeneratorBase<ClassDeclarationSyntax>
     {
-        private Dictionary<string, TypeSyntax> m_nonStaticFieldTypes;
-        private Dictionary<string, TypeSyntax> m_propertyTypes;
+        private ClassCodeData m_classCode;
 
         /// <summary>
         /// Class struct generator
         /// </summary>
         /// <param name="context">The walker context</param>
-        public ClassStructGenerator(WalkerContext context, Dictionary<string, TypeSyntax> nonStaticFieldTypes, Dictionary<string, TypeSyntax> propertyTypes)
+        /// <param name="classCode">Class code</param>
+        public ClassStructGenerator(WalkerContext context, ClassCodeData classCode)
         {
             m_context = context;
-            m_nonStaticFieldTypes = nonStaticFieldTypes;
-            m_propertyTypes = propertyTypes;
+            m_classCode = classCode;
         }
 
         /// <summary>
@@ -36,13 +35,13 @@ namespace LibCS2C.Generators
             // Usage count for garbage collector
             m_context.Writer.AppendLine("\tint32_t usage_count;");
 
-            foreach (KeyValuePair<string, TypeSyntax> pair in m_nonStaticFieldTypes)
+            foreach (KeyValuePair<string, TypeSyntax> pair in m_classCode.nonStaticFieldTypes)
             {
                 m_context.Writer.AppendLine("\t/* Field: " + pair.Key + " */");
                 m_context.Writer.AppendLine(string.Format("\t{0} field_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
 
-            foreach (KeyValuePair<string, TypeSyntax> pair in m_propertyTypes)
+            foreach (KeyValuePair<string, TypeSyntax> pair in m_classCode.propertyTypesNonStatic)
             {
                 m_context.Writer.AppendLine("\t/* Property: " + pair.Key + " */");
                 m_context.Writer.AppendLine(string.Format("\t{0} prop_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));

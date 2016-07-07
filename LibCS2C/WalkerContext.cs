@@ -24,7 +24,7 @@ namespace LibCS2C
         public GenericTypeConversion TypeConvert { get; private set; } = new GenericTypeConversion();
 
         /// <summary>
-        /// List of static constructors
+        /// .cctor list
         /// </summary>
         public List<string> CctorList { get; private set; } = new List<string>();
 
@@ -282,6 +282,22 @@ namespace LibCS2C
                    kind == SyntaxKind.LogicalNotExpression ||
                    kind == SyntaxKind.LogicalOrExpression ||
                    kind == SyntaxKind.ConditionalExpression;
+        }
+
+        /// <summary>
+        /// Checks if the given kind is a literal expression
+        /// </summary>
+        /// <param name="kind">The kind</param>
+        /// <returns>If it's a literal expression</returns>
+        public bool IsLiteralExpression(SyntaxKind kind)
+        {
+            return kind == SyntaxKind.CharacterLiteralExpression ||
+                   kind == SyntaxKind.FalseLiteralExpression ||
+                   kind == SyntaxKind.TrueLiteralExpression ||
+                   kind == SyntaxKind.StringLiteralExpression ||
+                   kind == SyntaxKind.NumericLiteralExpression ||
+                   kind == SyntaxKind.NullLiteralExpression ||
+                   kind == SyntaxKind.ArrayInitializerExpression;
         }
     }
 }

@@ -9,18 +9,17 @@ namespace LibCS2C.Generators
 {
     class ClassInitGenerator : GeneratorBase<ClassDeclarationSyntax>
     {
-        private Dictionary<string, EqualsValueClauseSyntax> m_nonStaticFields;
-        private Dictionary<string, EqualsValueClauseSyntax> m_propertyInitialValues;
-        
+        private ClassCodeData m_classCode;
+
         /// <summary>
         /// Class struct generator
         /// </summary>
         /// <param name="context">The walker context</param>
-        public ClassInitGenerator(WalkerContext context, Dictionary<string, EqualsValueClauseSyntax> nonStaticFields, Dictionary<string, EqualsValueClauseSyntax> propertyInitialValues)
+        /// <param name="classCode">Class code</param>
+        public ClassInitGenerator(WalkerContext context, ClassCodeData classCode)
         {
             m_context = context;
-            m_nonStaticFields = nonStaticFields;
-            m_propertyInitialValues = propertyInitialValues;
+            m_classCode = classCode;
         }
 
         /// <summary>
@@ -49,7 +48,7 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine("\tobject->usage_count = 1;");
 
             // Loop through the fields and initialize them
-            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_nonStaticFields)
+            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_classCode.nonStaticFields)
             {
                 m_context.Writer.Append(string.Format("\tobject->field_{0} = ", pair.Key));
                 ExpressionSyntax expression = pair.Value.Value;
@@ -58,7 +57,7 @@ namespace LibCS2C.Generators
             }
 
             // Loop through the properties and initialize them
-            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_propertyInitialValues)
+            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_classCode.propertyInitialValuesNonStatic)
             {
                 m_context.Writer.Append(string.Format("\tobject->prop_{0} = ", pair.Key));
                 ExpressionSyntax expression = pair.Value.Value;

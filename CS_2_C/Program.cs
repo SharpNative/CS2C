@@ -13,8 +13,8 @@ namespace CS_2_C
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            // string output = Compiler.CompileProject("../../../TestProject/TestProject.csproj");
-            string output = Compiler.CompileProject(@"C:\Users\Niels\Source\Repos\Sharpen\Sharpen\Sharpen.csproj");
+            string output = Compiler.CompileProject("../../../TestProject/TestProject.csproj");
+            // string output = Compiler.CompileProject(@"C:\Users\Niels\Source\Repos\Sharpen\Sharpen\Sharpen.csproj");
 
             File.WriteAllText("output.c", output);
             Console.ReadLine();

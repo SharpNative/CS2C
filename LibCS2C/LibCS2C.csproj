@@ -104,6 +104,8 @@
     <Compile Include="FormattedStringBuilder.cs" />
     <Compile Include="AllGenerators.cs" />
     <Compile Include="Generators\ArgumentListGenerator.cs" />
+    <Compile Include="Generators\ClassCctorGenerator.cs" />
+    <Compile Include="Generators\ClassCode.cs" />
     <Compile Include="Generators\ElementAccessGenerator.cs" />
     <Compile Include="Generators\EnumGenerator.cs" />
     <Compile Include="Generators\FixedStatementGenerator.cs" />
@@ -118,7 +120,6 @@
     <Compile Include="Generators\AssignmentGenerator.cs" />
     <Compile Include="Generators\BlockGenerator.cs" />
     <Compile Include="Generators\CastExpressionGenerator.cs" />
-    <Compile Include="Generators\ClassCctorGenerator.cs" />
     <Compile Include="Generators\ClassCodeGenerator.cs" />
     <Compile Include="Generators\ClassInitGenerator.cs" />
     <Compile Include="Generators\ClassStaticStructGenerator.cs" />

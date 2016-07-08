@@ -32,7 +32,7 @@ namespace LibCS2C.Generators
             IEnumerable<SyntaxNode> children = node.ChildNodes();
             foreach (SyntaxNode child in children)
             {
-                m_context.Generators.Block.GenerateChildren(child);
+                m_context.Generators.Block.GenerateChild(child);
             }
 
             m_context.Writer.UnIndent();

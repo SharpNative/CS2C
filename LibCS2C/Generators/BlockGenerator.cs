@@ -24,7 +24,7 @@ namespace LibCS2C.Generators
         /// Generate the child node
         /// </summary>
         /// <param name="childNode">The child node</param>
-        public void GenerateChildren(SyntaxNode childNode)
+        public void GenerateChild(SyntaxNode childNode)
         {
             switch (childNode.Kind())
             {
@@ -78,6 +78,10 @@ namespace LibCS2C.Generators
                     m_context.Writer.Append("break");
                     break;
 
+                case SyntaxKind.SwitchStatement:
+                    m_context.Generators.SwitchStatement.Generate(childNode as SwitchStatementSyntax);
+                    break;
+
                 default:
                     throw new NotImplementedException();
             }
@@ -97,7 +101,7 @@ namespace LibCS2C.Generators
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
             foreach (SyntaxNode childNode in nodes)
             {
-                GenerateChildren(childNode);
+                GenerateChild(childNode);
             }
 
             m_context.Writer.UnIndent();

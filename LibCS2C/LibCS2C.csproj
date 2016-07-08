@@ -103,6 +103,7 @@
     <Compile Include="Compiler.cs" />
     <Compile Include="FormattedStringBuilder.cs" />
     <Compile Include="AllGenerators.cs" />
+    <Compile Include="Generators\SwitchStatementGenerator.cs" />
     <Compile Include="Generators\DelegateDeclarationGenerator.cs" />
     <Compile Include="Generators\ConditionalAccessExpressionGenerator.cs" />
     <Compile Include="Generators\ArgumentListGenerator.cs" />

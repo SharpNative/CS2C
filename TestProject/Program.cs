@@ -17,6 +17,29 @@ namespace TestProject
             nein.TestProperty = 42;
             short val = 42;
             nein.Test(val);
+
+            int a = 55;
+            switch(a)
+            {
+                case 3:
+                {
+                    Console.WriteLine("three");
+                    break;
+                }
+
+                case 6:
+                    Console.WriteLine("six");
+                    a += 5;
+                    if(a > 2)
+                    {
+                        a -= 2;
+                    }
+                    break;
+
+                default:
+                    Console.WriteLine("default");
+                    break;
+            }
         }
     }
 }

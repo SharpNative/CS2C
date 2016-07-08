@@ -44,6 +44,7 @@ namespace LibCS2C
         public SimpleMemberAccessGenerator SimpleMemberAccess { get; private set; }
         public SizeofExpressionGenerator SizeOfExpression { get; private set; }
         public StructGenerator Struct { get; private set; }
+        public SwitchStatementGenerator SwitchStatement { get; private set; }
         public VariableGenerator Variable { get; private set; }
         public WhileStatementGenerator WhileStatement { get; private set; }
 
@@ -93,6 +94,7 @@ namespace LibCS2C
             SimpleMemberAccess = new SimpleMemberAccessGenerator(context);
             SizeOfExpression = new SizeofExpressionGenerator(context);
             Struct = new StructGenerator(context);
+            SwitchStatement = new SwitchStatementGenerator(context);
             Variable = new VariableGenerator(context);
             WhileStatement = new WhileStatementGenerator(context);
         }

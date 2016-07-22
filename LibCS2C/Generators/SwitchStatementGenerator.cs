@@ -46,7 +46,7 @@ namespace LibCS2C.Generators
                         m_context.Generators.Expression.Generate(caseLabel.Value);
                         m_context.Writer.AppendLine("):");
                     }
-                    else /* if(labelKind==SyntaxKind.DefaultSwitchLabel) */
+                    else /* if(labelKind == SyntaxKind.DefaultSwitchLabel) */
                     {
                         m_context.Writer.AppendLine("default:");
                     }

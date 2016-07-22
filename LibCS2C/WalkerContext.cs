@@ -183,7 +183,7 @@ namespace LibCS2C
             }
             else
             {
-                ITypeSymbol typeSymbol = Model.GetTypeInfo(type).Type;
+                ITypeSymbol typeSymbol = /*Model*/Model.Compilation.GetSemanticModel(type.Parent.SyntaxTree).GetTypeInfo(type).Type;
                 string nameSpace = typeSymbol.ContainingNamespace.ToString().Replace(".", "_");
                 
                 if(typeSymbol.TypeKind == TypeKind.Delegate)
@@ -237,8 +237,7 @@ namespace LibCS2C
             else if(symbol.Kind == SymbolKind.Method)
             {
                 MethodDeclarationSyntax reference = symbol.DeclaringSyntaxReferences[0].GetSyntax() as MethodDeclarationSyntax;
-                ParameterListSyntax paramList = reference.ParameterList;
-                typeNameConverted = string.Format("{0}_{1}_{2}", symbol.ContainingSymbol.ToString().Replace(".", "_"), symbol.Name, paramList.ChildNodes().Count());
+                typeNameConverted = Generators.MethodDeclaration.CreateMethodPrototype(reference, false);
             }
             // Static field
             else if (symbol.IsStatic)

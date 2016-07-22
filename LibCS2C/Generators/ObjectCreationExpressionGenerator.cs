@@ -32,8 +32,13 @@ namespace LibCS2C.Generators
             // Class
             if(type.TypeKind == TypeKind.Class)
             {
-                // Call Constructor
-                m_context.Writer.Append(string.Format("{0}_{1}_{1}(", nameSpace, type.Name));
+                IdentifierNameSyntax identifier = node.ChildNodes().First() as IdentifierNameSyntax;
+                ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
+                ConstructorDeclarationSyntax reference = symbol.DeclaringSyntaxReferences[0].GetSyntax() as ConstructorDeclarationSyntax;
+
+                // Call constructor
+                m_context.Writer.Append(m_context.Generators.MethodDeclaration.CreateMethodPrototype(reference, false));
+                m_context.Writer.Append("(");
 
                 // Class initialization (returns the object, we can pass it as an argument to the constructor)
                 m_context.Writer.Append(string.Format("classInit_{0}_{1}()", nameSpace, type.Name));

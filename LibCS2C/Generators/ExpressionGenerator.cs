@@ -127,6 +127,10 @@ namespace LibCS2C.Generators
                     break;
 
                 case SyntaxKind.IdentifierName:
+                    ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
+                    if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
+                        m_context.Writer.Append("obj->");
+
                     m_context.Writer.Append(m_context.ConvertVariableName(node));
                     break;
 

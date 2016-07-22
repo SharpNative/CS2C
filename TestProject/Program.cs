@@ -23,12 +23,10 @@ namespace TestProject
             {
                 case 3:
                 {
-                    Console.WriteLine("three");
                     break;
                 }
 
                 case 6:
-                    Console.WriteLine("six");
                     a += 5;
                     if(a > 2)
                     {
@@ -37,7 +35,6 @@ namespace TestProject
                     break;
 
                 default:
-                    Console.WriteLine("default");
                     break;
             }
         }

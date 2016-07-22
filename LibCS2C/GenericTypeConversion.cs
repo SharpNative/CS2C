@@ -32,7 +32,8 @@ namespace LibCS2C
             { "char", "char" },
             { "string", "char*" },
 
-            { "Action", "void*" }
+            { "Action", "void*" },
+            { "object", "void*" }
         };
 
         /// <summary>

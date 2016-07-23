@@ -37,11 +37,12 @@ namespace LibCS2C.Generators
             ArgumentListSyntax argsList = node.ArgumentList;
             int argCount = argsList.ChildNodes().Count();
 
-            // Member binding expression
+            // Member binding expression call
             if (firstKind == SyntaxKind.MemberBindingExpression)
             {
                 m_context.Generators.Expression.Generate(node.Parent.ChildNodes().First());
             }
+            // Normal method call
             else
             {
                 MethodDeclarationSyntax reference = firstSymbol.DeclaringSyntaxReferences[0].GetSyntax() as MethodDeclarationSyntax;
@@ -62,9 +63,26 @@ namespace LibCS2C.Generators
                 }
                 else
                 {
-                    objName = (children.First() as IdentifierNameSyntax).Identifier.ToString();
-                }
+                    SyntaxNode firstChild = children.First();
+                    SyntaxKind firstChildKind = firstChild.Kind();
 
+                    // OBJECT.METHOD(...)
+                    if(firstChildKind == SyntaxKind.IdentifierName)
+                    {
+                        objName = (firstChild as IdentifierNameSyntax).Identifier.ToString();
+                    }
+                    // base.METHOD(...)
+                    else if(firstChildKind == SyntaxKind.BaseExpression)
+                    {
+                        objName = "(void*)obj";
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+                
+                // Argument for the object reference
                 m_context.Writer.Append(objName);
                 if (argsList.Arguments.Count() > 0)
                     m_context.Writer.Append(", ");

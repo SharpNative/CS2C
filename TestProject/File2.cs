@@ -7,7 +7,20 @@ using System.Runtime.InteropServices;
 
 namespace TestProject.OtherNameSpace
 {
-    class TestClass
+    public class ParentClass
+    {
+        public ParentClass()
+        {
+
+        }
+
+        public virtual void abc()
+        {
+
+        }
+    }
+
+    public class TestClass : ParentClass
     {
         public int TestProperty { get; set; } = 5;
 
@@ -23,6 +36,11 @@ namespace TestProject.OtherNameSpace
         public void Test(int a)
         {
             TestProperty = a * 5 - TestProperty;
+        }
+
+        public override void abc()
+        {
+            base.abc();
         }
     }
 }

@@ -23,6 +23,7 @@ namespace LibCS2C.Generators
         /// <param name="childNode">The child node</param>
         public void GenerateChild(SyntaxNode childNode)
         {
+            bool semiColonNeeded = true;
             switch (childNode.Kind())
             {
                 case SyntaxKind.VariableDeclaration:
@@ -43,6 +44,7 @@ namespace LibCS2C.Generators
 
                 case SyntaxKind.IfStatement:
                     m_context.Generators.IfStatement.Generate(childNode as IfStatementSyntax);
+                    semiColonNeeded = false;
                     break;
 
                 case SyntaxKind.ForStatement:
@@ -55,12 +57,14 @@ namespace LibCS2C.Generators
 
                 case SyntaxKind.FixedStatement:
                     m_context.Generators.FixedStatement.Generate(childNode as FixedStatementSyntax);
+                    semiColonNeeded = false;
                     break;
 
                 case SyntaxKind.Block:
                     m_context.Writer.AppendLine("{");
                     Generate(childNode as BlockSyntax);
                     m_context.Writer.AppendLine("}");
+                    semiColonNeeded = false;
                     break;
 
                 case SyntaxKind.DoStatement:
@@ -77,6 +81,11 @@ namespace LibCS2C.Generators
 
                 case SyntaxKind.SwitchStatement:
                     m_context.Generators.SwitchStatement.Generate(childNode as SwitchStatementSyntax);
+                    semiColonNeeded = false;
+                    break;
+
+                case SyntaxKind.EmptyStatement:
+                    semiColonNeeded = false;
                     break;
 
                 default:
@@ -84,7 +93,8 @@ namespace LibCS2C.Generators
             }
 
             // At the end of the line
-            m_context.Writer.AppendLine(";");
+            if (semiColonNeeded)
+                m_context.Writer.AppendLine(";");
         }
 
         /// <summary>

@@ -1,11 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace LibCS2C.Generators
 {
@@ -27,23 +20,9 @@ namespace LibCS2C.Generators
         public override void Generate(WhileStatementSyntax node)
         {
             m_context.Writer.Append("while(");
-
             m_context.Generators.Expression.Generate(node.Condition);
-
             m_context.Writer.AppendLine(")");
-            m_context.Writer.AppendLine("{");
-
-            IEnumerable<SyntaxNode> children = node.ChildNodes();
-            foreach(SyntaxNode child in children)
-            {
-                if(child.Kind() == SyntaxKind.Block)
-                {
-                    m_context.Generators.Block.Generate(child as BlockSyntax);
-                    break;
-                }
-            }
-            
-            m_context.Writer.AppendLine("}");
+            m_context.Generators.Block.GenerateChild(node.Statement);
         }
     }
 }

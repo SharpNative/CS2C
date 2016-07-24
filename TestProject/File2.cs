@@ -53,6 +53,26 @@ namespace TestProject.OtherNameSpace
         public override void abc()
         {
             base.abc();
+
+            while (true)
+                TestProperty++;
+
+            while(false)
+            {
+                TestProperty--;
+                TestProperty /= 2;
+                TestProperty++;
+            }
+
+            do
+            {
+                TestProperty++;
+            }
+            while (true);
+
+            do
+                TestProperty++;
+            while (false);
         }
     }
 }

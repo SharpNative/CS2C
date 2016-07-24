@@ -47,9 +47,15 @@ namespace LibCS2C.Generators
         /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
+            // Are there even things to initialize?
+            if(m_classCode.staticFields.Count() == 0 && m_classCode.propertyInitialValuesStatic.Count() == 0)
+            {
+                return;
+            }
+
             string convertedClassName = m_context.ConvertClassName(node.Identifier.ToString());
             string methodName = string.Format("classCctor_{0}", convertedClassName);
-            string methodPrototype = string.Format("void {0}(void)", methodName);
+            string methodPrototype = string.Format("inline void {0}(void)", methodName);
 
             // Add to .cctor list so we can call it on initialization
             m_context.CctorList.Add(methodName);

@@ -5,29 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
-    public enum MethodGeneratorType
-    {
-        Method = 0,
-        Constructor = 1
-    }
-
     public class MethodGenerator : GeneratorBase<BaseMethodDeclarationSyntax>
     {
-        private MethodGeneratorType m_type;
-
         /// <summary>
         /// Method declaration generator
         /// </summary>
         /// <param name="context">The walker context</param>
-        /// <param name="type">The method type: constructor or method</param>
-        public MethodGenerator(WalkerContext context, MethodGeneratorType type)
+        public MethodGenerator(WalkerContext context)
         {
             m_context = context;
-            m_type = type;
         }
 
         /// <summary>
@@ -135,15 +124,16 @@ namespace LibCS2C.Generators
         {
             SyntaxToken identifier = default(SyntaxToken);
             string returnType;
+            bool isConstructor = (node.Kind() == SyntaxKind.ConstructorDeclaration);
 
-            // Static methods don't require a reference to the object as parameter
-            if (m_type == MethodGeneratorType.Constructor)
+            // Constructor of method declaration
+            if (isConstructor)
             {
                 ConstructorDeclarationSyntax nodeTyped = node as ConstructorDeclarationSyntax;
                 identifier = nodeTyped.Identifier;
                 returnType = m_context.CurrentClassStructName + "*";
             }
-            else /* if (m_type == MethodGeneratorType.Method)*/
+            else
             {
                 MethodDeclarationSyntax nodeTyped = node as MethodDeclarationSyntax;
                 identifier = nodeTyped.Identifier;
@@ -171,7 +161,7 @@ namespace LibCS2C.Generators
             m_context.Generators.Block.Generate(node.Body);
 
             // If the method is a constructor, we need to return the object
-            if (m_type == MethodGeneratorType.Constructor)
+            if (isConstructor)
                 m_context.Writer.AppendLine("\treturn obj;");
 
             m_context.Writer.AppendLine("}");

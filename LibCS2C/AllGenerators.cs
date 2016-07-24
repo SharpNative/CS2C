@@ -31,7 +31,6 @@ namespace LibCS2C
         public IfStatementGenerator IfStatement { get; private set; }
         public InvocationGenerator Invocation { get; private set; }
         public LocalDeclarationGenerator LocalDeclaration { get; private set; }
-        public MethodGenerator ConstructorDeclaration { get; private set; }
         public MethodGenerator MethodDeclaration { get; private set; }
         public ObjectCreationExpressionGenerator ObjectCreationExpression { get; private set; }
         public PrePostExpressionGenerator PreIncrementExpression { get; private set; }
@@ -81,8 +80,7 @@ namespace LibCS2C
             IfStatement = new IfStatementGenerator(context);
             Invocation = new InvocationGenerator(context);
             LocalDeclaration = new LocalDeclarationGenerator(context);
-            ConstructorDeclaration = new MethodGenerator(context, MethodGeneratorType.Constructor);
-            MethodDeclaration = new MethodGenerator(context, MethodGeneratorType.Method);
+            MethodDeclaration = new MethodGenerator(context);
             ObjectCreationExpression = new ObjectCreationExpressionGenerator(context);
             PreIncrementExpression = new PrePostExpressionGenerator(context, ExpressionType.PreIncrement);
             PreDecrementExpression = new PrePostExpressionGenerator(context, ExpressionType.PreDecrement);

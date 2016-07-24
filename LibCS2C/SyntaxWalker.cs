@@ -57,7 +57,7 @@ namespace LibCS2C
         /// <param name="node">The constructor declaration node</param>
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
         {
-            m_context.Generators.ConstructorDeclaration.Generate(node);
+            m_context.Generators.MethodDeclaration.Generate(node);
             base.VisitConstructorDeclaration(node);
         }
 

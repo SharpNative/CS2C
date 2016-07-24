@@ -16,7 +16,19 @@ namespace TestProject.OtherNameSpace
 
         public virtual void abc()
         {
-
+            int abc = 123 & 5;
+            if (abc < 456)
+                abc--;
+            else if (abc == 1)
+                abc++;
+            else if(abc >= 8 && abc <= 10)
+            {
+                abc *= 64;
+            }
+            else
+            {
+                abc = 0;
+            }
         }
     }
 

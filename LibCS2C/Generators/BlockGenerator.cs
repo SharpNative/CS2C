@@ -88,6 +88,14 @@ namespace LibCS2C.Generators
                     semiColonNeeded = false;
                     break;
 
+                case SyntaxKind.IdentifierName:
+                    ISymbol symbol = m_context.Model.GetSymbolInfo(childNode).Symbol;
+                    if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
+                        m_context.Writer.Append("obj->");
+
+                    m_context.Writer.Append(m_context.ConvertVariableName(childNode));
+                    break;
+
                 default:
                     throw new NotImplementedException();
             }

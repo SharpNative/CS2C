@@ -23,6 +23,15 @@ namespace LibCS2C
         }
 
         /// <summary>
+        /// Clears the buffer
+        /// </summary>
+        public void Clear()
+        {
+            m_sb.Clear();
+            m_tabs = "";
+        }
+
+        /// <summary>
         /// Adds a tab
         /// </summary>
         public void Indent()

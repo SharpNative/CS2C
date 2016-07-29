@@ -29,18 +29,53 @@ namespace LibCS2C.Generators
             ISymbol symbol = m_context.Model.GetSymbolInfo(node.ChildNodes().First()).Symbol;
             bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);
 
+            string prefix = "";
             if (isProperty)
             {
                 // If the first node is a memberaccess, we need to get the object name from that node
                 string objName = "obj";
                 SyntaxNode firstNode = nodes[0].AsNode();
-                if(firstNode is MemberAccessExpressionSyntax)
+                
+                if (firstNode is MemberAccessExpressionSyntax)
                 {
-                    IdentifierNameSyntax identifier = firstNode.ChildNodes().First() as IdentifierNameSyntax;
-                    objName = m_context.ConvertVariableName(identifier);
-                }
+                    SyntaxNode firstChild = firstNode.ChildNodes().First();
+                    SyntaxKind firstChildKind = firstChild.Kind();
+                    
+                    if (firstChildKind == SyntaxKind.IdentifierName)
+                    {
+                        IdentifierNameSyntax identifier = firstChild as IdentifierNameSyntax;
+                        objName = m_context.ConvertVariableName(identifier);
 
-                m_context.Writer.Append(string.Format("{0}_{1}_setter(", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
+                        // TODO: beautify this
+                        IdentifierNameSyntax abc = firstChild as IdentifierNameSyntax;
+                        ITypeSymbol typeSymbol2 = m_context.Model.GetTypeInfo(abc).Type;
+                        if (!m_context.TypeConvert.IsGeneric(typeSymbol2.Name) && typeSymbol2.TypeKind == TypeKind.Struct)
+                        {
+                            prefix = "&";
+                        }
+                    }
+                    else if (firstChildKind == SyntaxKind.ElementAccessExpression)
+                    {
+                        WriterDestination destination = m_context.CurrentDestination;
+                        m_context.CurrentDestination = WriterDestination.TempBuffer;
+                        m_context.Generators.ElementAccess.Generate(firstChild as ElementAccessExpressionSyntax);
+                        m_context.CurrentDestination = destination;
+                        objName = m_context.FlushTempBuffer();
+                        // TODO: beautify this
+                        ElementAccessExpressionSyntax abc = firstChild as ElementAccessExpressionSyntax;
+                        ITypeSymbol typeSymbol2 = m_context.Model.GetTypeInfo(abc).Type;
+                        if(!m_context.TypeConvert.IsGeneric(typeSymbol2.Name) && typeSymbol2.TypeKind == TypeKind.Struct)
+                        {
+                            prefix = "&";
+                        }
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+                
+                m_context.Writer.Append(string.Format("{0}_{1}_setter({2}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, prefix));
                 if (!symbol.IsStatic)
                     m_context.Writer.Append(string.Format("{0}, ", objName));
             }

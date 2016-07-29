@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Linq;
 
 namespace LibCS2C.Generators
@@ -49,9 +50,20 @@ namespace LibCS2C.Generators
                         else
                         {
                             m_context.Writer.AppendLine("else");
-                            m_context.Writer.AppendLine("{");
-                            m_context.Generators.Block.Generate(childNode.ChildNodes().First() as BlockSyntax);
-                            m_context.Writer.AppendLine("}");
+
+                            SyntaxNode first = childNode.ChildNodes().First();
+                            SyntaxKind firstKind = first.Kind();
+
+                            if(firstKind == SyntaxKind.Block)
+                            {
+                                m_context.Writer.AppendLine("{");
+                                m_context.Generators.Block.Generate(first as BlockSyntax);
+                                m_context.Writer.AppendLine("}");
+                            }
+                            else
+                            {
+                                m_context.Generators.Block.GenerateChild(first);
+                            }
                         }
                     }
                     else if (kind == SyntaxKind.Block)

@@ -76,6 +76,15 @@ namespace LibCS2C.Generators
                     {
                         objName = "(void*)obj";
                     }
+                    // member.member
+                    else if (firstChildKind == SyntaxKind.SimpleMemberAccessExpression)
+                    {
+                        WriterDestination destination = m_context.CurrentDestination;
+                        m_context.CurrentDestination = WriterDestination.TempBuffer;
+                        m_context.Generators.SimpleMemberAccess.Generate(firstChild as MemberAccessExpressionSyntax);
+                        m_context.CurrentDestination = destination;
+                        objName = m_context.FlushTempBuffer();
+                    }
                     else
                     {
                         throw new NotImplementedException();

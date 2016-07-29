@@ -58,7 +58,12 @@ namespace LibCS2C.Generators
             }
             else
             {
-                m_context.Writer.Append(string.Format("{1} = {1}{0}", type, m_context.ConvertVariableName(name)));
+                string varName = "";
+                if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
+                    varName += "obj->";
+
+                varName += m_context.ConvertVariableName(name);
+                m_context.Writer.Append(string.Format("{1} = {1}{0}", type, varName));
             }
 
             if (isProperty)

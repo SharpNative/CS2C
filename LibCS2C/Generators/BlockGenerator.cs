@@ -92,8 +92,9 @@ namespace LibCS2C.Generators
                     ISymbol symbol = m_context.Model.GetSymbolInfo(childNode).Symbol;
                     if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
                         m_context.Writer.Append("obj->");
-
+                    
                     m_context.Writer.Append(m_context.ConvertVariableName(childNode));
+                    semiColonNeeded = false;
                     break;
 
                 default:

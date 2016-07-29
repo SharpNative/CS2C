@@ -65,8 +65,6 @@ namespace LibCS2C.Generators
             // Normal member access
             else
             {
-                // children: (this / object) (dot) (identifier)
-
                 // If it's static, we don't need the first part (identifier)
                 // because the reference is already in the second part (identifier)
                 ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
@@ -87,9 +85,18 @@ namespace LibCS2C.Generators
                 IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
                 m_context.Writer.Append(m_context.ConvertVariableName(name));
 
+                // TODO: beautify this
                 if (symbol.Kind == SymbolKind.Property && !symbol.IsStatic)
                 {
                     m_context.Writer.Append("(");
+                    
+                    ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(children.First().AsNode()).Type;
+                    
+                    if (!m_context.TypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct)
+                    {
+                        m_context.Writer.Append("&");
+                    }
+
                     GenerateObjectPart(first);
                     m_context.Writer.Append(")");
                 }

@@ -47,6 +47,16 @@ namespace LibCS2C
         }
 
         /// <summary>
+        /// Checks if a given C# type is a generic type
+        /// </summary>
+        /// <param name="type">The C# type name</param>
+        /// <returns>If the type is a generic type</returns>
+        public bool IsGeneric(string type)
+        {
+            return m_convert.ContainsKey(type);
+        }
+
+        /// <summary>
         /// Converts the given C# type to a C type
         /// </summary>
         /// <param name="type">The C# type</param>

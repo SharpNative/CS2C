@@ -33,6 +33,10 @@ namespace LibCS2C.Generators
 
                 if (kind == SyntaxKind.IdentifierName)
                 {
+                    ISymbol symbol = m_context.Model.GetSymbolInfo(child).Symbol;
+                    if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
+                        m_context.Writer.Append("obj->");
+
                     m_context.Writer.Append(m_context.ConvertVariableName(child));
                 }
                 else if (kind == SyntaxKind.BracketedArgumentList)

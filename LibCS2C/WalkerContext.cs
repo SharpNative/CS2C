@@ -15,6 +15,7 @@ namespace LibCS2C
         Delegates,
         MethodPrototypes,
         MethodDeclarations,
+        TempBuffer
     }
 
     public class WalkerContext
@@ -94,6 +95,10 @@ namespace LibCS2C
                         Writer = SbMethodDeclarations;
                         break;
 
+                    case WriterDestination.TempBuffer:
+                        Writer = m_sbTempBuffer;
+                        break;
+
                     default:
                         throw new NotImplementedException();
                 }
@@ -115,6 +120,8 @@ namespace LibCS2C
         /// </summary>
         public AllGenerators Generators { get; private set; }
 
+        private FormattedStringBuilder m_sbTempBuffer = new FormattedStringBuilder();
+
         // String builders
         public FormattedStringBuilder SbEnums { get; private set; } = new FormattedStringBuilder();
         public FormattedStringBuilder SbStructs { get; private set; } = new FormattedStringBuilder();
@@ -132,6 +139,13 @@ namespace LibCS2C
         public WalkerContext()
         {
             Generators = new AllGenerators(this);
+        }
+
+        public string FlushTempBuffer()
+        {
+            string ret = m_sbTempBuffer.ToString();
+            m_sbTempBuffer.Clear();
+            return ret;
         }
 
         /// <summary>

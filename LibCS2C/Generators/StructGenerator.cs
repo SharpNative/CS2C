@@ -83,8 +83,8 @@ namespace LibCS2C.Generators
             }
 
             // Temporarily hold all the data
-            Dictionary<string, EqualsValueClauseSyntax> fields = new Dictionary<string, EqualsValueClauseSyntax>();
-            Dictionary<string, TypeSyntax> fieldTypes = new Dictionary<string, TypeSyntax>();
+            Dictionary<string, EqualsValueClauseSyntax> data = new Dictionary<string, EqualsValueClauseSyntax>();
+            Dictionary<string, TypeSyntax> dataTypes = new Dictionary<string, TypeSyntax>();
 
             // Collect the data and put it in the dictionaries
             IEnumerable<SyntaxNode> children = node.ChildNodes();
@@ -101,13 +101,16 @@ namespace LibCS2C.Generators
                     {
                         foreach (VariableDeclaratorSyntax variable in fieldChild.Variables)
                         {
-                            string identifier = variable.Identifier.ToString();
-                            if (variable.Initializer != null)
-                                fields.Add(identifier, variable.Initializer);
-
-                            fieldTypes.Add(identifier, fieldChild.Type);
+                            string identifier = "field_" + variable.Identifier.ToString();
+                            dataTypes.Add(identifier, fieldChild.Type);
                         }
                     }
+                }
+                else if(kind == SyntaxKind.PropertyDeclaration)
+                {
+                    PropertyDeclarationSyntax property = child as PropertyDeclarationSyntax;
+                    string identifier = "prop_" + property.Identifier.ToString();
+                    dataTypes.Add(identifier, property.Type);
                 }
             }
 
@@ -115,10 +118,9 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine(string.Format("struct struct_{0}", structName));
             m_context.Writer.AppendLine("{");
             
-            foreach (KeyValuePair<string, TypeSyntax> pair in fieldTypes)
+            foreach (KeyValuePair<string, TypeSyntax> pair in dataTypes)
             {
-                m_context.Writer.AppendLine("\t/* Field: " + pair.Key + " */");
-                m_context.Writer.AppendLine(string.Format("\t{0} field_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
+                m_context.Writer.AppendLine(string.Format("\t{0} {1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
 
             // Attributes
@@ -141,7 +143,7 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine(string.Format("\tstruct struct_{0} object;", structName));
 
             // Loop through the fields and initialize them
-            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in fields)
+            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in data)
             {
                 m_context.Writer.Append(string.Format("\tobject.field_{0} = ", pair.Key));
                 ExpressionSyntax expression = pair.Value.Value;

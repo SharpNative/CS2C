@@ -39,6 +39,27 @@ namespace LibCS2C.Generators
                 }
                 else if (childKind == SyntaxKind.AccessorList)
                 {
+                    SyntaxNode parentNode = node.Parent;
+                    SyntaxKind parentKind = parentNode.Kind();
+
+                    // TODO: make this beautiful
+                    string objTypeName, typeName;
+                    if(parentKind == SyntaxKind.StructDeclaration)
+                    {
+                        StructDeclarationSyntax structDeclaration = parentNode as StructDeclarationSyntax;
+                        typeName = m_context.ConvertClassName(structDeclaration.Identifier.ToString());
+                        objTypeName = "struct struct_" + m_context.ConvertClassName(structDeclaration.Identifier.ToString());
+                    }
+                    else if(parentKind == SyntaxKind.ClassDeclaration)
+                    {
+                        typeName = m_context.CurrentClassNameFormatted;
+                        objTypeName = m_context.CurrentClassStructName;
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+
                     AccessorListSyntax accessors = child.AsNode() as AccessorListSyntax;
                     SyntaxList<AccessorDeclarationSyntax> accessorDeclarations = accessors.Accessors;
 
@@ -50,13 +71,14 @@ namespace LibCS2C.Generators
                                                              where a.Kind() == SyntaxKind.SetAccessorDeclaration
                                                              select a).FirstOrDefault();
 
+
                     if (getAccessor != default(AccessorDeclarationSyntax))
                     {
                         string methodPrototype;
                         if (isStatic)
-                            methodPrototype = string.Format("{0} {1}_{2}_getter(void)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier);
+                            methodPrototype = string.Format("{0} {1}_{2}_getter(void)", m_context.ConvertTypeName(node.Type), typeName, node.Identifier);
                         else
-                            methodPrototype = string.Format("{0} {1}_{2}_getter({3}* obj)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier, m_context.CurrentClassStructName);
+                            methodPrototype = string.Format("{0} {1}_{2}_getter({3}* obj)", m_context.ConvertTypeName(node.Type), typeName, node.Identifier, objTypeName);
 
                         // Method prototype
                         m_context.CurrentDestination = WriterDestination.MethodPrototypes;
@@ -71,7 +93,7 @@ namespace LibCS2C.Generators
                         if (getAccessor.Body == null)
                         {
                             if (isStatic)
-                                m_context.Writer.AppendLine(string.Format("\treturn classStatics_{0}.prop_{1};", m_context.CurrentClassNameFormatted, node.Identifier));
+                                m_context.Writer.AppendLine(string.Format("\treturn classStatics_{0}.prop_{1};", typeName, node.Identifier));
                             else
                                 m_context.Writer.AppendLine(string.Format("\treturn obj->prop_{0};", node.Identifier));
                         }
@@ -87,9 +109,9 @@ namespace LibCS2C.Generators
                     {
                         string methodPrototype;
                         if (isStatic)
-                            methodPrototype = string.Format("{0} {1}_{2}_setter({0} value)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier);
+                            methodPrototype = string.Format("{0} {1}_{2}_setter({0} value)", m_context.ConvertTypeName(node.Type), typeName, node.Identifier);
                         else
-                            methodPrototype = string.Format("{0} {1}_{2}_setter({3}* obj, {0} value)", m_context.ConvertTypeName(node.Type), m_context.CurrentClassNameFormatted, node.Identifier, m_context.CurrentClassStructName);
+                            methodPrototype = string.Format("{0} {1}_{2}_setter({3}* obj, {0} value)", m_context.ConvertTypeName(node.Type), typeName, node.Identifier, objTypeName);
 
                         // Method prototype
                         m_context.CurrentDestination = WriterDestination.MethodPrototypes;
@@ -104,7 +126,7 @@ namespace LibCS2C.Generators
                         if (setAccessor.Body == null)
                         {
                             if (isStatic)
-                                m_context.Writer.AppendLine(string.Format("\tclassStatics_{0}.prop_{1} = value;", m_context.CurrentClassNameFormatted, node.Identifier));
+                                m_context.Writer.AppendLine(string.Format("\tclassStatics_{0}.prop_{1} = value;", typeName, node.Identifier));
                             else
                                 m_context.Writer.AppendLine(string.Format("\tobj->prop_{0} = value;", node.Identifier));
                         }

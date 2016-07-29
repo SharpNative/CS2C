@@ -128,6 +128,14 @@ namespace LibCS2C.Generators
 
                 case SyntaxKind.IdentifierName:
                     ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
+                    ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(node).Type;
+
+                    //// TODO: Quickfix!
+                    //if (typeSymbol != null && symbol.Kind == SymbolKind.Parameter && !m_context.TypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct)
+                    //{
+                    //    m_context.Writer.Append("&");
+                    //}
+
                     if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
                         m_context.Writer.Append("obj->");
 

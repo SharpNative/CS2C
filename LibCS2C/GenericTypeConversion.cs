@@ -33,7 +33,20 @@ namespace LibCS2C
             { "string", "char*" },
 
             { "Action", "void*" },
-            { "object", "void*" }
+            { "object", "void*" },
+
+            { "UInt8", "uint8_t" },
+            { "UInt16", "uint16_t" },
+            { "UInt32", "uint32_t" },
+            { "UInt64", "uint64_t" },
+
+            { "Char", "char" },
+            { "Int8", "int8_t" },
+            { "Int16", "int16_t" },
+            { "Int32", "int32_t" },
+            { "Int64", "int64_t" },
+            { "Boolean", "int32_t" },
+            { "Byte", "uint8_t" }
         };
 
         /// <summary>

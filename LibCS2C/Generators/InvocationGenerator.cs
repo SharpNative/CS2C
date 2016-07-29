@@ -67,8 +67,15 @@ namespace LibCS2C.Generators
                     SyntaxKind firstChildKind = firstChild.Kind();
 
                     // OBJECT.METHOD(...)
-                    if(firstChildKind == SyntaxKind.IdentifierName)
+                    if (firstChildKind == SyntaxKind.IdentifierName)
                     {
+                        ISymbol sym = m_context.Model.GetSymbolInfo(firstChild).Symbol;
+                        
+                        if (sym != null && sym.Kind == SymbolKind.Field)
+                        {
+                            m_context.Writer.Append("obj->field_");
+                        }
+                        
                         objName = (firstChild as IdentifierNameSyntax).Identifier.ToString();
                     }
                     // base.METHOD(...)

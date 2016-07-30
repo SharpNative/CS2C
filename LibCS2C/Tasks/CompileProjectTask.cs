@@ -2,6 +2,7 @@
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,8 @@ namespace LibCS2C.Tasks
     {
         private string m_projectpath;
         private string m_outputpath;
+        private string m_afterbuildcommand;
+        private string m_afterworkingdir;
 
         [Required]
         public string Path
@@ -39,6 +42,31 @@ namespace LibCS2C.Tasks
             }
         }
 
+        public string AfterBuildCommand
+        {
+            get
+            {
+                return m_afterbuildcommand;
+            }
+
+            set
+            {
+                m_afterbuildcommand = value;
+            }
+        }
+
+        public string AfterBuildWorkingDir
+        {
+            get
+            {
+                return m_afterworkingdir;
+            }
+
+            set
+            {
+                m_afterworkingdir = value;
+            }
+        }
 
         public override bool Execute()
         {
@@ -56,6 +84,17 @@ namespace LibCS2C.Tasks
                     Directory.CreateDirectory(outDir);
 
                 File.WriteAllText(m_outputpath, output);
+
+                if(m_afterbuildcommand != null)
+                {
+                    Log.LogMessage(MessageImportance.High, "Running after build command " + m_afterbuildcommand);
+
+                    ProcessStartInfo info = new ProcessStartInfo(m_afterbuildcommand);
+                    if (m_afterworkingdir != null)
+                        info.WorkingDirectory = m_afterworkingdir;
+
+                    Process.Start(info);
+                }
 
                 Log.LogMessage(MessageImportance.High, "Finished compiling");
             }

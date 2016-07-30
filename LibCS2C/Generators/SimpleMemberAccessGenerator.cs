@@ -80,6 +80,8 @@ namespace LibCS2C.Generators
                         m_context.Writer.Append("->");
                 }
 
+                Console.WriteLine("smag: " + node);
+
                 // Variable name
                 IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
                 m_context.Writer.Append(m_context.ConvertVariableName(name));

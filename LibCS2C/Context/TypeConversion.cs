@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 
 namespace LibCS2C.Context
 {
@@ -82,6 +83,10 @@ namespace LibCS2C.Context
                 else if (typeSymbol.TypeKind == TypeKind.Class)
                 {
                     typeNameConverted = string.Format("struct class_{0}_{1}*", nameSpace, type.ToString());
+                }
+                else if(typeSymbol.TypeKind == TypeKind.Enum)
+                {
+                    typeNameConverted = "int32_t";
                 }
                 else
                 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibCS2C
+namespace LibCS2C.Context
 {
     public enum WriterDestination
     {

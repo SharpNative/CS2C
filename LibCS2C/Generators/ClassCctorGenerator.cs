@@ -1,9 +1,7 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -53,7 +51,7 @@ namespace LibCS2C.Generators
                 return;
             }
 
-            string convertedClassName = m_context.ConvertClassName(node.Identifier.ToString());
+            string convertedClassName = m_context.TypeConvert.ConvertClassName(node.Identifier.ToString());
             string methodName = string.Format("classCctor_{0}", convertedClassName);
             string methodPrototype = string.Format("inline void {0}(void)", methodName);
 
@@ -61,12 +59,12 @@ namespace LibCS2C.Generators
             m_context.CctorList.Add(methodName);
 
             // Prototype
-            m_context.CurrentDestination = WriterDestination.MethodPrototypes;
+            m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
             m_context.Writer.Append(methodPrototype);
             m_context.Writer.AppendLine(";");
 
             // Declaration
-            m_context.CurrentDestination = WriterDestination.MethodDeclarations;
+            m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
             m_context.Writer.AppendLine(methodPrototype);
             m_context.Writer.AppendLine("{");
 

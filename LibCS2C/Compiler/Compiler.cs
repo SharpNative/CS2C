@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.MSBuild;
 using System;
 
-namespace LibCS2C
+namespace LibCS2C.Compiler
 {
     public class Compiler
     {

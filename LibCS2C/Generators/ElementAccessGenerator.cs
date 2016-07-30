@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -23,7 +24,7 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression</param>
         public override void Generate(ElementAccessExpressionSyntax node)
         {
-            m_context.ShouldOutputPost = true;
+            m_context.Writer.ShouldOutputPost = true;
 
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
             foreach (SyntaxNode child in nodes)
@@ -36,7 +37,7 @@ namespace LibCS2C.Generators
                     if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
                         m_context.Writer.Append("obj->");
 
-                    m_context.Writer.Append(m_context.ConvertVariableName(child));
+                    m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(child));
                 }
                 else if (kind == SyntaxKind.BracketedArgumentList)
                 {
@@ -62,7 +63,7 @@ namespace LibCS2C.Generators
                 }
             }
 
-            m_context.ShouldOutputPost = false;
+            m_context.Writer.ShouldOutputPost = false;
         }
     }
 }

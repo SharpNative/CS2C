@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 
-namespace LibCS2C
+namespace LibCS2C.Context
 {
     /// <summary>
     /// Contains the native / generic type conversions

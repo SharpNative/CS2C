@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -84,11 +85,11 @@ namespace LibCS2C.Generators
                     // member.member
                     else if (firstChildKind == SyntaxKind.SimpleMemberAccessExpression)
                     {
-                        WriterDestination destination = m_context.CurrentDestination;
-                        m_context.CurrentDestination = WriterDestination.TempBuffer;
+                        WriterDestination destination = m_context.Writer.CurrentDestination;
+                        m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
                         m_context.Generators.SimpleMemberAccess.Generate(firstChild as MemberAccessExpressionSyntax);
-                        m_context.CurrentDestination = destination;
-                        objName = m_context.FlushTempBuffer();
+                        m_context.Writer.CurrentDestination = destination;
+                        objName = m_context.Writer.FlushTempBuffer();
                     }
                     else
                     {

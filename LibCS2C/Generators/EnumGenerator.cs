@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -26,8 +27,8 @@ namespace LibCS2C.Generators
         /// <param name="node">The enum</param>
         public override void Generate(EnumDeclarationSyntax node)
         {
-            WriterDestination destination = m_context.CurrentDestination;
-            m_context.CurrentDestination = WriterDestination.Enums;
+            WriterDestination destination = m_context.Writer.CurrentDestination;
+            m_context.Writer.CurrentDestination = WriterDestination.Enums;
 
             bool insideClass = (node.Parent is ClassDeclarationSyntax);
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
@@ -38,12 +39,12 @@ namespace LibCS2C.Generators
                 string value = child.EqualsValue.Value.ToString();
 
                 if(insideClass)
-                    m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2} ({3})", m_context.CurrentClassNameFormatted, node.Identifier, identifier, value));
+                    m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2} ({3})", m_context.TypeConvert.CurrentClassNameFormatted, node.Identifier, identifier, value));
                 else
                     m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2}", m_context.CurrentNamespaceFormatted, node.Identifier, identifier, value));
             }
 
-            m_context.CurrentDestination = destination;
+            m_context.Writer.CurrentDestination = destination;
         }
     }
 }

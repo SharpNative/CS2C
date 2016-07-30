@@ -1,11 +1,8 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -112,7 +109,7 @@ namespace LibCS2C.Generators
             ClassInitGenerator classInitGen = new ClassInitGenerator(m_context, classCode);
             ClassCctorGenerator classCctorGen = new ClassCctorGenerator(m_context, classCode);
 
-            m_context.CurrentDestination = WriterDestination.ClassStructs;
+            m_context.Writer.CurrentDestination = WriterDestination.ClassStructs;
             structGen.Generate(node);
             staticStructGen.Generate(node);
             classInitGen.Generate(node);

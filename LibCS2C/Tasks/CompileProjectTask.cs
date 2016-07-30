@@ -1,11 +1,8 @@
 ﻿using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace LibCS2C.Tasks
 {
@@ -76,7 +73,7 @@ namespace LibCS2C.Tasks
 
             try
             {
-                var output = Compiler.CompileProject(Path);
+                var output = Compiler.Compiler.CompileProject(Path);
 
                 string outDir = System.IO.Path.GetDirectoryName(Outpath);
 

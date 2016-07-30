@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -93,7 +94,7 @@ namespace LibCS2C.Generators
                     if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
                         m_context.Writer.Append("obj->");
                     
-                    m_context.Writer.Append(m_context.ConvertVariableName(childNode));
+                    m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(childNode));
                     semiColonNeeded = false;
                     break;
 
@@ -105,8 +106,8 @@ namespace LibCS2C.Generators
             if (semiColonNeeded)
                 m_context.Writer.AppendLine(";");
 
-            if (!m_context.IsPostBufferEmpty())
-                m_context.Writer.AppendLine(string.Format("{0};", m_context.FlushPostBuffer()));
+            if (!m_context.Writer.IsPostBufferEmpty())
+                m_context.Writer.AppendLine(string.Format("{0};", m_context.Writer.FlushPostBuffer()));
         }
 
         /// <summary>

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
-namespace LibCS2C
+namespace LibCS2C.Util
 {
     public class FormattedStringBuilder
     {
@@ -99,12 +95,16 @@ namespace LibCS2C
         /// Append text at the start
         /// </summary>
         /// <param name="text">The text</param>
-        public void Prepend(string text)
+        /*public void Prepend(string text)
         {
             m_empty = false;
             m_sb.Insert(0, text);
-        }
+        }*/
 
+        /// <summary>
+        /// Checks if the stringbuilder is empty
+        /// </summary>
+        /// <returns>If it's empty</returns>
         public bool IsEmpty()
         {
             return m_empty;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
-
-using LibCS2C;
+using LibCS2C.Compiler;
 
 namespace CS_2_C
 {
@@ -14,8 +13,8 @@ namespace CS_2_C
         static void Main(string[] args)
         {
             // string output = Compiler.CompileProject("../../../TestProject/TestProject.csproj");
-            string output = Compiler.CompileProject(@"C:\Users\jeffr\Documents\visual studio 2015\Projects\Sharpen\Sharpen\Sharpen.csproj");
-            // string output = Compiler.CompileProject(@"C:\Users\Niels\Source\Repos\Sharpen\Sharpen\Sharpen.csproj");
+            // string output = Compiler.CompileProject(@"C:\Users\jeffr\Documents\visual studio 2015\Projects\Sharpen\Sharpen\Sharpen.csproj");
+            string output = Compiler.CompileProject(@"C:\Users\Niels\Source\Repos\Sharpen\Sharpen\Sharpen.csproj");
 
             File.WriteAllText("output.c", output);
             Console.ReadLine();

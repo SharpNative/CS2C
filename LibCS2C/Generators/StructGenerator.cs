@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -26,8 +27,8 @@ namespace LibCS2C.Generators
         /// <param name="node">The struct declaration</param>
         public override void Generate(StructDeclarationSyntax node)
         {
-            WriterDestination destination = m_context.CurrentDestination;
-            m_context.CurrentDestination = WriterDestination.Structs;
+            WriterDestination destination = m_context.Writer.CurrentDestination;
+            m_context.Writer.CurrentDestination = WriterDestination.Structs;
 
             // Check for attributes
             bool packed = false;
@@ -74,7 +75,7 @@ namespace LibCS2C.Generators
             string structName;
             if (node.Parent is ClassDeclarationSyntax)
             {
-                structName = string.Format("{0}_{1}", m_context.CurrentClassNameFormatted, node.Identifier.ToString());
+                structName = string.Format("{0}_{1}", m_context.TypeConvert.CurrentClassNameFormatted, node.Identifier.ToString());
             }
             else
             {
@@ -144,19 +145,19 @@ namespace LibCS2C.Generators
 
             // Method prototype of init code
             string methodName = string.Format("inline struct struct_{0} structInit_{0}(void)", structName);
-            m_context.CurrentDestination = WriterDestination.MethodPrototypes;
+            m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
             m_context.Writer.Append(methodName);
             m_context.Writer.AppendLine(";");
 
             // Init method declaration
-            m_context.CurrentDestination = WriterDestination.MethodDeclarations;
+            m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
             m_context.Writer.AppendLine(methodName);
             m_context.Writer.AppendLine("{");
             m_context.Writer.AppendLine(string.Format("\tstruct struct_{0} object;", structName));
             m_context.Writer.AppendLine("\treturn object;");
             m_context.Writer.AppendLine("}");
 
-            m_context.CurrentDestination = destination;
+            m_context.Writer.CurrentDestination = destination;
         }
     }
 }

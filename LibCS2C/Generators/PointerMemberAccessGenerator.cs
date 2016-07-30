@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -35,7 +36,7 @@ namespace LibCS2C.Generators
                 }
                 else if(childKind == SyntaxKind.IdentifierName)
                 {
-                    m_context.Writer.Append(m_context.ConvertVariableName(child.AsNode()));
+                    m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(child.AsNode()));
                 }
                 else
                 {

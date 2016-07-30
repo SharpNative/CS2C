@@ -1,6 +1,6 @@
-﻿using LibCS2C.Generators;
+﻿using LibCS2C.Context;
 
-namespace LibCS2C
+namespace LibCS2C.Generators
 {
     public class AllGenerators
     {

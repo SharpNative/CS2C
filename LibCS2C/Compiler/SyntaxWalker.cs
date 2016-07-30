@@ -1,10 +1,10 @@
 ﻿using System.Text;
-
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using LibCS2C.Context;
 
-namespace LibCS2C
+namespace LibCS2C.Compiler
 {
     public class SyntaxWalker : CSharpSyntaxWalker
     {
@@ -33,8 +33,7 @@ namespace LibCS2C
         /// <param name="node">The struct declaration node</param>
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            m_context.CurrentDestination = WriterDestination.Structs;
-            m_context.Writer.AppendLine("/* Struct <" + node.Identifier + "> */");
+            m_context.Writer.CurrentDestination = WriterDestination.Structs;
             m_context.Generators.Struct.Generate(node);
             base.VisitStructDeclaration(node);
         }
@@ -45,7 +44,7 @@ namespace LibCS2C
         /// <param name="node">The class declaration node</param>
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            m_context.CurrentDestination = WriterDestination.ClassStructs;
+            m_context.Writer.CurrentDestination = WriterDestination.ClassStructs;
             m_context.CurrentClass = node;
             m_context.Generators.ClassCode.Generate(node);
             base.VisitClassDeclaration(node);
@@ -119,12 +118,12 @@ namespace LibCS2C
         {
             // Append all the code
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine(m_context.SbEnums.ToString());
-            sb.AppendLine(m_context.SbStructs.ToString());
-            sb.AppendLine(m_context.SbDelegates.ToString());
-            sb.AppendLine(m_context.SbClassStructs.ToString());
-            sb.AppendLine(m_context.SbMethodPrototypes.ToString());
-            sb.AppendLine(m_context.SbMethodDeclarations.ToString());
+            sb.AppendLine(m_context.Writer.SbEnums.ToString());
+            sb.AppendLine(m_context.Writer.SbStructs.ToString());
+            sb.AppendLine(m_context.Writer.SbDelegates.ToString());
+            sb.AppendLine(m_context.Writer.SbClassStructs.ToString());
+            sb.AppendLine(m_context.Writer.SbMethodPrototypes.ToString());
+            sb.AppendLine(m_context.Writer.SbMethodDeclarations.ToString());
 
             // Add .cctor calls in init method
             sb.AppendLine("void init(void)");

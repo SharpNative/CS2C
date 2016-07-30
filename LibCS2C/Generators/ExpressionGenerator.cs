@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
@@ -141,7 +142,7 @@ namespace LibCS2C.Generators
                     if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
                         m_context.Writer.Append("obj->");
 
-                    m_context.Writer.Append(m_context.ConvertVariableName(node));
+                    m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(node));
                     break;
 
                 case SyntaxKind.CastExpression:

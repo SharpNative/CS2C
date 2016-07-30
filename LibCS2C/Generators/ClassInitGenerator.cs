@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,19 +29,19 @@ namespace LibCS2C.Generators
         /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
-            string methodPrototype = string.Format("{0}* classInit_{1}_{2}(void)", m_context.CurrentClassStructName, m_context.CurrentNamespaceFormatted, node.Identifier);
+            string methodPrototype = string.Format("{0}* classInit_{1}_{2}(void)", m_context.TypeConvert.CurrentClassStructName, m_context.CurrentNamespaceFormatted, node.Identifier);
 
             // Method prototype
-            m_context.CurrentDestination = WriterDestination.MethodPrototypes;
+            m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
             m_context.Writer.Append(methodPrototype);
             m_context.Writer.AppendLine(";");
 
             // Method declaration
             // Class initialization method: returns a pointer to this object
-            m_context.CurrentDestination = WriterDestination.MethodDeclarations;
+            m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
             m_context.Writer.AppendLine(methodPrototype);
             m_context.Writer.AppendLine("{");
-            m_context.Writer.AppendLine(string.Format("\t{0}* object = malloc(sizeof({0}));", m_context.CurrentClassStructName));
+            m_context.Writer.AppendLine(string.Format("\t{0}* object = malloc(sizeof({0}));", m_context.TypeConvert.CurrentClassStructName));
             m_context.Writer.AppendLine("\tif(!object)");
             m_context.Writer.AppendLine("\t\treturn NULL;");
 

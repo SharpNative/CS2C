@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -84,7 +85,7 @@ namespace LibCS2C.Generators
             if (!isStatic)
             {
                 paramTypeBuilder.Append("class_");
-                argumentBuilder.Append(string.Format("{0}* obj", m_context.CurrentClassStructName));
+                argumentBuilder.Append(string.Format("{0}* obj", m_context.TypeConvert.CurrentClassStructName));
                 if (paramCount > 1)
                     argumentBuilder.Append(", ");
             }
@@ -131,7 +132,7 @@ namespace LibCS2C.Generators
             {
                 ConstructorDeclarationSyntax nodeTyped = node as ConstructorDeclarationSyntax;
                 identifier = nodeTyped.Identifier;
-                returnType = m_context.CurrentClassStructName + "*";
+                returnType = m_context.TypeConvert.CurrentClassStructName + "*";
             }
             else
             {
@@ -143,7 +144,7 @@ namespace LibCS2C.Generators
             string methodPrototype = returnType + " " + CreateMethodPrototype(node, true);
 
             // Append to properties
-            m_context.CurrentDestination = WriterDestination.MethodPrototypes;
+            m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
             m_context.Writer.Append(methodPrototype);
             m_context.Writer.AppendLine(";");
 
@@ -152,7 +153,7 @@ namespace LibCS2C.Generators
                 return;
 
             // Append the declaration so we can add contents
-            m_context.CurrentDestination = WriterDestination.MethodDeclarations;
+            m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
             m_context.Writer.AppendLine(methodPrototype);
 
             // Block containing the code of the method

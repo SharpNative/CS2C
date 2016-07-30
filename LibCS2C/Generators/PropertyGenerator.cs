@@ -1,11 +1,8 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -27,6 +24,8 @@ namespace LibCS2C.Generators
         public override void Generate(PropertyDeclarationSyntax node)
         {
             ChildSyntaxList children = node.ChildNodesAndTokens();
+            SyntaxNode parentNode = node.Parent;
+            SyntaxKind parentKind = parentNode.Kind();
 
             bool isStatic = false;
             foreach (SyntaxNodeOrToken child in children)
@@ -39,25 +38,18 @@ namespace LibCS2C.Generators
                 }
                 else if (childKind == SyntaxKind.AccessorList)
                 {
-                    SyntaxNode parentNode = node.Parent;
-                    SyntaxKind parentKind = parentNode.Kind();
-
-                    // TODO: make this beautiful
+                    // Determine where the property is located and use that to determine the names
                     string objTypeName, typeName;
-                    if(parentKind == SyntaxKind.StructDeclaration)
+                    if (parentKind == SyntaxKind.StructDeclaration)
                     {
                         StructDeclarationSyntax structDeclaration = parentNode as StructDeclarationSyntax;
-                        typeName = m_context.ConvertClassName(structDeclaration.Identifier.ToString());
-                        objTypeName = "struct struct_" + m_context.ConvertClassName(structDeclaration.Identifier.ToString());
+                        typeName = m_context.TypeConvert.ConvertClassName(structDeclaration.Identifier.ToString());
+                        objTypeName = "struct struct_" + m_context.TypeConvert.ConvertClassName(structDeclaration.Identifier.ToString());
                     }
-                    else if(parentKind == SyntaxKind.ClassDeclaration)
+                    else /* if(parentKind == SyntaxKind.ClassDeclaration) */
                     {
-                        typeName = m_context.CurrentClassNameFormatted;
-                        objTypeName = m_context.CurrentClassStructName;
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
+                        typeName = m_context.TypeConvert.CurrentClassNameFormatted;
+                        objTypeName = m_context.TypeConvert.CurrentClassStructName;
                     }
 
                     AccessorListSyntax accessors = child.AsNode() as AccessorListSyntax;
@@ -81,12 +73,12 @@ namespace LibCS2C.Generators
                             methodPrototype = string.Format("{0} {1}_{2}_getter({3}* obj)", m_context.ConvertTypeName(node.Type), typeName, node.Identifier, objTypeName);
 
                         // Method prototype
-                        m_context.CurrentDestination = WriterDestination.MethodPrototypes;
+                        m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
                         m_context.Writer.Append(methodPrototype);
                         m_context.Writer.AppendLine(";");
 
                         // Method declaration
-                        m_context.CurrentDestination = WriterDestination.MethodDeclarations;
+                        m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
                         m_context.Writer.AppendLine(methodPrototype);
                         m_context.Writer.AppendLine("{");
 
@@ -114,12 +106,12 @@ namespace LibCS2C.Generators
                             methodPrototype = string.Format("{0} {1}_{2}_setter({3}* obj, {0} value)", m_context.ConvertTypeName(node.Type), typeName, node.Identifier, objTypeName);
 
                         // Method prototype
-                        m_context.CurrentDestination = WriterDestination.MethodPrototypes;
+                        m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
                         m_context.Writer.Append(methodPrototype);
                         m_context.Writer.AppendLine(";");
 
                         // Method declaration
-                        m_context.CurrentDestination = WriterDestination.MethodDeclarations;
+                        m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
                         m_context.Writer.AppendLine(methodPrototype);
                         m_context.Writer.AppendLine("{");
 

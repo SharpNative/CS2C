@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -43,7 +44,7 @@ namespace LibCS2C.Generators
 
                     // Check if the argument needs to be passed as a reference
                     ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(firstChild).Type;
-                    if (!m_context.TypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct)
+                    if (!m_context.GenericTypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct)
                     {
                         prefix = "&";
                     }
@@ -51,15 +52,15 @@ namespace LibCS2C.Generators
                     if (firstChildKind == SyntaxKind.IdentifierName)
                     {
                         IdentifierNameSyntax identifier = firstChild as IdentifierNameSyntax;
-                        objName = m_context.ConvertVariableName(identifier);
+                        objName = m_context.TypeConvert.ConvertVariableName(identifier);
                     }
                     else if (firstChildKind == SyntaxKind.ElementAccessExpression)
                     {
-                        WriterDestination destination = m_context.CurrentDestination;
-                        m_context.CurrentDestination = WriterDestination.TempBuffer;
+                        WriterDestination destination = m_context.Writer.CurrentDestination;
+                        m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
                         m_context.Generators.ElementAccess.Generate(firstChild as ElementAccessExpressionSyntax);
-                        m_context.CurrentDestination = destination;
-                        objName = m_context.FlushTempBuffer();
+                        m_context.Writer.CurrentDestination = destination;
+                        objName = m_context.Writer.FlushTempBuffer();
                     }
                     else
                     {
@@ -85,7 +86,7 @@ namespace LibCS2C.Generators
                     {
                         SyntaxNode childNode = child.AsNode();
                         ISymbol identifierSymbol = m_context.Model.GetSymbolInfo(childNode).Symbol;
-                        string converted = m_context.ConvertVariableName(childNode);
+                        string converted = m_context.TypeConvert.ConvertVariableName(childNode);
 
                         if (identifierSymbol.Kind == SymbolKind.Field && !identifierSymbol.IsStatic)
                             m_context.Writer.Append("obj->" + converted);

@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace LibCS2C.Generators
         /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
-            m_context.Writer.AppendLine(m_context.CurrentClassStructName);
+            m_context.Writer.AppendLine(m_context.TypeConvert.CurrentClassStructName);
             m_context.Writer.AppendLine("{");
 
             // Usage count for garbage collector

@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
@@ -24,10 +25,10 @@ namespace LibCS2C.Generators
         /// <param name="node">The delegate</param>
         public override void Generate(DelegateDeclarationSyntax node)
         {
-            WriterDestination destination = m_context.CurrentDestination;
-            m_context.CurrentDestination = WriterDestination.Delegates;
+            WriterDestination destination = m_context.Writer.CurrentDestination;
+            m_context.Writer.CurrentDestination = WriterDestination.Delegates;
 
-            m_context.Writer.Append(string.Format("typedef {0} (*delegate_{1}_{2}) (", m_context.ConvertTypeName(node.ReturnType), m_context.CurrentClassNameFormatted, node.Identifier));
+            m_context.Writer.Append(string.Format("typedef {0} (*delegate_{1}_{2}) (", m_context.ConvertTypeName(node.ReturnType), m_context.TypeConvert.CurrentClassNameFormatted, node.Identifier));
 
             IEnumerable<SyntaxNode> paramNodes = node.ParameterList.ChildNodes();
             foreach (ParameterSyntax paramNode in paramNodes)
@@ -41,7 +42,7 @@ namespace LibCS2C.Generators
 
             m_context.Writer.AppendLine(");");
 
-            m_context.CurrentDestination = destination;
+            m_context.Writer.CurrentDestination = destination;
         }
     }
 }

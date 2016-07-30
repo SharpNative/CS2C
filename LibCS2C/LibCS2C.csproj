@@ -100,9 +100,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Compiler.cs" />
-    <Compile Include="FormattedStringBuilder.cs" />
-    <Compile Include="AllGenerators.cs" />
+    <Compile Include="Compiler\Compiler.cs" />
+    <Compile Include="Context\TypeConversion.cs" />
+    <Compile Include="Context\Writer.cs" />
+    <Compile Include="Util\FormattedStringBuilder.cs" />
+    <Compile Include="Generators\AllGenerators.cs" />
     <Compile Include="Generators\PointerMemberAccessGenerator.cs" />
     <Compile Include="Generators\SwitchStatementGenerator.cs" />
     <Compile Include="Generators\DelegateDeclarationGenerator.cs" />
@@ -143,11 +145,11 @@
     <Compile Include="Generators\SimpleMemberAccessGenerator.cs" />
     <Compile Include="Generators\VariableGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SyntaxWalker.cs" />
+    <Compile Include="Compiler\SyntaxWalker.cs" />
     <Compile Include="Tasks\CompileProjectTask.cs" />
-    <Compile Include="GenericTypeConversion.cs" />
-    <Compile Include="WalkerContext.cs" />
-    <Compile Include="WriterDestination.cs" />
+    <Compile Include="Context\GenericTypeConversion.cs" />
+    <Compile Include="Context\WalkerContext.cs" />
+    <Compile Include="Context\WriterDestination.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

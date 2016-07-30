@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -56,7 +57,7 @@ namespace LibCS2C.Generators
                     // Uninitialized for now
                     // C wants {0} for structs instead of 0
                     ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(pair.Value).Type;
-                    if (!m_context.TypeConvert.IsGeneric(pair.Value) && typeSymbol.TypeKind == TypeKind.Struct)
+                    if (!m_context.GenericTypeConvert.IsGeneric(pair.Value) && typeSymbol.TypeKind == TypeKind.Struct)
                     {
                         m_context.Writer.AppendLine("{0},");
                     }
@@ -100,7 +101,7 @@ namespace LibCS2C.Generators
         /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
-            string convertedClassName = m_context.ConvertClassName(node.Identifier.ToString());
+            string convertedClassName = m_context.TypeConvert.ConvertClassName(node.Identifier.ToString());
 
             m_context.Writer.AppendLine("struct");
             m_context.Writer.AppendLine("{");

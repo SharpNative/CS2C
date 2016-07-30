@@ -1,11 +1,8 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -53,7 +50,7 @@ namespace LibCS2C.Generators
             bool isPost = (m_expressionType == ExpressionType.PostIncrement || m_expressionType == ExpressionType.PostDecrement);
 
             // There is post code and there is current code
-            WriterDestination destination = m_context.CurrentDestination;
+            WriterDestination destination = m_context.Writer.CurrentDestination;
 
             // The getter contains the code to get the current value
             string getter = "";
@@ -65,7 +62,7 @@ namespace LibCS2C.Generators
 
                     // Set future value in post code
                     if (isPost)
-                        m_context.CurrentDestination = WriterDestination.PostBuffer;
+                        m_context.Writer.CurrentDestination = WriterDestination.PostBuffer;
 
                     m_context.Writer.Append(string.Format("{0}_{1}_setter({2}{3})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter, type));
                 }
@@ -75,7 +72,7 @@ namespace LibCS2C.Generators
 
                     // Set future value in post code
                     if (isPost)
-                        m_context.CurrentDestination = WriterDestination.PostBuffer;
+                        m_context.Writer.CurrentDestination = WriterDestination.PostBuffer;
 
                     m_context.Writer.Append(string.Format("{0}_{1}_setter(obj, {2}{3})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter, type));
                 }
@@ -86,10 +83,10 @@ namespace LibCS2C.Generators
                 if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
                     prefix += "obj->";
 
-                getter = prefix + m_context.ConvertVariableName(name);
+                getter = prefix + m_context.TypeConvert.ConvertVariableName(name);
 
                 if (isPost)
-                    m_context.CurrentDestination = WriterDestination.PostBuffer;
+                    m_context.Writer.CurrentDestination = WriterDestination.PostBuffer;
 
                 m_context.Writer.Append(string.Format("{0} = {0}{1}", getter, type));
             }
@@ -97,13 +94,13 @@ namespace LibCS2C.Generators
             // Reset destination
             if (isPost)
             {
-                m_context.CurrentDestination = destination;
+                m_context.Writer.CurrentDestination = destination;
             }
 
-            if (m_context.ShouldOutputPost)
+            if (m_context.Writer.ShouldOutputPost)
                 m_context.Writer.Append(getter);
             else
-                m_context.Writer.AppendLine(string.Format("{0}", m_context.FlushPostBuffer()));
+                m_context.Writer.AppendLine(string.Format("{0}", m_context.Writer.FlushPostBuffer()));
         }
     }
 }

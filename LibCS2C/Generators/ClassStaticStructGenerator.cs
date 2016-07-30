@@ -40,7 +40,7 @@ namespace LibCS2C.Generators
                     ExpressionSyntax expression = value.Value;
 
                     // If it's a literal, we can initialize it safely
-                    if (m_context.IsLiteralExpression(expression.Kind()))
+                    if (m_context.Generators.Expression.IsLiteralExpression(expression.Kind()))
                     {
                         m_context.Generators.Expression.Generate(expression);
                         m_context.Writer.AppendLine(",");

@@ -147,6 +147,7 @@
     <Compile Include="Tasks\CompileProjectTask.cs" />
     <Compile Include="GenericTypeConversion.cs" />
     <Compile Include="WalkerContext.cs" />
+    <Compile Include="WriterDestination.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

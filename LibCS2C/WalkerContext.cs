@@ -1,24 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LibCS2C
 {
-    public enum WriterDestination
-    {
-        Enums,
-        Structs,
-        ClassStructs,
-        Delegates,
-        MethodPrototypes,
-        MethodDeclarations,
-        TempBuffer,
-        PostBuffer
-    }
-
     public class WalkerContext
     {
         /// <summary>
@@ -60,6 +46,7 @@ namespace LibCS2C
         /// Current destionation of the writer, this is because a destination depends on the structure of the code
         /// Therefor, we cannot assume one generator is one writer
         /// </summary>
+        
         public WriterDestination CurrentDestination
         {
             get
@@ -70,46 +57,13 @@ namespace LibCS2C
             set
             {
                 m_currentDestination = value;
-                switch (value)
-                {
-                    case WriterDestination.Enums:
-                        Writer = SbEnums;
-                        break;
-
-                    case WriterDestination.Structs:
-                        Writer = SbStructs;
-                        break;
-
-                    case WriterDestination.ClassStructs:
-                        Writer = SbClassStructs;
-                        break;
-
-                    case WriterDestination.Delegates:
-                        Writer = SbDelegates;
-                        break;
-
-                    case WriterDestination.MethodPrototypes:
-                        Writer = SbMethodPrototypes;
-                        break;
-
-                    case WriterDestination.MethodDeclarations:
-                        Writer = SbMethodDeclarations;
-                        break;
-
-                    case WriterDestination.TempBuffer:
-                        Writer = m_sbTempBuffer;
-                        break;
-
-                    case WriterDestination.PostBuffer:
-                        Writer = m_sbPostBuffer;
-                        break;
-
-                    default:
-                        throw new NotImplementedException();
-                }
+                Writer = m_stringBuilders[(int)value];
             }
         }
 
+        /// <summary>
+        /// If a postcode should be outputted
+        /// </summary>
         public bool ShouldOutputPost { get; set; } = false;
 
         /// <summary>
@@ -126,11 +80,7 @@ namespace LibCS2C
         /// A list with all the generators
         /// </summary>
         public AllGenerators Generators { get; private set; }
-
-        private FormattedStringBuilder m_sbTempBuffer = new FormattedStringBuilder();
-
-        private FormattedStringBuilder m_sbPostBuffer = new FormattedStringBuilder();
-
+        
         // String builders
         public FormattedStringBuilder SbEnums { get; private set; } = new FormattedStringBuilder();
         public FormattedStringBuilder SbStructs { get; private set; } = new FormattedStringBuilder();
@@ -138,7 +88,11 @@ namespace LibCS2C
         public FormattedStringBuilder SbDelegates { get; private set; } = new FormattedStringBuilder();
         public FormattedStringBuilder SbMethodPrototypes { get; private set; } = new FormattedStringBuilder();
         public FormattedStringBuilder SbMethodDeclarations { get; private set; } = new FormattedStringBuilder();
+        private FormattedStringBuilder m_sbTempBuffer = new FormattedStringBuilder();
+        private FormattedStringBuilder m_sbPostBuffer = new FormattedStringBuilder();
+        private FormattedStringBuilder[] m_stringBuilders;
 
+        // Current writing destination
         private WriterDestination m_currentDestination;
 
         /// <summary>
@@ -147,9 +101,14 @@ namespace LibCS2C
         /// <param name="sb">The formatted string builder</param>
         public WalkerContext()
         {
+            m_stringBuilders = new FormattedStringBuilder[] { SbEnums, SbStructs, SbClassStructs, SbDelegates, SbMethodPrototypes, SbMethodDeclarations, m_sbTempBuffer, m_sbPostBuffer };
             Generators = new AllGenerators(this);
         }
 
+        /// <summary>
+        /// Flushes the temporary buffer
+        /// </summary>
+        /// <returns>The buffer contents</returns>
         public string FlushTempBuffer()
         {
             string ret = m_sbTempBuffer.ToString();
@@ -157,11 +116,19 @@ namespace LibCS2C
             return ret;
         }
 
+        /// <summary>
+        /// Checks if the post buffer is empty
+        /// </summary>
+        /// <returns>If it's empty</returns>
         public bool IsPostBufferEmpty()
         {
             return m_sbPostBuffer.IsEmpty();
         }
 
+        /// <summary>
+        /// Flushes the post buffer
+        /// </summary>
+        /// <returns>The buffer contents</returns>
         public string FlushPostBuffer()
         {
             string ret = m_sbPostBuffer.ToString();
@@ -218,7 +185,7 @@ namespace LibCS2C
             }
             else
             {
-                ITypeSymbol typeSymbol = /*Model*/Model.Compilation.GetSemanticModel(type.Parent.SyntaxTree).GetTypeInfo(type).Type;
+                ITypeSymbol typeSymbol = Model.Compilation.GetSemanticModel(type.Parent.SyntaxTree).GetTypeInfo(type).Type;
                 string nameSpace = typeSymbol.ContainingNamespace.ToString().Replace(".", "_");
                 
                 if(typeSymbol.TypeKind == TypeKind.Delegate)
@@ -291,58 +258,6 @@ namespace LibCS2C
             }
 
             return typeNameConverted;
-        }
-
-        /// <summary>
-        /// Checks if the syntax node kind is a sub expression
-        /// </summary>
-        /// <param name="kind">The syntax kind</param>
-        /// <returns>If it's a sub expression</returns>
-        public bool IsSubExpression(SyntaxKind kind)
-        {
-            return kind == SyntaxKind.AddExpression ||
-                   kind == SyntaxKind.CastExpression ||
-                   kind == SyntaxKind.SubtractExpression ||
-                   kind == SyntaxKind.MultiplyExpression ||
-                   kind == SyntaxKind.DivideExpression ||
-                   kind == SyntaxKind.BitwiseAndExpression ||
-                   kind == SyntaxKind.BitwiseNotExpression ||
-                   kind == SyntaxKind.BitwiseOrExpression ||
-                   kind == SyntaxKind.EqualsExpression ||
-                   kind == SyntaxKind.NotEqualsExpression ||
-                   kind == SyntaxKind.ElementAccessExpression ||
-                   kind == SyntaxKind.LessThanExpression ||
-                   kind == SyntaxKind.LessThanOrEqualExpression ||
-                   kind == SyntaxKind.GreaterThanExpression ||
-                   kind == SyntaxKind.GreaterThanOrEqualExpression ||
-                   kind == SyntaxKind.ParenthesizedExpression ||
-                   kind == SyntaxKind.SimpleMemberAccessExpression ||
-                   kind == SyntaxKind.SimpleAssignmentExpression ||
-                   kind == SyntaxKind.ObjectCreationExpression ||
-                   kind == SyntaxKind.ArrayCreationExpression ||
-                   kind == SyntaxKind.AddressOfExpression ||
-                   kind == SyntaxKind.InvocationExpression ||
-                   kind == SyntaxKind.LogicalAndExpression ||
-                   kind == SyntaxKind.LogicalNotExpression ||
-                   kind == SyntaxKind.LogicalOrExpression ||
-                   kind == SyntaxKind.ConditionalExpression ||
-                   kind == SyntaxKind.PointerMemberAccessExpression;
-        }
-
-        /// <summary>
-        /// Checks if the given kind is a literal expression
-        /// </summary>
-        /// <param name="kind">The kind</param>
-        /// <returns>If it's a literal expression</returns>
-        public bool IsLiteralExpression(SyntaxKind kind)
-        {
-            return kind == SyntaxKind.CharacterLiteralExpression ||
-                   kind == SyntaxKind.FalseLiteralExpression ||
-                   kind == SyntaxKind.TrueLiteralExpression ||
-                   kind == SyntaxKind.StringLiteralExpression ||
-                   kind == SyntaxKind.NumericLiteralExpression ||
-                   kind == SyntaxKind.NullLiteralExpression ||
-                   kind == SyntaxKind.ArrayInitializerExpression;
         }
     }
 }

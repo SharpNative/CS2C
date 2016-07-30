@@ -1,11 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -178,6 +174,28 @@ namespace LibCS2C.Generators
                     m_context.Writer.Append(node.ToString());
                     break;
             }
+        }
+
+        /// <summary>
+        /// Checks if the syntax node kind is a sub expression
+        /// </summary>
+        /// <param name="kind">The syntax kind</param>
+        /// <returns>If it's a sub expression</returns>
+        public bool IsSubExpression(SyntaxKind kind)
+        {
+            SyntaxKind[] kinds = { SyntaxKind.AddExpression, SyntaxKind.CastExpression, SyntaxKind.SubtractExpression, SyntaxKind.MultiplyExpression, SyntaxKind.DivideExpression, SyntaxKind.BitwiseAndExpression, SyntaxKind.BitwiseNotExpression, SyntaxKind.BitwiseOrExpression, SyntaxKind.EqualsExpression, SyntaxKind.NotEqualsExpression, SyntaxKind.ElementAccessExpression, SyntaxKind.LessThanExpression, SyntaxKind.LessThanOrEqualExpression, SyntaxKind.GreaterThanExpression, SyntaxKind.GreaterThanOrEqualExpression, SyntaxKind.ParenthesizedExpression, SyntaxKind.SimpleMemberAccessExpression, SyntaxKind.SimpleAssignmentExpression, SyntaxKind.ObjectCreationExpression, SyntaxKind.ArrayCreationExpression, SyntaxKind.AddressOfExpression, SyntaxKind.InvocationExpression, SyntaxKind.LogicalAndExpression, SyntaxKind.LogicalNotExpression, SyntaxKind.LogicalOrExpression, SyntaxKind.ConditionalExpression, SyntaxKind.PointerMemberAccessExpression };
+            return kinds.Contains(kind);
+        }
+
+        /// <summary>
+        /// Checks if the given kind is a literal expression
+        /// </summary>
+        /// <param name="kind">The kind</param>
+        /// <returns>If it's a literal expression</returns>
+        public bool IsLiteralExpression(SyntaxKind kind)
+        {
+            SyntaxKind[] kinds = { SyntaxKind.CharacterLiteralExpression, SyntaxKind.FalseLiteralExpression, SyntaxKind.TrueLiteralExpression, SyntaxKind.StringLiteralExpression, SyntaxKind.NumericLiteralExpression, SyntaxKind.NullLiteralExpression, SyntaxKind.ArrayInitializerExpression };
+            return kinds.Contains(kind);
         }
     }
 }

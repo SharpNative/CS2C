@@ -28,16 +28,19 @@ namespace LibCS2C.Generators
         {
             m_context.Writer.Append("for(");
 
+            // Declaration
             if (node.Declaration != null)
                 m_context.Generators.Variable.Generate(node.Declaration);
             
             m_context.Writer.Append(";");
 
+            // Condition
             if (node.Condition != null)
                 m_context.Generators.Expression.Generate(node.Condition);
 
             m_context.Writer.Append(";");
 
+            // Incrementors
             SeparatedSyntaxList<ExpressionSyntax> nodes = node.Incrementors;
             foreach (ExpressionSyntax expression in nodes)
             {
@@ -46,19 +49,11 @@ namespace LibCS2C.Generators
 
             m_context.Writer.AppendLine(")");
 
-            m_context.Writer.AppendLine("{");
-
-            IEnumerable<SyntaxNode> children = node.ChildNodes();
-            foreach (SyntaxNode child in children)
-            {
-                if (child.Kind() == SyntaxKind.Block)
-                {
-                    m_context.Generators.Block.Generate(child as BlockSyntax);
-                    break;
-                }
-            }
-            
-            m_context.Writer.AppendLine("}");
+            // Code inside the loop
+            if (node.Statement != null)
+                m_context.Generators.Block.GenerateChild(node.Statement);
+            else
+                m_context.Writer.AppendLine(";");
         }
     }
 }

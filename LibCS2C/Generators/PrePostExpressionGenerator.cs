@@ -43,6 +43,7 @@ namespace LibCS2C.Generators
             
             bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);
 
+            // Increase or decrease
             string type = "";
             if (m_expressionType == ExpressionType.PreIncrement || m_expressionType == ExpressionType.PostIncrement)
                 type = " + 1";
@@ -50,8 +51,11 @@ namespace LibCS2C.Generators
                 type = " - 1";
 
             bool isPost = (m_expressionType == ExpressionType.PostIncrement || m_expressionType == ExpressionType.PostDecrement);
+
+            // There is post code and there is current code
             WriterDestination destination = m_context.CurrentDestination;
 
+            // The getter contains the code to get the current value
             string getter = "";
             if (isProperty)
             {
@@ -59,6 +63,7 @@ namespace LibCS2C.Generators
                 {
                     getter = string.Format("{0}_{1}_getter()", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
 
+                    // Set future value in post code
                     if (isPost)
                         m_context.CurrentDestination = WriterDestination.PostBuffer;
 
@@ -68,6 +73,7 @@ namespace LibCS2C.Generators
                 {
                     getter = string.Format("{0}_{1}_getter(obj)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
 
+                    // Set future value in post code
                     if (isPost)
                         m_context.CurrentDestination = WriterDestination.PostBuffer;
 
@@ -88,6 +94,7 @@ namespace LibCS2C.Generators
                 m_context.Writer.Append(string.Format("{0} = {0}{1}", getter, type));
             }
 
+            // Reset destination
             if (isPost)
             {
                 m_context.CurrentDestination = destination;

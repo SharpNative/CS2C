@@ -40,19 +40,18 @@ namespace LibCS2C.Generators
                 {
                     SyntaxNode firstChild = firstNode.ChildNodes().First();
                     SyntaxKind firstChildKind = firstChild.Kind();
-                    
+
+                    // Check if the argument needs to be passed as a reference
+                    ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(firstChild).Type;
+                    if (!m_context.TypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct)
+                    {
+                        prefix = "&";
+                    }
+
                     if (firstChildKind == SyntaxKind.IdentifierName)
                     {
                         IdentifierNameSyntax identifier = firstChild as IdentifierNameSyntax;
                         objName = m_context.ConvertVariableName(identifier);
-
-                        // TODO: beautify this
-                        IdentifierNameSyntax abc = firstChild as IdentifierNameSyntax;
-                        ITypeSymbol typeSymbol2 = m_context.Model.GetTypeInfo(abc).Type;
-                        if (!m_context.TypeConvert.IsGeneric(typeSymbol2.Name) && typeSymbol2.TypeKind == TypeKind.Struct)
-                        {
-                            prefix = "&";
-                        }
                     }
                     else if (firstChildKind == SyntaxKind.ElementAccessExpression)
                     {
@@ -61,13 +60,6 @@ namespace LibCS2C.Generators
                         m_context.Generators.ElementAccess.Generate(firstChild as ElementAccessExpressionSyntax);
                         m_context.CurrentDestination = destination;
                         objName = m_context.FlushTempBuffer();
-                        // TODO: beautify this
-                        ElementAccessExpressionSyntax abc = firstChild as ElementAccessExpressionSyntax;
-                        ITypeSymbol typeSymbol2 = m_context.Model.GetTypeInfo(abc).Type;
-                        if(!m_context.TypeConvert.IsGeneric(typeSymbol2.Name) && typeSymbol2.TypeKind == TypeKind.Struct)
-                        {
-                            prefix = "&";
-                        }
                     }
                     else
                     {
@@ -112,7 +104,7 @@ namespace LibCS2C.Generators
                     if (!isProperty)
                         m_context.Generators.Expression.Generate(child.AsNode());
                 }
-                else if (m_context.IsSubExpression(kind))
+                else if (m_context.Generators.Expression.IsSubExpression(kind))
                 {
                     m_context.Generators.Expression.Generate(child.AsNode());
                 }

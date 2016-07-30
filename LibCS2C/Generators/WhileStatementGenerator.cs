@@ -22,7 +22,12 @@ namespace LibCS2C.Generators
             m_context.Writer.Append("while(");
             m_context.Generators.Expression.Generate(node.Condition);
             m_context.Writer.AppendLine(")");
-            m_context.Generators.Block.GenerateChild(node.Statement);
+
+            // Code inside the loop
+            if (node.Statement != null)
+                m_context.Generators.Block.GenerateChild(node.Statement);
+            else
+                m_context.Writer.AppendLine(";");
         }
     }
 }

@@ -66,7 +66,7 @@ namespace LibCS2C.Generators
                         m_context.Generators.Block.Generate(statement as BlockSyntax);
                         m_context.Writer.AppendLine("}");
                     }
-                    else if(m_context.IsSubExpression(kind))
+                    else if(m_context.Generators.Expression.IsSubExpression(kind))
                     {
                         m_context.Generators.Expression.Generate(statement as ExpressionStatementSyntax);
                         m_context.Writer.AppendLine("");

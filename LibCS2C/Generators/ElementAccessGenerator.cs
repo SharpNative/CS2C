@@ -3,9 +3,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -27,6 +24,7 @@ namespace LibCS2C.Generators
         public override void Generate(ElementAccessExpressionSyntax node)
         {
             m_context.ShouldOutputPost = true;
+
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
             foreach (SyntaxNode child in nodes)
             {
@@ -54,7 +52,7 @@ namespace LibCS2C.Generators
 
                     m_context.Writer.Append("]");
                 }
-                else if (m_context.IsSubExpression(kind))
+                else if (m_context.Generators.Expression.IsSubExpression(kind))
                 {
                     m_context.Generators.Expression.Generate(child);
                 }
@@ -63,6 +61,7 @@ namespace LibCS2C.Generators
                     throw new NotImplementedException();
                 }
             }
+
             m_context.ShouldOutputPost = false;
         }
     }

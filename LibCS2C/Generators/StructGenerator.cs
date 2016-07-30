@@ -57,7 +57,6 @@ namespace LibCS2C.Generators
 
                                 if(nameIdentifier.Equals("Pack"))
                                 {
-                                    // TODO: support more sizes for packing
                                     packed = true;
                                 }
                             }
@@ -144,7 +143,7 @@ namespace LibCS2C.Generators
             
 
             // Method prototype of init code
-            string methodName = string.Format("struct struct_{0} structInit_{0}(void)", structName);
+            string methodName = string.Format("inline struct struct_{0} structInit_{0}(void)", structName);
             m_context.CurrentDestination = WriterDestination.MethodPrototypes;
             m_context.Writer.Append(methodName);
             m_context.Writer.AppendLine(";");

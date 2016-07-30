@@ -1,11 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace LibCS2C.Generators
 {
@@ -26,7 +19,6 @@ namespace LibCS2C.Generators
         /// <param name="node"></param>
         public override void Generate(VariableDeclarationSyntax node)
         {
-            m_context.Writer.AppendLine(string.Format("/* Variable {0} */", node));
             m_context.Writer.Append(m_context.ConvertTypeName(node.Type));
             m_context.Writer.Append(" ");
 
@@ -36,6 +28,7 @@ namespace LibCS2C.Generators
             {
                 m_context.Writer.Append(variable.Identifier.ToString());
                 
+                // Initial value
                 if (variable.Initializer != null)
                 {
                     m_context.Writer.Append(" = ");
@@ -43,6 +36,7 @@ namespace LibCS2C.Generators
                     m_context.Generators.Expression.Generate(expression);
                 }
 
+                // There can be more than one variable
                 if (i != varCount - 1)
                     m_context.Writer.Append(", ");
 

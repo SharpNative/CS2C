@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Linq;
 
 namespace LibCS2C.Generators
@@ -33,7 +32,7 @@ namespace LibCS2C.Generators
                 {
                     SyntaxNode childNode = child.AsNode();
 
-                    if (m_context.IsSubExpression(kind))
+                    if (m_context.Generators.Expression.IsSubExpression(kind))
                     {
                         m_context.Generators.Expression.Generate(childNode);
                     }

@@ -33,7 +33,7 @@ namespace LibCS2C.Generators
             ExpressionSyntax expression = value.Value;
 
             // If it's a literal expression, it is already in the struct initializer
-            if (!m_context.IsLiteralExpression(expression.Kind()))
+            if (!m_context.Generators.Expression.IsLiteralExpression(expression.Kind()))
             {
                 m_context.Writer.Append(string.Format("\tclassStatics_{0}.{1} = ", className, name));
                 m_context.Generators.Expression.Generate(expression);

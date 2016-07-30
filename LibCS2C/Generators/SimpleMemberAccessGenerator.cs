@@ -2,10 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -37,7 +34,7 @@ namespace LibCS2C.Generators
             {
                 m_context.Writer.Append(m_context.ConvertVariableName(node as IdentifierNameSyntax));
             }
-            else if (m_context.IsSubExpression(firstKind))
+            else if (m_context.Generators.Expression.IsSubExpression(firstKind))
             {
                 m_context.Generators.Expression.Generate(node);
             }
@@ -55,8 +52,7 @@ namespace LibCS2C.Generators
         {
             ITypeSymbol symbolType = m_context.Model.GetTypeInfo(node).Type;
             SyntaxNodeOrToken[] children = node.ChildNodesAndTokens().ToArray();
-
-
+            
             // Enum
             if (symbolType.TypeKind == TypeKind.Enum)
             {
@@ -70,9 +66,8 @@ namespace LibCS2C.Generators
                 // because the reference is already in the second part (identifier)
                 ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
                 SyntaxNode first = children[0].AsNode();
-
-
-
+                
+                // Object part that contains the requested variable
                 bool objectFirst = (!symbol.IsStatic && symbol.Kind != SymbolKind.Property);
                 if (objectFirst)
                 {
@@ -84,28 +79,24 @@ namespace LibCS2C.Generators
                     else
                         m_context.Writer.Append("->");
                 }
+
+                // Variable name
                 IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
                 m_context.Writer.Append(m_context.ConvertVariableName(name));
                 
-                // TODO: beautify this
+                // Property getter stuff
                 if (symbol.Kind == SymbolKind.Property && !symbol.IsStatic)
                 {
                     m_context.Writer.Append("(");
                     
-                    ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(children.First().AsNode()).Type;
-                    
-                    if (!m_context.TypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct)
-                    {
-                        m_context.Writer.Append("&");
-                    }
-
-
+                    ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(first).Type;
                     ISymbol sym = m_context.Model.GetSymbolInfo(first).Symbol;
 
+                    if (!m_context.TypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct)
+                        m_context.Writer.Append("&");
+                    
                     if (sym != null && sym.Kind == SymbolKind.Field)
-                    {
                         m_context.Writer.Append("obj->");
-                    }
 
                     GenerateObjectPart(first);
                     m_context.Writer.Append(")");

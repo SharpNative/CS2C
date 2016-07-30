@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace LibCS2C.Generators
@@ -29,7 +30,7 @@ namespace LibCS2C.Generators
             SyntaxNode first = nodes.First();
             ISymbol firstSymbol = m_context.Model.GetSymbolInfo(first).Symbol;
             SyntaxKind firstKind = first.Kind();
-            
+
             bool needsObjReference = false;
 
             // Arguments
@@ -44,19 +45,35 @@ namespace LibCS2C.Generators
             // Normal method call
             else
             {
-                MethodDeclarationSyntax reference = firstSymbol.DeclaringSyntaxReferences[0].GetSyntax() as MethodDeclarationSyntax;
-                needsObjReference = !m_context.Generators.MethodDeclaration.IsMethodStatic(reference);
-                m_context.Writer.Append(m_context.Generators.MethodDeclaration.CreateMethodPrototype(reference, false));
+                ImmutableArray<SyntaxReference> references = firstSymbol.DeclaringSyntaxReferences;
+                SyntaxNode reference = references[0].GetSyntax();
+                SyntaxKind referenceKind = reference.Kind();
+
+                if (referenceKind == SyntaxKind.VariableDeclarator)
+                {
+                    foreach (SyntaxNode child in node.ChildNodes())
+                    {
+                        SyntaxKind childKind = child.Kind();
+                        if (m_context.Generators.Expression.IsSubExpression(childKind))
+                            m_context.Generators.Expression.Generate(child);
+                    }
+                }
+                else
+                {
+                    MethodDeclarationSyntax methodDeclaration = reference as MethodDeclarationSyntax;
+                    needsObjReference = !m_context.Generators.MethodDeclaration.IsMethodStatic(methodDeclaration);
+                    m_context.Writer.Append(m_context.Generators.MethodDeclaration.CreateMethodPrototype(methodDeclaration, false));
+                }
             }
 
             m_context.Writer.Append("(");
-            
+
             // Reference to the object if needed
             if (needsObjReference)
             {
                 string objName;
                 IEnumerable<SyntaxNode> children = first.ChildNodes();
-                if(children.Count() == 0)
+                if (children.Count() == 0)
                 {
                     objName = "obj";
                 }
@@ -69,16 +86,16 @@ namespace LibCS2C.Generators
                     if (firstChildKind == SyntaxKind.IdentifierName)
                     {
                         ISymbol sym = m_context.Model.GetSymbolInfo(firstChild).Symbol;
-                        
+
                         if (sym != null && sym.Kind == SymbolKind.Field)
                         {
                             m_context.Writer.Append("obj->field_");
                         }
-                        
+
                         objName = (firstChild as IdentifierNameSyntax).Identifier.ToString();
                     }
                     // base.METHOD(...)
-                    else if(firstChildKind == SyntaxKind.BaseExpression)
+                    else if (firstChildKind == SyntaxKind.BaseExpression)
                     {
                         objName = "(void*)obj";
                     }
@@ -96,7 +113,7 @@ namespace LibCS2C.Generators
                         throw new NotImplementedException();
                     }
                 }
-                
+
                 // Argument for the object reference
                 m_context.Writer.Append(objName);
                 if (argsList.Arguments.Count() > 0)

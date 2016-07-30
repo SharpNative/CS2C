@@ -49,27 +49,54 @@ namespace LibCS2C.Generators
             else
                 type = " - 1";
 
+            bool isPost = (m_expressionType == ExpressionType.PostIncrement || m_expressionType == ExpressionType.PostDecrement);
+            WriterDestination destination = m_context.CurrentDestination;
+
+            string getter = "";
             if (isProperty)
             {
                 if (symbol.IsStatic)
-                    m_context.Writer.Append(string.Format("{0}_{1}_setter({0}_{1}_getter(){2}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, type));
+                {
+                    getter = string.Format("{0}_{1}_getter(){2}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, type);
+
+                    if (isPost)
+                        m_context.CurrentDestination = WriterDestination.PostBuffer;
+
+                    m_context.Writer.Append(string.Format("{0}_{1}_setter({2})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter));
+                }
                 else
-                    m_context.Writer.Append(string.Format("{0}_{1}_setter(obj, {0}_{1}_getter(obj){2}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, type));
+                {
+                    getter = string.Format("{0}_{1}_getter(obj){2}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, type);
+
+                    if (isPost)
+                        m_context.CurrentDestination = WriterDestination.PostBuffer;
+
+                    m_context.Writer.Append(string.Format("{0}_{1}_setter(obj, {2})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter));
+                }
             }
             else
             {
-                string varName = "";
+                string prefix = "";
                 if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
-                    varName += "obj->";
+                    prefix += "obj->";
 
-                varName += m_context.ConvertVariableName(name);
-                m_context.Writer.Append(string.Format("{1} = {1}{0}", type, varName));
+                getter = prefix + m_context.ConvertVariableName(name);
+
+                if (isPost)
+                    m_context.CurrentDestination = WriterDestination.PostBuffer;
+
+                m_context.Writer.Append(string.Format("{0} = {0}{1}", getter, type));
             }
 
-            if (isProperty)
+            if (isPost)
             {
-                m_context.Writer.Append(")");
+                m_context.CurrentDestination = destination;
             }
+
+            if (m_context.ShouldOutputPost)
+                m_context.Writer.Append(getter);
+            else
+                m_context.Writer.AppendLine(string.Format("{0}", m_context.FlushPostBuffer()));
         }
     }
 }

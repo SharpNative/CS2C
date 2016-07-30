@@ -26,6 +26,7 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression</param>
         public override void Generate(ElementAccessExpressionSyntax node)
         {
+            m_context.ShouldOutputPost = true;
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
             foreach (SyntaxNode child in nodes)
             {
@@ -62,6 +63,7 @@ namespace LibCS2C.Generators
                     throw new NotImplementedException();
                 }
             }
+            m_context.ShouldOutputPost = false;
         }
     }
 }

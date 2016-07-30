@@ -157,7 +157,7 @@ namespace LibCS2C.Generators
                 case SyntaxKind.PostDecrementExpression:
                     m_context.Generators.PostDecrementExpression.Generate(node as ExpressionSyntax);
                     break;
-
+                
                 case SyntaxKind.PostIncrementExpression:
                     m_context.Generators.PostIncrementExpression.Generate(node as ExpressionSyntax);
                     break;

@@ -15,7 +15,8 @@ namespace LibCS2C
         Delegates,
         MethodPrototypes,
         MethodDeclarations,
-        TempBuffer
+        TempBuffer,
+        PostBuffer
     }
 
     public class WalkerContext
@@ -99,11 +100,17 @@ namespace LibCS2C
                         Writer = m_sbTempBuffer;
                         break;
 
+                    case WriterDestination.PostBuffer:
+                        Writer = m_sbPostBuffer;
+                        break;
+
                     default:
                         throw new NotImplementedException();
                 }
             }
         }
+
+        public bool ShouldOutputPost { get; set; } = false;
 
         /// <summary>
         /// Gets the semantic Model
@@ -121,6 +128,8 @@ namespace LibCS2C
         public AllGenerators Generators { get; private set; }
 
         private FormattedStringBuilder m_sbTempBuffer = new FormattedStringBuilder();
+
+        private FormattedStringBuilder m_sbPostBuffer = new FormattedStringBuilder();
 
         // String builders
         public FormattedStringBuilder SbEnums { get; private set; } = new FormattedStringBuilder();
@@ -145,6 +154,18 @@ namespace LibCS2C
         {
             string ret = m_sbTempBuffer.ToString();
             m_sbTempBuffer.Clear();
+            return ret;
+        }
+
+        public bool IsPostBufferEmpty()
+        {
+            return m_sbPostBuffer.IsEmpty();
+        }
+
+        public string FlushPostBuffer()
+        {
+            string ret = m_sbPostBuffer.ToString();
+            m_sbPostBuffer.Clear();
             return ret;
         }
 

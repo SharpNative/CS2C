@@ -13,6 +13,8 @@ namespace LibCS2C
 
         private bool m_alreadyIndented = false;
 
+        private bool m_empty = true;
+
         /// <summary>
         /// Formatted string builder
         /// </summary>
@@ -28,6 +30,7 @@ namespace LibCS2C
         public void Clear()
         {
             m_sb.Clear();
+            m_empty = true;
             m_tabs = "";
         }
 
@@ -55,6 +58,7 @@ namespace LibCS2C
         /// </summary>
         public void AppendIndent()
         {
+            m_empty = false;
             m_sb.Append(m_tabs);
         }
 
@@ -70,6 +74,7 @@ namespace LibCS2C
                 AppendIndent();
             }
 
+            m_empty = false;
             m_sb.Append(text);
         }
 
@@ -85,6 +90,7 @@ namespace LibCS2C
                 AppendIndent();
             }
 
+            m_empty = false;
             m_sb.AppendLine(text);
             m_alreadyIndented = false;
         }
@@ -95,7 +101,13 @@ namespace LibCS2C
         /// <param name="text">The text</param>
         public void Prepend(string text)
         {
+            m_empty = false;
             m_sb.Insert(0, text);
+        }
+
+        public bool IsEmpty()
+        {
+            return m_empty;
         }
 
         /// <summary>

@@ -104,6 +104,9 @@ namespace LibCS2C.Generators
             // At the end of the line
             if (semiColonNeeded)
                 m_context.Writer.AppendLine(";");
+
+            if (!m_context.IsPostBufferEmpty())
+                m_context.Writer.AppendLine(string.Format("{0};", m_context.FlushPostBuffer()));
         }
 
         /// <summary>

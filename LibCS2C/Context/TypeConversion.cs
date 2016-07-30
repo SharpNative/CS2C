@@ -63,12 +63,12 @@ namespace LibCS2C.Context
             else if (type is PointerTypeSyntax)
             {
                 PointerTypeSyntax ptr = type as PointerTypeSyntax;
-                typeNameConverted = ConvertTypeName(ptr.ElementType) + "*";
+                typeNameConverted = m_context.ConvertTypeName(ptr.ElementType) + "*";
             }
             else if (type is ArrayTypeSyntax)
             {
                 ArrayTypeSyntax array = type as ArrayTypeSyntax;
-                typeNameConverted = ConvertTypeName(array.ElementType) + "*";
+                typeNameConverted = m_context.ConvertTypeName(array.ElementType) + "*";
             }
             else
             {

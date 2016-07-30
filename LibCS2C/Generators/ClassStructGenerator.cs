@@ -38,13 +38,11 @@ namespace LibCS2C.Generators
 
             foreach (KeyValuePair<string, TypeSyntax> pair in m_classCode.nonStaticFieldTypes)
             {
-                m_context.Writer.AppendLine("\t/* Field: " + pair.Key + " */");
                 m_context.Writer.AppendLine(string.Format("\t{0} field_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
 
             foreach (KeyValuePair<string, TypeSyntax> pair in m_classCode.propertyTypesNonStatic)
             {
-                m_context.Writer.AppendLine("\t/* Property: " + pair.Key + " */");
                 m_context.Writer.AppendLine(string.Format("\t{0} prop_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
 

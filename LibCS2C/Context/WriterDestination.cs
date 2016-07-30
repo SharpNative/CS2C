@@ -9,6 +9,7 @@ namespace LibCS2C.Context
     public enum WriterDestination
     {
         Enums,
+        StructPrototypes,
         Structs,
         ClassStructs,
         Delegates,

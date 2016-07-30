@@ -28,7 +28,6 @@ namespace LibCS2C.Generators
         public override void Generate(StructDeclarationSyntax node)
         {
             WriterDestination destination = m_context.Writer.CurrentDestination;
-            m_context.Writer.CurrentDestination = WriterDestination.Structs;
 
             // Check for attributes
             bool packed = false;
@@ -124,8 +123,14 @@ namespace LibCS2C.Generators
                 }
             }
 
-            // Struct
-            m_context.Writer.AppendLine(string.Format("struct struct_{0}", structName));
+            // Struct prototype
+            string structPrototype = string.Format("struct struct_{0}", structName);
+            m_context.Writer.CurrentDestination = WriterDestination.StructPrototypes;
+            m_context.Writer.AppendLine(string.Format("{0};", structPrototype));
+
+            // Struct definition
+            m_context.Writer.CurrentDestination = WriterDestination.Structs;
+            m_context.Writer.AppendLine(structPrototype);
             m_context.Writer.AppendLine("{");
             
             foreach (KeyValuePair<string, TypeSyntax> pair in dataTypes)

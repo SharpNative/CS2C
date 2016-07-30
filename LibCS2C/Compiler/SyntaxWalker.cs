@@ -119,8 +119,9 @@ namespace LibCS2C.Compiler
             // Append all the code
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(m_context.Writer.SbEnums.ToString());
-            sb.AppendLine(m_context.Writer.SbStructs.ToString());
+            sb.AppendLine(m_context.Writer.SbStructPrototypes.ToString());
             sb.AppendLine(m_context.Writer.SbDelegates.ToString());
+            sb.AppendLine(m_context.Writer.SbStructs.ToString());
             sb.AppendLine(m_context.Writer.SbClassStructs.ToString());
             sb.AppendLine(m_context.Writer.SbMethodPrototypes.ToString());
             sb.AppendLine(m_context.Writer.SbMethodDeclarations.ToString());

@@ -17,6 +17,7 @@ namespace LibCS2C.Context
         // String builders
         public FormattedStringBuilder SbEnums { get; private set; } = new FormattedStringBuilder();
         public FormattedStringBuilder SbStructs { get; private set; } = new FormattedStringBuilder();
+        public FormattedStringBuilder SbStructPrototypes { get; private set; } = new FormattedStringBuilder();
         public FormattedStringBuilder SbClassStructs { get; private set; } = new FormattedStringBuilder();
         public FormattedStringBuilder SbDelegates { get; private set; } = new FormattedStringBuilder();
         public FormattedStringBuilder SbMethodPrototypes { get; private set; } = new FormattedStringBuilder();
@@ -51,7 +52,7 @@ namespace LibCS2C.Context
         /// </summary>
         public Writer()
         {
-            m_stringBuilders = new FormattedStringBuilder[] { SbEnums, SbStructs, SbClassStructs, SbDelegates, SbMethodPrototypes, SbMethodDeclarations, m_sbTempBuffer, m_sbPostBuffer };
+            m_stringBuilders = new FormattedStringBuilder[] { SbEnums, SbStructPrototypes, SbStructs, SbClassStructs, SbDelegates, SbMethodPrototypes, SbMethodDeclarations, m_sbTempBuffer, m_sbPostBuffer };
         }
 
         /// <summary>

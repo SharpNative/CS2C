@@ -53,10 +53,26 @@ namespace LibCS2C.Generators
         {
             ITypeSymbol symbolType = m_context.Model.GetTypeInfo(node).Type;
             SyntaxNodeOrToken[] children = node.ChildNodesAndTokens().ToArray();
+            bool isEnum = symbolType.TypeKind == TypeKind.Enum;
+
+            // After the type is checked as enum, check if it is an assignment to a enum type
+            // if so, we cannot transform this to a constant
+            if(isEnum)
+            {
+                SyntaxNode parent = node.Parent;
+                if (parent is AssignmentExpressionSyntax)
+                {
+                    AssignmentExpressionSyntax assignment = parent as AssignmentExpressionSyntax;
+                    if (node != assignment.Right)
+                    {
+                        isEnum = false;
+                    }
+                }
+            }
             
             // Enum
-            if (symbolType.TypeKind == TypeKind.Enum)
-            {
+            if (isEnum)
+            {   
                 IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
                 m_context.Writer.Append("enum_" + symbolType.ToString().Replace(".", "_") + "_" + name.Identifier);
             }

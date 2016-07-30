@@ -33,15 +33,15 @@ namespace LibCS2C.Generators
             bool insideClass = (node.Parent is ClassDeclarationSyntax);
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
 
-            foreach(EnumMemberDeclarationSyntax child in nodes)
+            foreach (EnumMemberDeclarationSyntax child in nodes)
             {
                 string identifier = child.Identifier.ToString();
                 string value = child.EqualsValue.Value.ToString();
 
-                if(insideClass)
+                if (insideClass)
                     m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2} ({3})", m_context.TypeConvert.CurrentClassNameFormatted, node.Identifier, identifier, value));
                 else
-                    m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2}", m_context.CurrentNamespaceFormatted, node.Identifier, identifier, value));
+                    m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2} ({3})", m_context.CurrentNamespaceFormatted, node.Identifier, identifier, value));
             }
 
             m_context.Writer.CurrentDestination = destination;

@@ -57,21 +57,21 @@ namespace LibCS2C.Generators
             {
                 if (symbol.IsStatic)
                 {
-                    getter = string.Format("{0}_{1}_getter(){2}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, type);
+                    getter = string.Format("{0}_{1}_getter()", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
 
                     if (isPost)
                         m_context.CurrentDestination = WriterDestination.PostBuffer;
 
-                    m_context.Writer.Append(string.Format("{0}_{1}_setter({2})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter));
+                    m_context.Writer.Append(string.Format("{0}_{1}_setter({2}{3})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter, type));
                 }
                 else
                 {
-                    getter = string.Format("{0}_{1}_getter(obj){2}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, type);
+                    getter = string.Format("{0}_{1}_getter(obj)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
 
                     if (isPost)
                         m_context.CurrentDestination = WriterDestination.PostBuffer;
 
-                    m_context.Writer.Append(string.Format("{0}_{1}_setter(obj, {2})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter));
+                    m_context.Writer.Append(string.Format("{0}_{1}_setter(obj, {2}{3})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter, type));
                 }
             }
             else

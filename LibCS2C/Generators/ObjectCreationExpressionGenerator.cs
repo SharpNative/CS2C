@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace LibCS2C.Generators
@@ -24,33 +25,41 @@ namespace LibCS2C.Generators
         public override void Generate(ObjectCreationExpressionSyntax node)
         {
             IEnumerable<SyntaxNode> objNodes = node.ChildNodes();
-            
+
             ArgumentListSyntax args = node.ArgumentList;
             ITypeSymbol type = m_context.Model.GetTypeInfo(node).Type;
             string nameSpace = type.ContainingNamespace.ToString().Replace(".", "_");
-            
+
             // Class
-            if(type.TypeKind == TypeKind.Class)
+            if (type.TypeKind == TypeKind.Class)
             {
                 IdentifierNameSyntax identifier = node.ChildNodes().First() as IdentifierNameSyntax;
                 ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
-                ConstructorDeclarationSyntax reference = symbol.DeclaringSyntaxReferences[0].GetSyntax() as ConstructorDeclarationSyntax;
+
+                ImmutableArray<SyntaxReference> references = symbol.DeclaringSyntaxReferences;
+                bool hasConstructor = (references.Length > 0);
 
                 // Call constructor
-                m_context.Writer.Append(m_context.Generators.MethodDeclaration.CreateMethodPrototype(reference, false));
-                m_context.Writer.Append("(");
+                if (hasConstructor)
+                {
+                    ConstructorDeclarationSyntax reference = references[0].GetSyntax() as ConstructorDeclarationSyntax;
+                    m_context.Writer.Append(m_context.Generators.MethodDeclaration.CreateMethodPrototype(reference, false));
+                    m_context.Writer.Append("(");
+                }
 
                 // Class initialization (returns the object, we can pass it as an argument to the constructor)
                 m_context.Writer.Append(string.Format("classInit_{0}_{1}()", nameSpace, type.Name));
 
-                // Remaining arguments
-                int argCount = args.ChildNodes().Count();
-                if (argCount > 0)
-                    m_context.Writer.Append(", ");
+                // Remaining arguments (if constructor)
+                if (hasConstructor)
+                {
+                    int argCount = args.ChildNodes().Count();
+                    if (argCount > 0)
+                        m_context.Writer.Append(", ");
 
-                m_context.Generators.ArgumentList.Generate(args);
-
-                m_context.Writer.Append(")");
+                    m_context.Generators.ArgumentList.Generate(args);
+                    m_context.Writer.Append(")");
+                }
             }
             // Struct
             else

@@ -87,7 +87,7 @@ namespace LibCS2C.Generators
             }
 
             // Property (getter/setter required)
-            if (symbol.Kind == SymbolKind.Property)
+            if (symbol != null && symbol.Kind == SymbolKind.Property)
             {
                 if (symbol.IsStatic)
                     m_context.Writer.Append(string.Format("{0}_{1}_setter(", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));

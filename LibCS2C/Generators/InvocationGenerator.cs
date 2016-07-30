@@ -48,7 +48,7 @@ namespace LibCS2C.Generators
                 ImmutableArray<SyntaxReference> references = firstSymbol.DeclaringSyntaxReferences;
                 SyntaxNode reference = references[0].GetSyntax();
                 SyntaxKind referenceKind = reference.Kind();
-
+                
                 if (referenceKind == SyntaxKind.VariableDeclarator)
                 {
                     foreach (SyntaxNode child in node.ChildNodes())
@@ -85,14 +85,11 @@ namespace LibCS2C.Generators
                     // OBJECT.METHOD(...)
                     if (firstChildKind == SyntaxKind.IdentifierName)
                     {
-                        ISymbol sym = m_context.Model.GetSymbolInfo(firstChild).Symbol;
-
-                        if (sym != null && sym.Kind == SymbolKind.Field)
-                        {
-                            m_context.Writer.Append("obj->field_");
-                        }
-
-                        objName = (firstChild as IdentifierNameSyntax).Identifier.ToString();
+                        WriterDestination destination = m_context.Writer.CurrentDestination;
+                        m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
+                        m_context.Generators.Expression.Generate(firstChild);
+                        m_context.Writer.CurrentDestination = destination;
+                        objName = m_context.Writer.FlushTempBuffer();
                     }
                     // base.METHOD(...)
                     else if (firstChildKind == SyntaxKind.BaseExpression)

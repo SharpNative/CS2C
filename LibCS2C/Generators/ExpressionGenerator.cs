@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Linq;
 
 namespace LibCS2C.Generators
@@ -136,10 +137,10 @@ namespace LibCS2C.Generators
                     // TODO: Quickfix!
                     /*if (typeSymbol != null && symbol.Kind == SymbolKind.Parameter && !m_context.GenericTypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct)
                         m_context.Writer.Append("&");*/
-
+                    
                     if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
                         m_context.Writer.Append("obj->");
-
+                    
                     m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(node));
                     break;
 

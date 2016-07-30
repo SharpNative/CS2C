@@ -304,7 +304,8 @@ namespace LibCS2C
                    kind == SyntaxKind.LogicalAndExpression ||
                    kind == SyntaxKind.LogicalNotExpression ||
                    kind == SyntaxKind.LogicalOrExpression ||
-                   kind == SyntaxKind.ConditionalExpression;
+                   kind == SyntaxKind.ConditionalExpression ||
+                   kind == SyntaxKind.PointerMemberAccessExpression;
         }
 
         /// <summary>

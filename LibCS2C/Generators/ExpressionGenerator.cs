@@ -32,6 +32,10 @@ namespace LibCS2C.Generators
                     m_context.Generators.ArrayCreationExpression.Generate(node as ArrayCreationExpressionSyntax);
                     break;
 
+                case SyntaxKind.PointerMemberAccessExpression:
+                    m_context.Generators.PointerMemberAccessExpression.Generate(node as MemberAccessExpressionSyntax);
+                    break;
+
                 case SyntaxKind.AddressOfExpression:
                     m_context.Generators.AddressOfExpression.Generate(node as PrefixUnaryExpressionSyntax);
                     break;

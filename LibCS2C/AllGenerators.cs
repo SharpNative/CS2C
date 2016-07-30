@@ -37,6 +37,7 @@ namespace LibCS2C
         public PrePostExpressionGenerator PreDecrementExpression { get; private set; }
         public PrePostExpressionGenerator PostIncrementExpression { get; private set; }
         public PrePostExpressionGenerator PostDecrementExpression { get; private set; }
+        public PointerMemberAccessGenerator PointerMemberAccessExpression { get; private set; }
         public PropertyGenerator Property { get; private set; }
         public ReturnStatementGenerator ReturnStatement { get; private set; }
         public SimpleAssignmentGenerator SimpleAssignment { get; private set; }
@@ -86,6 +87,7 @@ namespace LibCS2C
             PreDecrementExpression = new PrePostExpressionGenerator(context, ExpressionType.PreDecrement);
             PostIncrementExpression = new PrePostExpressionGenerator(context, ExpressionType.PostIncrement);
             PostDecrementExpression = new PrePostExpressionGenerator(context, ExpressionType.PostDecrement);
+            PointerMemberAccessExpression = new PointerMemberAccessGenerator(context);
             Property = new PropertyGenerator(context);
             ReturnStatement = new ReturnStatementGenerator(context);
             SimpleAssignment = new SimpleAssignmentGenerator(context);

@@ -83,8 +83,8 @@ namespace LibCS2C.Generators
             }
 
             // Temporarily hold all the data
-            Dictionary<string, EqualsValueClauseSyntax> data = new Dictionary<string, EqualsValueClauseSyntax>();
             Dictionary<string, TypeSyntax> dataTypes = new Dictionary<string, TypeSyntax>();
+            Dictionary<string, string> dataSuffixes = new Dictionary<string, string>();
 
             // Collect the data and put it in the dictionaries
             IEnumerable<SyntaxNode> children = node.ChildNodes();
@@ -103,6 +103,16 @@ namespace LibCS2C.Generators
                         {
                             string identifier = "field_" + variable.Identifier.ToString();
                             dataTypes.Add(identifier, fieldChild.Type);
+
+                            BracketedArgumentListSyntax argumentList = (from a in variable.ChildNodes()
+                                                                        where a.Kind() == SyntaxKind.BracketedArgumentList
+                                                                        select a).FirstOrDefault() as BracketedArgumentListSyntax;
+
+                            if(argumentList != default(BracketedArgumentListSyntax))
+                            {
+                                ArgumentSyntax argument = argumentList.Arguments[0];
+                                dataSuffixes.Add(identifier, "[" + argument.ToString() + "]");
+                            }
                         }
                     }
                 }
@@ -120,7 +130,10 @@ namespace LibCS2C.Generators
             
             foreach (KeyValuePair<string, TypeSyntax> pair in dataTypes)
             {
-                m_context.Writer.AppendLine(string.Format("\t{0} {1};", m_context.ConvertTypeName(pair.Value), pair.Key));
+                m_context.Writer.Append(string.Format("\t{0} {1}", m_context.ConvertTypeName(pair.Value), pair.Key));
+                if (dataSuffixes.ContainsKey(pair.Key))
+                    m_context.Writer.Append(dataSuffixes[pair.Key]);
+                m_context.Writer.AppendLine(";");
             }
 
             // Attributes
@@ -141,16 +154,6 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine(methodName);
             m_context.Writer.AppendLine("{");
             m_context.Writer.AppendLine(string.Format("\tstruct struct_{0} object;", structName));
-
-            // Loop through the fields and initialize them
-            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in data)
-            {
-                m_context.Writer.Append(string.Format("\tobject.field_{0} = ", pair.Key));
-                ExpressionSyntax expression = pair.Value.Value;
-                m_context.Generators.Expression.Generate(expression);
-                m_context.Writer.AppendLine(";");
-            }
-
             m_context.Writer.AppendLine("\treturn object;");
             m_context.Writer.AppendLine("}");
 

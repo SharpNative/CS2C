@@ -73,6 +73,8 @@ namespace LibCS2C.Generators
                     m_context.Writer.Append(string.Format("{0}, ", objName));
             }
 
+            Console.WriteLine("  sag " + node);
+
             bool first = true;
             foreach (SyntaxNodeOrToken child in nodes)
             {
@@ -102,7 +104,7 @@ namespace LibCS2C.Generators
                 else if (kind == SyntaxKind.SimpleMemberAccessExpression)
                 {
                     // Ignore if property because we would get an getter here
-                    if (!isProperty)
+                    if (!first || !isProperty)
                         m_context.Generators.Expression.Generate(child.AsNode());
                 }
                 else if (m_context.Generators.Expression.IsSubExpression(kind))

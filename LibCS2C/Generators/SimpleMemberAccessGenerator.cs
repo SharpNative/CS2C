@@ -79,6 +79,8 @@ namespace LibCS2C.Generators
             // Normal member access
             else
             {
+                Console.WriteLine("smag: " + node);
+
                 // If it's static, we don't need the first part (identifier)
                 // because the reference is already in the second part (identifier)
                 SyntaxNode first = children[0].AsNode();

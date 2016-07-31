@@ -29,7 +29,7 @@ namespace LibCS2C.Generators
             ChildSyntaxList nodes = node.ChildNodesAndTokens();
             ISymbol symbol = m_context.Model.GetSymbolInfo(node.ChildNodes().First()).Symbol;
             bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);
-
+            
             string prefix = "";
             if (isProperty)
             {
@@ -77,7 +77,7 @@ namespace LibCS2C.Generators
             foreach (SyntaxNodeOrToken child in nodes)
             {
                 SyntaxKind kind = child.Kind();
-
+                
                 if (kind == SyntaxKind.IdentifierName)
                 {
                     // Skip the first identifier if it's a property
@@ -107,7 +107,9 @@ namespace LibCS2C.Generators
                 }
                 else if (m_context.Generators.Expression.IsSubExpression(kind))
                 {
+                    m_context.Writer.ShouldOutputPost = true;
                     m_context.Generators.Expression.Generate(child.AsNode());
+                    m_context.Writer.ShouldOutputPost = false;
                 }
                 else
                 {

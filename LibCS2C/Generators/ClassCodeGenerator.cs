@@ -108,9 +108,9 @@ namespace LibCS2C.Generators
             ClassStaticStructGenerator staticStructGen = new ClassStaticStructGenerator(m_context, classCode);
             ClassInitGenerator classInitGen = new ClassInitGenerator(m_context, classCode);
             ClassCctorGenerator classCctorGen = new ClassCctorGenerator(m_context, classCode);
-
-            m_context.Writer.CurrentDestination = WriterDestination.ClassStructs;
+            
             structGen.Generate(node);
+            m_context.Writer.CurrentDestination = WriterDestination.ClassStructs;
             staticStructGen.Generate(node);
             classInitGen.Generate(node);
             classCctorGen.Generate(node);

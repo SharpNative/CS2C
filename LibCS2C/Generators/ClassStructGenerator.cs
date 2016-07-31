@@ -30,6 +30,7 @@ namespace LibCS2C.Generators
         /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
+            m_context.Writer.CurrentDestination = WriterDestination.ClassStructs;
             m_context.Writer.AppendLine(m_context.TypeConvert.CurrentClassStructName);
             m_context.Writer.AppendLine("{");
 
@@ -48,6 +49,9 @@ namespace LibCS2C.Generators
 
             m_context.Writer.AppendLine("};");
             m_context.Writer.AppendLine("");
+
+            m_context.Writer.CurrentDestination = WriterDestination.StructPrototypes;
+            m_context.Writer.AppendLine(string.Format("{0};", m_context.TypeConvert.CurrentClassStructName));
         }
     }
 }

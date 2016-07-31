@@ -80,11 +80,11 @@ namespace LibCS2C.Generators
             }
             else
             {
-                string prefix = "";
-                if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
-                    prefix += "obj->";
-
-                getter = prefix + m_context.TypeConvert.ConvertVariableName(name);
+                WriterDestination destination2 = m_context.Writer.CurrentDestination;
+                m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
+                m_context.Generators.Expression.Generate(name);
+                getter = m_context.Writer.FlushTempBuffer();
+                m_context.Writer.CurrentDestination = destination2;
 
                 if (isPost)
                     m_context.Writer.CurrentDestination = WriterDestination.PostBuffer;

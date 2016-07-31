@@ -72,9 +72,7 @@ namespace LibCS2C.Generators
                 if (!symbol.IsStatic)
                     m_context.Writer.Append(string.Format("{0}, ", objName));
             }
-
-            Console.WriteLine("  sag " + node);
-
+            
             bool first = true;
             foreach (SyntaxNodeOrToken child in nodes)
             {

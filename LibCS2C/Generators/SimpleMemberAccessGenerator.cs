@@ -23,7 +23,8 @@ namespace LibCS2C.Generators
         /// Generates the object part
         /// </summary>
         /// <param name="node">The object node</param>
-        private void GenerateObjectPart(SyntaxNode node)
+        /// <param name="identifierAsExpression">If the identifier should be parsed as an expression (for object part)</param>
+        private void GenerateObjectPart(SyntaxNode node, bool identifierAsExpression)
         {
             SyntaxKind firstKind = node.Kind();
 
@@ -33,7 +34,10 @@ namespace LibCS2C.Generators
             }
             else if (firstKind == SyntaxKind.IdentifierName)
             {
-                m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(node as IdentifierNameSyntax));
+                if (identifierAsExpression)
+                    m_context.Generators.Expression.Generate(node);
+                else
+                    m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(node));
             }
             else if (m_context.Generators.Expression.IsSubExpression(firstKind))
             {
@@ -84,12 +88,13 @@ namespace LibCS2C.Generators
                 SyntaxNode first = children[0].AsNode();
                 ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
                 ISymbol firstSymbol = m_context.Model.GetSymbolInfo(first).Symbol;
-                
+
                 // Object part that contains the requested variable
                 bool objectFirst = (!symbol.IsStatic && symbol.Kind != SymbolKind.Property);
+                // bool objectFirst = (firstSymbol != null && !firstSymbol.IsStatic && symbol.Kind != SymbolKind.Property);
                 if (objectFirst)
                 {
-                    GenerateObjectPart(first);
+                    GenerateObjectPart(first, true);
 
                     ITypeSymbol type = m_context.Model.GetTypeInfo(first).Type;
                     if (type.TypeKind == TypeKind.Struct)
@@ -115,7 +120,7 @@ namespace LibCS2C.Generators
                     if (firstSymbol != null && (!firstSymbol.IsStatic && firstSymbol.Kind == SymbolKind.Field))
                         m_context.Writer.Append("obj->");
 
-                    GenerateObjectPart(first);
+                    GenerateObjectPart(first, false);
                     m_context.Writer.Append(")");
                 }
             }

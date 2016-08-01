@@ -45,6 +45,7 @@ namespace LibCS2C.Context
         /// <returns>The C type name</returns>
         public string ConvertTypeName(SyntaxNode type)
         {
+            Console.WriteLine("convert typename: " + type);
             string typeNameConverted;
             if (type is QualifiedNameSyntax)
             {
@@ -69,7 +70,7 @@ namespace LibCS2C.Context
             else if (type is ArrayTypeSyntax)
             {
                 ArrayTypeSyntax array = type as ArrayTypeSyntax;
-                typeNameConverted = m_context.ConvertTypeName(array.ElementType) + "*";
+                typeNameConverted = m_context.ConvertTypeName(array.ElementType) + new string('*', array.RankSpecifiers.Count);
             }
             else
             {

@@ -21,7 +21,11 @@ namespace LibCS2C.Generators
         public override void Generate(DoStatementSyntax node)
         {
             m_context.Writer.AppendLine("do");
+            m_context.Writer.AppendLine("{");
+            m_context.Writer.Indent();
             m_context.Generators.Block.GenerateChild(node.Statement);
+            m_context.Writer.UnIndent();
+            m_context.Writer.AppendLine("}");
             m_context.Writer.Append("while(");
             m_context.Generators.Expression.Generate(node.Condition);
             m_context.Writer.Append(")");

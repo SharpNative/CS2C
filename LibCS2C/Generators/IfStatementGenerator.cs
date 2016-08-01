@@ -54,16 +54,18 @@ namespace LibCS2C.Generators
                             SyntaxNode first = childNode.ChildNodes().First();
                             SyntaxKind firstKind = first.Kind();
 
-                            if(firstKind == SyntaxKind.Block)
+                            m_context.Writer.AppendLine("{");
+                            if (firstKind == SyntaxKind.Block)
                             {
-                                m_context.Writer.AppendLine("{");
                                 m_context.Generators.Block.Generate(first as BlockSyntax);
-                                m_context.Writer.AppendLine("}");
                             }
                             else
                             {
+                                m_context.Writer.Indent();
                                 m_context.Generators.Block.GenerateChild(first);
+                                m_context.Writer.UnIndent();
                             }
+                            m_context.Writer.AppendLine("}");
                         }
                     }
                     else if (kind == SyntaxKind.Block)

@@ -17,6 +17,12 @@ namespace TestProject
             nein.TestProperty = 42;
             short val = 42;
             nein.Test(val);
+
+            int[][] arrayOfArray = new int[5][];
+            for(int i = 0; i < 5; i++)
+            {
+                arrayOfArray[i] = new int[10];
+            }
         }
     }
 }

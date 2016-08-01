@@ -23,15 +23,19 @@ namespace LibCS2C.Generators
         /// <param name="node">The array creation expression</param>
         public override void Generate(ArrayCreationExpressionSyntax node)
         {
-            // new (IdentifierName or Type)[ArrayRankSpecifier]
             IEnumerable<SyntaxNode> children = node.Type.ChildNodes();
-            SyntaxNode first = children.First();
+            //SyntaxNode first = children.First();
             SyntaxNode second = children.ElementAt(1);
             
             ArrayRankSpecifierSyntax rank = second as ArrayRankSpecifierSyntax;
             ExpressionSyntax sizeExpression = rank.Sizes.First();
 
-            m_context.Writer.Append(string.Format("malloc(sizeof({0}) * (", m_context.ConvertTypeName(first)));
+            // Malloc returns a pointer to the type
+            // So that means this type has a pointer too much
+            string type = m_context.ConvertTypeName(node.Type);
+            type = type.Substring(0, type.Length - 1);
+
+            m_context.Writer.Append(string.Format("malloc(sizeof({0}) * (", type));
             m_context.Generators.Expression.Generate(sizeExpression);
             m_context.Writer.Append("))");
         }

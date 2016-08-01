@@ -46,9 +46,17 @@ namespace LibCS2C.Generators
 
             // Code inside the loop
             if (node.Statement != null)
+            {
+                m_context.Writer.AppendLine("{");
+                m_context.Writer.Indent();
                 m_context.Generators.Block.GenerateChild(node.Statement);
+                m_context.Writer.UnIndent();
+                m_context.Writer.AppendLine("}");
+            }
             else
+            {
                 m_context.Writer.AppendLine(";");
+            }
         }
     }
 }

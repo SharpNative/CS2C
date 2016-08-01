@@ -45,7 +45,6 @@ namespace LibCS2C.Context
         /// <returns>The C type name</returns>
         public string ConvertTypeName(SyntaxNode type)
         {
-            Console.WriteLine("convert typename: " + type);
             string typeNameConverted;
             if (type is QualifiedNameSyntax)
             {

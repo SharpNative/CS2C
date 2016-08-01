@@ -27,6 +27,8 @@ namespace LibCS2C.Generators
         public override void Generate(MemberAccessExpressionSyntax node)
         {
             ChildSyntaxList children = node.ChildNodesAndTokens();
+
+            bool first = true;
             foreach (SyntaxNodeOrToken child in children)
             {
                 SyntaxKind childKind = child.Kind();
@@ -36,12 +38,18 @@ namespace LibCS2C.Generators
                 }
                 else if(childKind == SyntaxKind.IdentifierName)
                 {
+                    ISymbol firstSymbol = m_context.Model.GetSymbolInfo(child.AsNode()).Symbol;
+                    if (firstSymbol != null && (!firstSymbol.IsStatic && firstSymbol.Kind == SymbolKind.Field) && first)
+                        m_context.Writer.Append("obj->");
+
                     m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(child.AsNode()));
                 }
                 else
                 {
                     m_context.Generators.Expression.Generate(child.AsNode());
                 }
+
+                first = false;
             }
         }
     }

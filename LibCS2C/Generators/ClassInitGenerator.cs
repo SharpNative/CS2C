@@ -29,7 +29,7 @@ namespace LibCS2C.Generators
         /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
-            string methodPrototype = string.Format("{0}* classInit_{1}_{2}(void)", m_context.TypeConvert.CurrentClassStructName, m_context.CurrentNamespaceFormatted, node.Identifier);
+            string methodPrototype = string.Format("{0}* classInit_{1}_{2}(void)", m_context.TypeConvert.CurrentClassStructName, m_context.TypeConvert.CurrentNamespaceFormatted, node.Identifier);
 
             // Method prototype
             m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
@@ -47,6 +47,9 @@ namespace LibCS2C.Generators
 
             // For the garbage collector
             m_context.Writer.AppendLine("\tobject->usage_count = 1;");
+
+            // For indirect function calls
+            m_context.Writer.AppendLine(string.Format("\tobject->lookup_table = methods_{0};", m_context.TypeConvert.CurrentClassNameFormatted));
 
             // Loop through the fields and initialize them
             foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_classCode.nonStaticFields)

@@ -1,11 +1,6 @@
 ﻿using LibCS2C.Context;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -36,6 +31,9 @@ namespace LibCS2C.Generators
 
             // Usage count for garbage collector
             m_context.Writer.AppendLine("\tint32_t usage_count;");
+
+            // For method lookup
+            m_context.Writer.AppendLine("\tvoid** lookup_table;");
 
             foreach (KeyValuePair<string, TypeSyntax> pair in m_classCode.nonStaticFieldTypes)
             {

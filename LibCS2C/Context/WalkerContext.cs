@@ -20,6 +20,16 @@ namespace LibCS2C.Context
         public TypeConversion TypeConvert { get; private set; }
 
         /// <summary>
+        /// Method table
+        /// </summary>
+        public MethodTable MethodTable { get; private set; }
+
+        /// <summary>
+        /// If a class is ever extended by another type
+        /// </summary>
+        public Dictionary<string, bool> TypeIsExtended { get; private set; } = new Dictionary<string, bool>();
+
+        /// <summary>
         /// .cctor list
         /// </summary>
         public List<string> CctorList { get; private set; } = new List<string>();
@@ -40,11 +50,6 @@ namespace LibCS2C.Context
         public SemanticModel Model { get; set; }
 
         /// <summary>
-        /// Gets the current namespace name formatted
-        /// </summary>
-        public string CurrentNamespaceFormatted { get { return CurrentNamespace.Name.ToString().Replace(".", "_"); } }
-
-        /// <summary>
         /// A list with all the generators
         /// </summary>
         public AllGenerators Generators { get; private set; }
@@ -62,6 +67,7 @@ namespace LibCS2C.Context
         {
             Generators = new AllGenerators(this);
             TypeConvert = new TypeConversion(this);
+            MethodTable = new MethodTable(this);
             Writer = new Writer();
         }
         

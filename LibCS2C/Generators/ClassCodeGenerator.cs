@@ -3,6 +3,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace LibCS2C.Generators
 {
@@ -18,6 +20,21 @@ namespace LibCS2C.Generators
         }
 
         /// <summary>
+        /// Creates the base class struct code
+        /// </summary>
+        /// <returns>The code for the base class struct</returns>
+        public string CreateBaseClassStruct()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("struct base_class");
+            sb.AppendLine("{");
+            sb.AppendLine("\tint32_t usage_count;");
+            sb.AppendLine("\tvoid** lookup_table;");
+            sb.AppendLine("};");
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Calls the class fields and .cctor generators
         /// </summary>
         /// <param name="node">The class declaration</param>
@@ -25,6 +42,18 @@ namespace LibCS2C.Generators
         {
             // Temporarily hold all the fields/properties so we can put them in the initialization method
             ClassCodeData classCode = new ClassCodeData();
+
+            // Mark the base class as an extending class
+            if(node.BaseList != null)
+            {
+                IEnumerable<SyntaxNode> children = node.BaseList.ChildNodes();
+                foreach(SimpleBaseTypeSyntax child in children)
+                {
+                    ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(child.ChildNodes().First()).Type;
+                    string str = string.Format("{0}_{1}", typeSymbol.ContainingNamespace.ToString().Replace('.', '_'), typeSymbol.Name);
+                    m_context.TypeIsExtended[str] = true;
+                }
+            }
 
             // Loop through the children to find the fields
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
@@ -108,7 +137,8 @@ namespace LibCS2C.Generators
             ClassStaticStructGenerator staticStructGen = new ClassStaticStructGenerator(m_context, classCode);
             ClassInitGenerator classInitGen = new ClassInitGenerator(m_context, classCode);
             ClassCctorGenerator classCctorGen = new ClassCctorGenerator(m_context, classCode);
-            
+
+            m_context.Writer.CurrentDestination = WriterDestination.ClassStructs;
             structGen.Generate(node);
             m_context.Writer.CurrentDestination = WriterDestination.ClassStructs;
             staticStructGen.Generate(node);

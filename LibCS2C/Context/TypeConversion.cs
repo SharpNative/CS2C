@@ -16,6 +16,11 @@ namespace LibCS2C.Context
         /// </summary>
         public string CurrentClassStructName { get { return string.Format("struct class_{0}", CurrentClassNameFormatted); } }
 
+        /// <summary>
+        /// Gets the current namespace name formatted
+        /// </summary>
+        public string CurrentNamespaceFormatted { get { return m_context.CurrentNamespace.Name.ToString().Replace(".", "_"); } }
+
         // The context
         private WalkerContext m_context;
 
@@ -35,7 +40,7 @@ namespace LibCS2C.Context
         /// <returns>The formatted name</returns>
         public string ConvertClassName(string identifier)
         {
-            return m_context.CurrentNamespaceFormatted + "_" + identifier;
+            return m_context.TypeConvert.CurrentNamespaceFormatted + "_" + identifier;
         }
 
         /// <summary>
@@ -84,9 +89,13 @@ namespace LibCS2C.Context
                 {
                     typeNameConverted = string.Format("struct class_{0}_{1}*", nameSpace, type.ToString());
                 }
-                else if(typeSymbol.TypeKind == TypeKind.Enum)
+                else if (typeSymbol.TypeKind == TypeKind.Enum)
                 {
                     typeNameConverted = "int32_t";
+                }
+                else if (typeSymbol.TypeKind == TypeKind.Interface)
+                {
+                    typeNameConverted = "struct base_class*";
                 }
                 else
                 {
@@ -131,7 +140,7 @@ namespace LibCS2C.Context
             else if (symbol.Kind == SymbolKind.Method)
             {
                 MethodDeclarationSyntax reference = symbol.DeclaringSyntaxReferences[0].GetSyntax() as MethodDeclarationSyntax;
-                typeNameConverted = m_context.Generators.MethodDeclaration.CreateMethodPrototype(reference, false);
+                typeNameConverted = m_context.Generators.MethodDeclaration.CreateMethodPrototype(reference, false, false);
             }
             // Static field
             else if (symbol.IsStatic)

@@ -44,8 +44,8 @@ namespace LibCS2C.Compiler
         /// <param name="node">The class declaration node</param>
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            m_context.Writer.CurrentDestination = WriterDestination.ClassStructs;
             m_context.CurrentClass = node;
+            m_context.MethodTable.AddCurrentClass();
             m_context.Generators.ClassCode.Generate(node);
             base.VisitClassDeclaration(node);
         }
@@ -123,8 +123,11 @@ namespace LibCS2C.Compiler
             sb.AppendLine(m_context.Writer.SbDelegates.ToString());
             sb.AppendLine(m_context.Writer.SbStructs.ToString());
             sb.AppendLine(m_context.Writer.SbClassStructs.ToString());
+            sb.AppendLine(m_context.Generators.ClassCode.CreateBaseClassStruct());
             sb.AppendLine(m_context.Writer.SbMethodPrototypes.ToString());
+            sb.AppendLine(m_context.MethodTable.ToPrototypeArrayCode());
             sb.AppendLine(m_context.Writer.SbMethodDeclarations.ToString());
+            sb.AppendLine(m_context.MethodTable.ToArrayCode());
 
             // Add .cctor calls in init method
             sb.AppendLine("void init(void)");

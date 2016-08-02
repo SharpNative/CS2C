@@ -11,18 +11,13 @@ namespace TestProject
     {
         static void Main(string[] args)
         {
-            TestClass nein = new TestClass(44);
-            nein.Test();
+            ITest t = new Test();
+            t.abc();
 
-            nein.TestProperty = 42;
-            short val = 42;
-            nein.Test(val);
-
-            int[][] arrayOfArray = new int[5][];
-            for(int i = 0; i < 5; i++)
-            {
-                arrayOfArray[i] = new int[10];
-            }
+            Test2 a = new Test3();
+            a.def();
+            Test3 b = (Test3)a;
+            b.def();
         }
     }
 }

@@ -41,7 +41,7 @@ namespace LibCS2C.Generators
                 if (insideClass)
                     m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2} ({3})", m_context.TypeConvert.CurrentClassNameFormatted, node.Identifier, identifier, value));
                 else
-                    m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2} ({3})", m_context.CurrentNamespaceFormatted, node.Identifier, identifier, value));
+                    m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2} ({3})", m_context.TypeConvert.CurrentNamespaceFormatted, node.Identifier, identifier, value));
             }
 
             m_context.Writer.CurrentDestination = destination;

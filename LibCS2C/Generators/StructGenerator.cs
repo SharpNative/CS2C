@@ -78,7 +78,7 @@ namespace LibCS2C.Generators
             }
             else
             {
-                structName = string.Format("{0}_{1}", m_context.CurrentNamespaceFormatted, node.Identifier.ToString());
+                structName = string.Format("{0}_{1}", m_context.TypeConvert.CurrentNamespaceFormatted, node.Identifier.ToString());
             }
 
             // Temporarily hold all the data

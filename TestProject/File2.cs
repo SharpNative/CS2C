@@ -7,72 +7,33 @@ using System.Runtime.InteropServices;
 
 namespace TestProject.OtherNameSpace
 {
-    public class ParentClass
+    public interface ITest
     {
-        public ParentClass()
-        {
+        void abc();
+    }
 
-        }
-
-        public virtual void abc()
+    public class Test : ITest
+    {
+        public void abc()
         {
-            int abc = 123 & 5;
-            if (abc < 456)
-                abc--;
-            else if (abc == 1)
-                abc++;
-            else if(abc >= 8 && abc <= 10)
-            {
-                abc *= 64;
-            }
-            else
-            {
-                abc = 0;
-            }
+            int a = 3;
+
         }
     }
 
-    public class TestClass : ParentClass
+    public class Test2
     {
-        public int TestProperty { get; set; } = 5;
-
-        public TestClass(int test)
+        public virtual void def()
         {
+
         }
+    }
 
-        public void Test()
+    public class Test3:Test2
+    {
+        public override void def()
         {
-            TestProperty = 22;
-        }
 
-        public void Test(int a)
-        {
-            TestProperty = a * 5 - TestProperty;
-        }
-
-        public override void abc()
-        {
-            base.abc();
-
-            while (true)
-                TestProperty++;
-
-            while(false)
-            {
-                TestProperty--;
-                TestProperty /= 2;
-                TestProperty++;
-            }
-
-            do
-            {
-                TestProperty++;
-            }
-            while (true);
-
-            do
-                TestProperty++;
-            while (false);
         }
     }
 }

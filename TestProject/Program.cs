@@ -16,8 +16,21 @@ namespace TestProject
 
             Test2 a = new Test3();
             a.def();
+
+
+            goto quel;
+
             Test3 b = (Test3)a;
             b.def();
+
+            broken:
+            {
+                int a = 3;
+                int b = 4;
+            }
+
+        quel:
+            break;
         }
     }
 }

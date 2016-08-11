@@ -104,6 +104,8 @@
     <Compile Include="Context\MethodTable.cs" />
     <Compile Include="Context\TypeConversion.cs" />
     <Compile Include="Context\Writer.cs" />
+    <Compile Include="Generators\GotoStatementGenerator.cs" />
+    <Compile Include="Generators\LabeledStatementGenerator.cs" />
     <Compile Include="Util\FormattedStringBuilder.cs" />
     <Compile Include="Generators\AllGenerators.cs" />
     <Compile Include="Generators\PointerMemberAccessGenerator.cs" />

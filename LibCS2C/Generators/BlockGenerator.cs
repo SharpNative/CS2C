@@ -98,6 +98,15 @@ namespace LibCS2C.Generators
                     semiColonNeeded = false;
                     break;
 
+                case SyntaxKind.GotoStatement:
+                    m_context.Generators.GotoStatement.Generate(childNode as GotoStatementSyntax);
+                    semiColonNeeded = true;
+                    break;
+
+                case SyntaxKind.LabeledStatement:
+                    m_context.Generators.LabeledStatement.Generate(childNode as LabeledStatementSyntax);
+                    break;
+
                 default:
                     throw new NotImplementedException();
             }

@@ -24,8 +24,10 @@ namespace LibCS2C.Generators
         public ExpressionStatementGenerator ExpressionStatement { get; private set; }
         public FixedStatementGenerator FixedStatement { get; private set; }
         public ForStatementGenerator ForStatement { get; private set; }
+        public GotoStatementGenerator GotoStatement { get; private set; }
         public IfStatementGenerator IfStatement { get; private set; }
         public InvocationGenerator Invocation { get; private set; }
+        public LabeledStatementGenerator LabeledStatement { get; private set; }
         public AssignmentGenerator LeftShiftAssignment { get; private set; }
         public LocalDeclarationGenerator LocalDeclaration { get; private set; }
         public MethodGenerator MethodDeclaration { get; private set; }
@@ -74,8 +76,10 @@ namespace LibCS2C.Generators
             ExpressionStatement = new ExpressionStatementGenerator(context);
             FixedStatement = new FixedStatementGenerator(context);
             ForStatement = new ForStatementGenerator(context);
+            GotoStatement = new GotoStatementGenerator(context);
             IfStatement = new IfStatementGenerator(context);
             Invocation = new InvocationGenerator(context);
+            LabeledStatement = new LabeledStatementGenerator(context);
             LeftShiftAssignment = new AssignmentGenerator(context, AssignmentType.LeftShift);
             LocalDeclaration = new LocalDeclarationGenerator(context);
             MethodDeclaration = new MethodGenerator(context);

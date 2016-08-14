@@ -41,7 +41,7 @@ namespace LibCS2C.Generators
             m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
             m_context.Writer.AppendLine(methodPrototype);
             m_context.Writer.AppendLine("{");
-            m_context.Writer.AppendLine(string.Format("\t{0}* object = malloc(sizeof({0}));", m_context.TypeConvert.CurrentClassStructName));
+            m_context.Writer.AppendLine(string.Format("\t{0}* object = calloc(1, sizeof({0}));", m_context.TypeConvert.CurrentClassStructName));
             m_context.Writer.AppendLine("\tif(!object)");
             m_context.Writer.AppendLine("\t\treturn NULL;");
 

@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 
 namespace LibCS2C.Generators
 {
@@ -56,14 +57,14 @@ namespace LibCS2C.Generators
                 foreach (StatementSyntax statement in statements)
                 {
                     SyntaxKind kind = statement.Kind();
-                    
+
                     if (kind == SyntaxKind.Block)
                     {
                         m_context.Writer.AppendLine("{");
                         m_context.Generators.Block.Generate(statement as BlockSyntax);
                         m_context.Writer.AppendLine("}");
                     }
-                    else if(m_context.Generators.Expression.IsSubExpression(kind))
+                    else if (m_context.Generators.Expression.IsSubExpression(kind))
                     {
                         m_context.Generators.Expression.Generate(statement as ExpressionStatementSyntax);
                         m_context.Writer.AppendLine("");

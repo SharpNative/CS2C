@@ -28,7 +28,7 @@ namespace LibCS2C.Generators
         public override void Generate(EnumDeclarationSyntax node)
         {
             WriterDestination destination = m_context.Writer.CurrentDestination;
-            m_context.Writer.CurrentDestination = WriterDestination.Enums;
+            m_context.Writer.CurrentDestination = WriterDestination.Defines;
 
             bool insideClass = (node.Parent is ClassDeclarationSyntax);
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();

@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace LibCS2C.Generators
@@ -56,17 +57,34 @@ namespace LibCS2C.Generators
         public override void Generate(ExpressionSyntax node)
         {
             ITypeSymbol symbolType = m_context.Model.GetTypeInfo(node).Type;
+            ISymbol nodeSymbol = m_context.Model.GetSymbolInfo(node).Symbol;
             SyntaxNodeOrToken[] children = node.ChildNodesAndTokens().ToArray();
 
+            // Check if it's a constant-defined value
+            bool isDefined = (symbolType.TypeKind == TypeKind.Enum);
+            bool isConst = false;
 
-            Console.WriteLine(node + " " + symbolType.TypeKind + " " + symbolType.Kind);
+            if (nodeSymbol.DeclaringSyntaxReferences.Length > 0)
+            {
+                SyntaxNode declaration = nodeSymbol.DeclaringSyntaxReferences[0].GetSyntax().Parent;
+                if (declaration.Kind() == SyntaxKind.VariableDeclaration)
+                {
+                    IEnumerable<SyntaxToken> fieldNodeTokens = declaration.Parent.ChildTokens();
+                    foreach (SyntaxToken token in fieldNodeTokens)
+                    {
+                        if (token.Kind() == SyntaxKind.ConstKeyword)
+                        {
+                            isDefined = true;
+                            isConst = true;
+                            break;
+                        }
+                    }
+                }
+            }
 
-
-            bool isEnum = symbolType.TypeKind == TypeKind.Enum;
-            
             // After the type is checked as enum, check if it is an assignment to a enum type
             // if so, we cannot transform this to a constant
-            if (isEnum)
+            if (isDefined)
             {
                 SyntaxNode parent = node.Parent;
 
@@ -77,16 +95,18 @@ namespace LibCS2C.Generators
                     // and should be a variable instead of an enum
                     if (node != parent.ChildNodes().ElementAt(1))
                     {
-                        isEnum = false;
+                        isDefined = false;
                     }
                 }
             }
 
             // Enum
-            if (isEnum)
+            if (isDefined)
             {
                 IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
-                m_context.Writer.Append("enum_" + symbolType.ToString().Replace(".", "_") + "_" + name.Identifier);
+                string prefix = (isConst) ? "const" : "enum";
+                string containing = (isConst) ? nodeSymbol.ContainingType.ToString() : symbolType.ToString();
+                m_context.Writer.Append(string.Format("{0}_{1}_{2}", prefix, containing.Replace(".", "_"), name.Identifier));
             }
             // Normal member access
             else

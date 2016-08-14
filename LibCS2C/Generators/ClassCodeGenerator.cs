@@ -44,10 +44,10 @@ namespace LibCS2C.Generators
             ClassCodeData classCode = new ClassCodeData();
 
             // Mark the base class as an extending class
-            if(node.BaseList != null)
+            if (node.BaseList != null)
             {
                 IEnumerable<SyntaxNode> children = node.BaseList.ChildNodes();
-                foreach(SimpleBaseTypeSyntax child in children)
+                foreach (SimpleBaseTypeSyntax child in children)
                 {
                     ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(child.ChildNodes().First()).Type;
                     string str = string.Format("{0}_{1}", typeSymbol.ContainingNamespace.ToString().Replace('.', '_'), typeSymbol.Name);
@@ -68,12 +68,16 @@ namespace LibCS2C.Generators
                     IEnumerable<SyntaxNode> fieldNodeChildren = fieldNode.ChildNodes();
 
                     bool isStatic = false;
+                    bool isConst = false;
 
                     IEnumerable<SyntaxToken> fieldNodeTokens = fieldNode.ChildTokens();
                     foreach (SyntaxToken token in fieldNodeTokens)
                     {
-                        if (token.Kind() == SyntaxKind.StaticKeyword)
+                        SyntaxKind tokenKind = token.Kind();
+                        if (tokenKind == SyntaxKind.StaticKeyword)
                             isStatic = true;
+                        else if (tokenKind == SyntaxKind.ConstKeyword)
+                            isConst = true;
                     }
 
                     foreach (VariableDeclarationSyntax fieldNodeChild in fieldNodeChildren)
@@ -81,7 +85,13 @@ namespace LibCS2C.Generators
                         foreach (VariableDeclaratorSyntax variable in fieldNodeChild.Variables)
                         {
                             string identifier = variable.Identifier.ToString();
-                            if (isStatic)
+
+                            if (isConst)
+                            {
+                                m_context.Writer.CurrentDestination = WriterDestination.Defines;
+                                m_context.Writer.AppendLine(string.Format("#define const_{0}_{1} ({2})", m_context.TypeConvert.CurrentClassNameFormatted, identifier, variable.Initializer.Value));
+                            }
+                            else if (isStatic)
                             {
                                 if (variable.Initializer != null)
                                     classCode.staticFields.Add(identifier, variable.Initializer);
@@ -99,23 +109,23 @@ namespace LibCS2C.Generators
                     }
                 }
                 // Found a property
-                else if(kind == SyntaxKind.PropertyDeclaration)
+                else if (kind == SyntaxKind.PropertyDeclaration)
                 {
                     PropertyDeclarationSyntax propertyDeclaration = childNode as PropertyDeclarationSyntax;
                     string identifier = propertyDeclaration.Identifier.ToString();
 
                     bool isStatic = false;
                     IEnumerable<SyntaxToken> tokens = propertyDeclaration.ChildTokens();
-                    foreach(SyntaxToken token in tokens)
+                    foreach (SyntaxToken token in tokens)
                     {
-                        if(token.Kind() == SyntaxKind.StaticKeyword)
+                        if (token.Kind() == SyntaxKind.StaticKeyword)
                         {
                             isStatic = true;
                             break;
                         }
                     }
 
-                    if(!isStatic)
+                    if (!isStatic)
                     {
                         classCode.propertyTypesNonStatic.Add(identifier, propertyDeclaration.Type);
 

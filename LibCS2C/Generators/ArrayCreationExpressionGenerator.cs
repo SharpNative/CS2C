@@ -24,7 +24,6 @@ namespace LibCS2C.Generators
         public override void Generate(ArrayCreationExpressionSyntax node)
         {
             IEnumerable<SyntaxNode> children = node.Type.ChildNodes();
-            //SyntaxNode first = children.First();
             SyntaxNode second = children.ElementAt(1);
             
             ArrayRankSpecifierSyntax rank = second as ArrayRankSpecifierSyntax;
@@ -35,9 +34,13 @@ namespace LibCS2C.Generators
             string type = m_context.ConvertTypeName(node.Type);
             type = type.Substring(0, type.Length - 1);
 
-            m_context.Writer.Append(string.Format("malloc(sizeof({0}) * (", type));
+            /*m_context.Writer.Append(string.Format("malloc(sizeof({0}) * (", type));
             m_context.Generators.Expression.Generate(sizeExpression);
-            m_context.Writer.Append("))");
+            m_context.Writer.Append("))");*/
+
+            m_context.Writer.Append("calloc((");
+            m_context.Generators.Expression.Generate(sizeExpression);
+            m_context.Writer.Append(string.Format("), sizeof({0}))", type));
         }
     }
 }

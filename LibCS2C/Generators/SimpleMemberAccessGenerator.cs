@@ -88,14 +88,23 @@ namespace LibCS2C.Generators
             {
                 SyntaxNode parent = node.Parent;
 
-                SyntaxKind[] kinds = { SyntaxKind.EqualsExpression, SyntaxKind.NotEqualsExpression, SyntaxKind.GreaterThanOrEqualExpression, SyntaxKind.LessThanOrEqualExpression, SyntaxKind.GreaterThanExpression, SyntaxKind.LessThanExpression };
-                if (parent is AssignmentExpressionSyntax || kinds.Contains(parent.Kind()))
+                string sType = symbolType.ToString();
+                sType = sType.Substring(sType.LastIndexOf('.') + 1);
+
+                string checkType = nodeSymbol.ToString();
+                checkType = checkType.Substring(0, checkType.LastIndexOf('.'));
+                checkType = checkType.Substring(checkType.LastIndexOf('.') + 1);
+
+                if (sType != checkType)
                 {
-                    // Check if the right hand of the expression isn't equal to this node, then we know it comes from the left
-                    // and should be a variable instead of an enum
-                    if (node != parent.ChildNodes().ElementAt(1))
+                    if (nodeSymbol.Kind == SymbolKind.Field || nodeSymbol.Kind == SymbolKind.Local)
                     {
-                        isDefined = false;
+                        // Check if the right hand of the expression isn't equal to this node, then we know it comes from the left
+                        // and should be a variable instead of an enum
+                        if (parent.ChildNodes().Count() > 1 && node != parent.ChildNodes().ElementAt(1))
+                        {
+                            isDefined = false;
+                        }
                     }
                 }
             }

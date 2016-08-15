@@ -54,16 +54,23 @@ namespace LibCS2C.Context
             if (type is QualifiedNameSyntax)
             {
                 ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(type).Type;
-                string containingType = typeSymbol.ContainingType.ToString().Replace('.', '_');
+                bool nameContainsType = (typeSymbol.ContainingType == null);
+                string containingType = nameContainsType ? typeSymbol.ToString().Replace('.', '_') : typeSymbol.ContainingType.ToString().Replace('.', '_');
                 string typeName = typeSymbol.Name;
 
                 if (typeSymbol.TypeKind == TypeKind.Class)
                 {
-                    typeNameConverted = string.Format("struct class_{0}_{1}*", containingType, typeName);
+                    if (nameContainsType)
+                        typeNameConverted = string.Format("struct class_{0}*", containingType);
+                    else
+                        typeNameConverted = string.Format("struct class_{0}_{1}*", containingType, typeName); 
                 }
                 else
                 {
-                    typeNameConverted = string.Format("struct struct_{0}_{1}", containingType, typeName);
+                    if (nameContainsType)
+                        typeNameConverted = string.Format("struct struct_{0}", containingType); 
+                    else
+                        typeNameConverted = string.Format("struct struct_{0}_{1}", containingType, typeName);
                 }
             }
             else if (type is PointerTypeSyntax)

@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Collections.Generic;
 
 namespace LibCS2C.Context
 {
@@ -63,12 +65,12 @@ namespace LibCS2C.Context
                     if (nameContainsType)
                         typeNameConverted = string.Format("struct class_{0}*", containingType);
                     else
-                        typeNameConverted = string.Format("struct class_{0}_{1}*", containingType, typeName); 
+                        typeNameConverted = string.Format("struct class_{0}_{1}*", containingType, typeName);
                 }
                 else
                 {
                     if (nameContainsType)
-                        typeNameConverted = string.Format("struct struct_{0}", containingType); 
+                        typeNameConverted = string.Format("struct struct_{0}", containingType);
                     else
                         typeNameConverted = string.Format("struct struct_{0}_{1}", containingType, typeName);
                 }
@@ -152,7 +154,23 @@ namespace LibCS2C.Context
             // Static field
             else if (symbol.IsStatic)
             {
-                typeNameConverted = string.Format("classStatics_{0}.{1}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+                FieldDeclarationSyntax fieldDeclaration = symbol.DeclaringSyntaxReferences[0].GetSyntax().Parent.Parent as FieldDeclarationSyntax;
+                IEnumerable<SyntaxToken> children = fieldDeclaration.ChildTokens();
+
+                bool isConst = false;
+                foreach (SyntaxToken token in children)
+                {
+                    if (token.Kind() == SyntaxKind.ConstKeyword)
+                    {
+                        isConst = true;
+                        break;
+                    }
+                }
+
+                if (isConst)
+                    typeNameConverted = string.Format("const_{0}_{1}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+                else
+                    typeNameConverted = string.Format("classStatics_{0}.{1}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
             }
             // Argument or local variable
             else if (symbol.ContainingSymbol.Kind == SymbolKind.Method)

@@ -31,6 +31,7 @@ namespace LibCS2C.Generators
         public AssignmentGenerator LeftShiftAssignment { get; private set; }
         public LocalDeclarationGenerator LocalDeclaration { get; private set; }
         public MethodGenerator MethodDeclaration { get; private set; }
+        public AssignmentGenerator ModuloAssignment { get; private set; }
         public AssignmentGenerator MultiplyAssignment { get; private set; }
         public ObjectCreationExpressionGenerator ObjectCreationExpression { get; private set; }
         public PrePostExpressionGenerator PreIncrementExpression { get; private set; }
@@ -83,6 +84,7 @@ namespace LibCS2C.Generators
             LeftShiftAssignment = new AssignmentGenerator(context, AssignmentType.LeftShift);
             LocalDeclaration = new LocalDeclarationGenerator(context);
             MethodDeclaration = new MethodGenerator(context);
+            ModuloAssignment = new AssignmentGenerator(context, AssignmentType.Modulo);
             MultiplyAssignment = new AssignmentGenerator(context, AssignmentType.Multiply);
             ObjectCreationExpression = new ObjectCreationExpressionGenerator(context);
             PreIncrementExpression = new PrePostExpressionGenerator(context, ExpressionType.PreIncrement);

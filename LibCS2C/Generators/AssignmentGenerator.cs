@@ -20,7 +20,8 @@ namespace LibCS2C.Generators
         Add,
         Substract,
         Multiply,
-        Divide
+        Divide,
+        Modulo
     }
 
     public class AssignmentGenerator : GeneratorBase<AssignmentExpressionSyntax>
@@ -83,6 +84,10 @@ namespace LibCS2C.Generators
 
                 case AssignmentType.Divide:
                     assignmentSymbol = "/";
+                    break;
+
+                case AssignmentType.Modulo:
+                    assignmentSymbol = "%";
                     break;
             }
 

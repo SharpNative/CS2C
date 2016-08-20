@@ -89,7 +89,14 @@ namespace LibCS2C.Generators
                             if (isConst)
                             {
                                 m_context.Writer.CurrentDestination = WriterDestination.Defines;
-                                m_context.Writer.AppendLine(string.Format("#define const_{0}_{1} ({2})", m_context.TypeConvert.CurrentClassNameFormatted, identifier, variable.Initializer.Value));
+                                m_context.Writer.Append(string.Format("#define const_{0}_{1}", m_context.TypeConvert.CurrentClassNameFormatted, identifier));
+
+                                m_context.Writer.Append(" (");
+                                m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
+                                m_context.Generators.Expression.Generate(variable.Initializer.Value);
+                                m_context.Writer.CurrentDestination = WriterDestination.Defines;
+                                m_context.Writer.Append(m_context.Writer.FlushTempBuffer());
+                                m_context.Writer.AppendLine(")");
                             }
                             else if (isStatic)
                             {

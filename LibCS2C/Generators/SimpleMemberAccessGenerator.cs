@@ -128,7 +128,6 @@ namespace LibCS2C.Generators
 
                 // Object part that contains the requested variable
                 bool objectFirst = (!symbol.IsStatic && symbol.Kind != SymbolKind.Property);
-                // bool objectFirst = (firstSymbol != null && !firstSymbol.IsStatic && symbol.Kind != SymbolKind.Property);
                 if (objectFirst)
                 {
                     GenerateObjectPart(first, true);

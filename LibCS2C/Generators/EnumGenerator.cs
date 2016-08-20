@@ -1,12 +1,7 @@
 ﻿using LibCS2C.Context;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -36,12 +31,19 @@ namespace LibCS2C.Generators
             foreach (EnumMemberDeclarationSyntax child in nodes)
             {
                 string identifier = child.Identifier.ToString();
-                string value = child.EqualsValue.Value.ToString();
+                ExpressionSyntax value = child.EqualsValue.Value;
 
                 if (insideClass)
-                    m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2} ({3})", m_context.TypeConvert.CurrentClassNameFormatted, node.Identifier, identifier, value));
+                    m_context.Writer.Append(string.Format("#define enum_{0}_{1}_{2}", m_context.TypeConvert.CurrentClassNameFormatted, node.Identifier, identifier));
                 else
-                    m_context.Writer.AppendLine(string.Format("#define enum_{0}_{1}_{2} ({3})", m_context.TypeConvert.CurrentNamespaceFormatted, node.Identifier, identifier, value));
+                    m_context.Writer.Append(string.Format("#define enum_{0}_{1}_{2}", m_context.TypeConvert.CurrentNamespaceFormatted, node.Identifier, identifier));
+
+                m_context.Writer.Append(" (");
+                m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
+                m_context.Generators.Expression.Generate(value);
+                m_context.Writer.CurrentDestination = WriterDestination.Defines;
+                m_context.Writer.Append(m_context.Writer.FlushTempBuffer());
+                m_context.Writer.AppendLine(")");
             }
 
             m_context.Writer.CurrentDestination = destination;

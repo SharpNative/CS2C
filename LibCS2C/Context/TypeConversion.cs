@@ -55,7 +55,8 @@ namespace LibCS2C.Context
             string typeNameConverted;
             if (type is QualifiedNameSyntax)
             {
-                ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(type).Type;
+                //ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(type).Type;
+                ITypeSymbol typeSymbol = m_context.Model.Compilation.GetSemanticModel(type.Parent.SyntaxTree).GetTypeInfo(type).Type;
                 bool nameContainsType = (typeSymbol.ContainingType == null);
                 string containingType = nameContainsType ? typeSymbol.ToString().Replace('.', '_') : typeSymbol.ContainingType.ToString().Replace('.', '_');
                 string typeName = typeSymbol.Name;

@@ -178,6 +178,10 @@ namespace LibCS2C.Generators
                 case SyntaxKind.ConditionalAccessExpression:
                     m_context.Generators.ConditionalAccessExpression.Generate(node as ConditionalAccessExpressionSyntax);
                     break;
+
+                case SyntaxKind.ThisExpression:
+                    m_context.Writer.Append("obj");
+                    break;
                     
                 default:
                     m_context.Writer.Append(node.ToString());

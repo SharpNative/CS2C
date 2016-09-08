@@ -55,7 +55,6 @@ namespace LibCS2C.Context
             string typeNameConverted;
             if (type is QualifiedNameSyntax)
             {
-                //ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(type).Type;
                 ITypeSymbol typeSymbol = m_context.Model.Compilation.GetSemanticModel(type.Parent.SyntaxTree).GetTypeInfo(type).Type;
                 bool nameContainsType = (typeSymbol.ContainingType == null);
                 string containingType = nameContainsType ? typeSymbol.ToString().Replace('.', '_') : typeSymbol.ContainingType.ToString().Replace('.', '_');
@@ -67,6 +66,10 @@ namespace LibCS2C.Context
                         typeNameConverted = string.Format("struct class_{0}*", containingType);
                     else
                         typeNameConverted = string.Format("struct class_{0}_{1}*", containingType, typeName);
+                }
+                else if(typeSymbol.TypeKind == TypeKind.Enum)
+                {
+                    typeNameConverted = "int32_t";
                 }
                 else
                 {

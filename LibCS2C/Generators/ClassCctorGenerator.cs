@@ -53,7 +53,7 @@ namespace LibCS2C.Generators
 
             string convertedClassName = m_context.TypeConvert.ConvertClassName(node.Identifier.ToString());
             string methodName = string.Format("classCctor_{0}", convertedClassName);
-            string methodPrototype = string.Format("inline void {0}(void)", methodName);
+            string methodPrototype = string.Format("static inline void {0}(void)", methodName);
 
             // Add to .cctor list so we can call it on initialization
             m_context.CctorList.Add(methodName);

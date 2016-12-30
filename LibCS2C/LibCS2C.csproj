@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compiler\Compiler.cs" />
+    <Compile Include="Compiler\CompilerSettings.cs" />
     <Compile Include="Context\MethodTable.cs" />
     <Compile Include="Context\TypeConversion.cs" />
     <Compile Include="Context\Writer.cs" />

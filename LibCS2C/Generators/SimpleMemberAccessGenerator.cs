@@ -141,11 +141,18 @@ namespace LibCS2C.Generators
 
                 // Variable name
                 IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
-                m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(name));
-
-                // Property getter stuff
-                if (symbol.Kind == SymbolKind.Property && !symbol.IsStatic)
+                bool getterArgument = (symbol.Kind == SymbolKind.Property && !symbol.IsStatic);
+                string convertedVariableName = m_context.TypeConvert.ConvertVariableName(name);
+                
+                // Property getter argument
+                if (getterArgument)
                 {
+                    // Make sure there are no double arguments
+                    int indexOfArg = convertedVariableName.IndexOf("(");
+                    if(indexOfArg > -1)
+                        convertedVariableName = convertedVariableName.Substring(0, indexOfArg);
+
+                    m_context.Writer.Append(convertedVariableName);
                     m_context.Writer.Append("(");
 
                     ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(first).Type;
@@ -158,6 +165,10 @@ namespace LibCS2C.Generators
 
                     GenerateObjectPart(first, false);
                     m_context.Writer.Append(")");
+                }
+                else
+                {
+                    m_context.Writer.Append(convertedVariableName);
                 }
             }
         }

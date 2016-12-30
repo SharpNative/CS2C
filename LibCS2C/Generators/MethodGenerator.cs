@@ -1,4 +1,5 @@
-﻿using LibCS2C.Context;
+﻿using LibCS2C.Compiler;
+using LibCS2C.Context;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -176,6 +177,12 @@ namespace LibCS2C.Generators
 
             // Block containing the code of the method
             m_context.Writer.AppendLine("{");
+
+            // If it's not static, we should check
+            if (CompilerSettings.EnableRuntimeChecks && !IsMethodStatic(node))
+            {
+                m_context.Writer.AppendLine("\tif(obj == NULL) abort(__ERROR_NULL_CALLED__);");
+            }
 
             m_context.Generators.Block.Generate(node.Body);
 

@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace LibCS2C.Generators
@@ -38,7 +39,7 @@ namespace LibCS2C.Generators
         {
             SyntaxNode name = node.ChildNodes().First();
             ISymbol symbol = m_context.Model.GetSymbolInfo(name).Symbol;
-            
+
             bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);
 
             // Increase or decrease
@@ -69,13 +70,21 @@ namespace LibCS2C.Generators
                 }
                 else
                 {
-                    getter = string.Format("{0}_{1}_getter(obj)", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
+                    string objectName = "obj";
+                    IEnumerable<SyntaxNode> nodes = name.ChildNodes();
+                    if (nodes.Count() > 1)
+                    {
+                        IdentifierNameSyntax identifier = nodes.First() as IdentifierNameSyntax;
+                        objectName = m_context.TypeConvert.ConvertVariableName(identifier);
+                    }
+
+                    getter = string.Format("{0}_{1}_getter({2})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, objectName);
 
                     // Set future value in post code
                     if (isPost)
                         m_context.Writer.CurrentDestination = WriterDestination.PostBuffer;
 
-                    m_context.Writer.Append(string.Format("{0}_{1}_setter(obj, {2}{3})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter, type));
+                    m_context.Writer.Append(string.Format("{0}_{1}_setter({4}, {2}{3})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter, type, objectName));
                 }
             }
             else

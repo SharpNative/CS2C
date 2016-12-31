@@ -107,6 +107,17 @@ namespace LibCS2C.Generators
                         }
                     }
                 }
+
+                // If the symbol is a class and the child is a field and the field is non-static, it can't be a defined constant
+                if (isDefined && !isConst && children[0].Kind() == SyntaxKind.IdentifierName)
+                {
+                    IdentifierNameSyntax name = children[0].AsNode() as IdentifierNameSyntax;
+                    IdentifierNameSyntax field = children[2].AsNode() as IdentifierNameSyntax;
+
+                    SymbolKind kind = m_context.Model.GetSymbolInfo(field).Symbol.Kind;
+                    if (m_context.Model.GetTypeInfo(name).Type.TypeKind == TypeKind.Class && (kind == SymbolKind.Field || kind == SymbolKind.Property) && !m_context.Model.GetTypeInfo(field).Type.IsStatic)
+                        isDefined = false;
+                }
             }
 
             // Enum
@@ -140,7 +151,7 @@ namespace LibCS2C.Generators
                 }
 
                 // Variable name
-                IdentifierNameSyntax name = children[2].AsNode() as IdentifierNameSyntax;
+                SyntaxNode name = children[2].AsNode();
                 bool getterArgument = (symbol.Kind == SymbolKind.Property && !symbol.IsStatic);
                 string convertedVariableName = m_context.TypeConvert.ConvertVariableName(name);
                 
@@ -149,7 +160,7 @@ namespace LibCS2C.Generators
                 {
                     // Make sure there are no double arguments
                     int indexOfArg = convertedVariableName.IndexOf("(");
-                    if(indexOfArg > -1)
+                    if (indexOfArg > -1)
                         convertedVariableName = convertedVariableName.Substring(0, indexOfArg);
 
                     m_context.Writer.Append(convertedVariableName);
@@ -157,6 +168,7 @@ namespace LibCS2C.Generators
 
                     ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(first).Type;
 
+                    // Pass struct in this case by reference
                     if (!m_context.GenericTypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct)
                         m_context.Writer.Append("&");
 

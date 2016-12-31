@@ -51,8 +51,7 @@ namespace LibCS2C.Generators
 
                     if (firstChildKind == SyntaxKind.IdentifierName)
                     {
-                        IdentifierNameSyntax identifier = firstChild as IdentifierNameSyntax;
-                        objName = m_context.TypeConvert.ConvertVariableName(identifier);
+                        objName = m_context.TypeConvert.ConvertVariableName(firstChild);
                     }
                     else if (firstChildKind == SyntaxKind.ElementAccessExpression)
                     {

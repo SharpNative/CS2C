@@ -94,10 +94,18 @@ namespace LibCS2C.Generators
             // Property (getter/setter required)
             if (symbol != null && symbol.Kind == SymbolKind.Property)
             {
+                // Check for the object name
+                string objectName = "obj";
+                IEnumerable<SyntaxNode> children = node.Left.ChildNodes();
+                if(children.Count() > 1)
+                {
+                    objectName = m_context.TypeConvert.ConvertVariableName(children.First());
+                }
+
                 if (symbol.IsStatic)
                     m_context.Writer.Append(string.Format("{0}_{1}_setter(", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
                 else
-                    m_context.Writer.Append(string.Format("{0}_{1}_setter(obj, ", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name));
+                    m_context.Writer.Append(string.Format("{0}_{1}_setter({2}, ", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, objectName));
 
                 m_context.Generators.Expression.Generate(node.Left);
                 m_context.Writer.Append(string.Format(" {0} ", assignmentSymbol));

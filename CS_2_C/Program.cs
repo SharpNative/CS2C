@@ -14,8 +14,8 @@ namespace CS_2_C
         {
             // string output = Compiler.CompileProject("../../../TestProject/TestProject.csproj");
             // string output = Compiler.CompileProject(@"C:\Users\jeffr\Documents\visual studio 2015\Projects\Sharpen\kernel\Sharpen\Sharpen.csproj");
-            // string output = Compiler.CompileProject(@"C:\Users\Niels\Documents\Sharpen\kernel\Sharpen\Sharpen.csproj");
-            string output = Compiler.CompileProject(@"C:\Users\jeffr\Source\Repos\Sharpen\user\shell\shell\shell.csproj");
+            string output = Compiler.CompileProject(@"C:\Users\Niels\Documents\Sharpen\kernel\Sharpen\Sharpen.csproj");
+            // string output = Compiler.CompileProject(@"C:\Users\jeffr\Source\Repos\Sharpen\user\shell\shell\shell.csproj");
 
             File.WriteAllText("output.c", output);
             Console.ReadLine();

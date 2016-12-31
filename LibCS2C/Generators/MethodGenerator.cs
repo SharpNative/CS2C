@@ -181,7 +181,7 @@ namespace LibCS2C.Generators
             // If it's not static, we should check
             if (CompilerSettings.EnableRuntimeChecks && !IsMethodStatic(node))
             {
-                m_context.Writer.AppendLine("\tif(obj == NULL) abort(__ERROR_NULL_CALLED__);");
+                m_context.Writer.AppendLine("\tif(obj == NULL) fatal(__ERROR_NULL_CALLED__);");
             }
 
             m_context.Generators.Block.Generate(node.Body);

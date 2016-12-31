@@ -28,13 +28,16 @@ namespace LibCS2C.Context
             { "char", "char" },
             { "string", "char*" },
 
-            { "Action", "void*" },
-            { "object", "void*" },
+            { "Action", "action_t" },
+            { "object", "object_t" },
 
             { "UInt8", "uint8_t" },
             { "UInt16", "uint16_t" },
             { "UInt32", "uint32_t" },
             { "UInt64", "uint64_t" },
+
+            { "IntPtr", "intptr_t" },
+            { "UIntPtr", "uintptr_t" },
 
             { "Char", "char" },
             { "Int8", "int8_t" },

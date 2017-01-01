@@ -10,7 +10,7 @@ namespace LibCS2C.Context
         public FormattedStringBuilder CurrentWriter { get; private set; }
 
         /// <summary>
-        /// If a postcode should be outputted
+        /// If a code should be outputted after the current code
         /// </summary>
         public bool ShouldOutputPost { get; set; } = false;
 

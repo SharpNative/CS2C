@@ -121,6 +121,7 @@ namespace LibCS2C.Generators
                 case SyntaxKind.LeftShiftExpression:
                 case SyntaxKind.UnaryMinusExpression:
                 case SyntaxKind.UnaryPlusExpression:
+                case SyntaxKind.PointerIndirectionExpression:
                     ChildSyntaxList children = node.ChildNodesAndTokens();
                     foreach (SyntaxNodeOrToken child in children)
                     {
@@ -140,10 +141,6 @@ namespace LibCS2C.Generators
                 case SyntaxKind.IdentifierName:
                     ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
                     ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(node).Type;
-                    
-                    // TODO: Quickfix!
-                    /*if (typeSymbol != null && symbol.Kind == SymbolKind.Parameter && !m_context.GenericTypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct)
-                        m_context.Writer.Append("&");*/
                     
                     if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
                         m_context.Writer.Append("obj->");
@@ -196,7 +193,7 @@ namespace LibCS2C.Generators
         /// <returns>If it's a sub expression</returns>
         public bool IsSubExpression(SyntaxKind kind)
         {
-            SyntaxKind[] kinds = { SyntaxKind.AddExpression, SyntaxKind.CastExpression, SyntaxKind.SubtractExpression, SyntaxKind.MultiplyExpression, SyntaxKind.DivideExpression, SyntaxKind.BitwiseAndExpression, SyntaxKind.BitwiseNotExpression, SyntaxKind.BitwiseOrExpression, SyntaxKind.EqualsExpression, SyntaxKind.NotEqualsExpression, SyntaxKind.ElementAccessExpression, SyntaxKind.LessThanExpression, SyntaxKind.LessThanOrEqualExpression, SyntaxKind.GreaterThanExpression, SyntaxKind.GreaterThanOrEqualExpression, SyntaxKind.ParenthesizedExpression, SyntaxKind.SimpleMemberAccessExpression, SyntaxKind.SimpleAssignmentExpression, SyntaxKind.ObjectCreationExpression, SyntaxKind.ArrayCreationExpression, SyntaxKind.AddressOfExpression, SyntaxKind.InvocationExpression, SyntaxKind.LogicalAndExpression, SyntaxKind.LogicalNotExpression, SyntaxKind.LogicalOrExpression, SyntaxKind.ConditionalExpression, SyntaxKind.PointerMemberAccessExpression, SyntaxKind.RightShiftExpression, SyntaxKind.LeftShiftExpression, SyntaxKind.PreDecrementExpression, SyntaxKind.PreIncrementExpression, SyntaxKind.PostDecrementExpression, SyntaxKind.PostIncrementExpression, SyntaxKind.UnaryMinusExpression, SyntaxKind.UnaryPlusExpression, SyntaxKind.ModuloExpression };
+            SyntaxKind[] kinds = { SyntaxKind.AddExpression, SyntaxKind.CastExpression, SyntaxKind.SubtractExpression, SyntaxKind.MultiplyExpression, SyntaxKind.DivideExpression, SyntaxKind.BitwiseAndExpression, SyntaxKind.BitwiseNotExpression, SyntaxKind.BitwiseOrExpression, SyntaxKind.EqualsExpression, SyntaxKind.NotEqualsExpression, SyntaxKind.ElementAccessExpression, SyntaxKind.LessThanExpression, SyntaxKind.LessThanOrEqualExpression, SyntaxKind.GreaterThanExpression, SyntaxKind.GreaterThanOrEqualExpression, SyntaxKind.ParenthesizedExpression, SyntaxKind.SimpleMemberAccessExpression, SyntaxKind.SimpleAssignmentExpression, SyntaxKind.ObjectCreationExpression, SyntaxKind.ArrayCreationExpression, SyntaxKind.AddressOfExpression, SyntaxKind.InvocationExpression, SyntaxKind.LogicalAndExpression, SyntaxKind.LogicalNotExpression, SyntaxKind.LogicalOrExpression, SyntaxKind.ConditionalExpression, SyntaxKind.PointerMemberAccessExpression, SyntaxKind.RightShiftExpression, SyntaxKind.LeftShiftExpression, SyntaxKind.PreDecrementExpression, SyntaxKind.PreIncrementExpression, SyntaxKind.PostDecrementExpression, SyntaxKind.PostIncrementExpression, SyntaxKind.UnaryMinusExpression, SyntaxKind.UnaryPlusExpression, SyntaxKind.ModuloExpression, SyntaxKind.PointerIndirectionExpression };
             return kinds.Contains(kind);
         }
 

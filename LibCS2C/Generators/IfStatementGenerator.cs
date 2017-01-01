@@ -24,6 +24,7 @@ namespace LibCS2C.Generators
         public override void Generate(IfStatementSyntax node)
         {
             ChildSyntaxList list = node.ChildNodesAndTokens();
+            
             foreach (SyntaxNodeOrToken child in list)
             {
                 SyntaxKind kind = child.Kind();

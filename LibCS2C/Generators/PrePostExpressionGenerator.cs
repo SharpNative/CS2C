@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,6 +18,9 @@ namespace LibCS2C.Generators
     public class PrePostExpressionGenerator : GeneratorBase<ExpressionSyntax>
     {
         private ExpressionType m_expressionType;
+        private bool m_isPost;
+        private string m_type;
+        private string m_shortType;
 
         /// <summary>
         /// Post expression generator
@@ -29,6 +31,19 @@ namespace LibCS2C.Generators
         {
             m_context = context;
             m_expressionType = expressionType;
+
+            m_isPost = (expressionType == ExpressionType.PostIncrement || expressionType == ExpressionType.PostDecrement);
+
+            if (expressionType == ExpressionType.PreIncrement || expressionType == ExpressionType.PostIncrement)
+            {
+                m_type = "+1";
+                m_shortType = "++";
+            }
+            else
+            {
+                m_type = "-1";
+                m_shortType = "--";
+            }
         }
 
         /// <summary>
@@ -41,76 +56,54 @@ namespace LibCS2C.Generators
             ISymbol symbol = m_context.Model.GetSymbolInfo(name).Symbol;
 
             bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);
-
-            // Increase or decrease
-            string type = "";
-            if (m_expressionType == ExpressionType.PreIncrement || m_expressionType == ExpressionType.PostIncrement)
-                type = " + 1";
-            else
-                type = " - 1";
-
-            bool isPost = (m_expressionType == ExpressionType.PostIncrement || m_expressionType == ExpressionType.PostDecrement);
-
-            // There is post code and there is current code
-            WriterDestination destination = m_context.Writer.CurrentDestination;
-
-            // The getter contains the code to get the current value
-            string getter = "";
+            
+            WriterDestination originalDestination = m_context.Writer.CurrentDestination;
+            
+            // Property
             if (isProperty)
             {
+                // Set future value in post code
+                bool doFutureValue = (m_isPost || m_context.Writer.ShouldOutputPost);
+                if (doFutureValue)
+                    m_context.Writer.CurrentDestination = WriterDestination.PostBuffer;
+
+                string getter;
                 if (symbol.IsStatic)
                 {
                     getter = string.Format("{0}_{1}_getter()", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name);
-
-                    // Set future value in post code
-                    if (isPost)
-                        m_context.Writer.CurrentDestination = WriterDestination.PostBuffer;
-
-                    m_context.Writer.Append(string.Format("{0}_{1}_setter({2}{3})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter, type));
+                    m_context.Writer.Append(string.Format("{0}_{1}_setter({2}{3})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter, m_type));
                 }
                 else
                 {
                     string objectName = "obj";
                     IEnumerable<SyntaxNode> nodes = name.ChildNodes();
                     if (nodes.Count() > 1)
-                    {
-                        IdentifierNameSyntax identifier = nodes.First() as IdentifierNameSyntax;
-                        objectName = m_context.TypeConvert.ConvertVariableName(identifier);
-                    }
+                        objectName = m_context.TypeConvert.ConvertVariableName(nodes.First());
 
                     getter = string.Format("{0}_{1}_getter({2})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, objectName);
-
-                    // Set future value in post code
-                    if (isPost)
-                        m_context.Writer.CurrentDestination = WriterDestination.PostBuffer;
-
-                    m_context.Writer.Append(string.Format("{0}_{1}_setter({4}, {2}{3})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter, type, objectName));
+                    m_context.Writer.Append(string.Format("{0}_{1}_setter({4}, {2}{3})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter, m_type, objectName));
                 }
+                
+                if (m_isPost)
+                    m_context.Writer.CurrentDestination = originalDestination;
+
+                if (doFutureValue)
+                    m_context.Writer.Append(string.Format("{0}", getter));
             }
+            // Variable
             else
             {
-                WriterDestination destination2 = m_context.Writer.CurrentDestination;
+                WriterDestination destinationVariable = m_context.Writer.CurrentDestination;
                 m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
                 m_context.Generators.Expression.Generate(name);
-                getter = m_context.Writer.FlushTempBuffer();
-                m_context.Writer.CurrentDestination = destination2;
-
-                if (isPost)
-                    m_context.Writer.CurrentDestination = WriterDestination.PostBuffer;
-
-                m_context.Writer.Append(string.Format("{0} = {0}{1}", getter, type));
+                string variable = m_context.Writer.FlushTempBuffer();
+                m_context.Writer.CurrentDestination = destinationVariable;
+                
+                if (m_isPost)
+                    m_context.Writer.Append(string.Format("{0}{1}", variable, m_shortType));
+                else
+                    m_context.Writer.Append(string.Format("{1}{0}", variable, m_shortType));
             }
-
-            // Reset destination
-            if (isPost)
-            {
-                m_context.Writer.CurrentDestination = destination;
-            }
-
-            if (m_context.Writer.ShouldOutputPost)
-                m_context.Writer.Append(getter);
-            else
-                m_context.Writer.AppendLine(string.Format("{0}", m_context.Writer.FlushPostBuffer()));
         }
     }
 }

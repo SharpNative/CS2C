@@ -106,9 +106,7 @@ namespace LibCS2C.Generators
                 }
                 else if (m_context.Generators.Expression.IsSubExpression(kind))
                 {
-                    m_context.Writer.ShouldOutputPost = true;
                     m_context.Generators.Expression.Generate(child.AsNode());
-                    m_context.Writer.ShouldOutputPost = false;
                 }
                 else
                 {

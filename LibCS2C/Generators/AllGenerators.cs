@@ -48,6 +48,7 @@ namespace LibCS2C.Generators
         public StructGenerator Struct { get; private set; }
         public AssignmentGenerator SubstractAssignment { get; private set; }
         public SwitchStatementGenerator SwitchStatement { get; private set; }
+        public checkedStatementGenerator checkedStatement { get; private set; }
         public VariableGenerator Variable { get; private set; }
         public WhileStatementGenerator WhileStatement { get; private set; }
 
@@ -101,6 +102,7 @@ namespace LibCS2C.Generators
             Struct = new StructGenerator(context);
             SubstractAssignment = new AssignmentGenerator(context, AssignmentType.Substract);
             SwitchStatement = new SwitchStatementGenerator(context);
+            checkedStatement = new checkedStatementGenerator(context);
             Variable = new VariableGenerator(context);
             WhileStatement = new WhileStatementGenerator(context);
         }

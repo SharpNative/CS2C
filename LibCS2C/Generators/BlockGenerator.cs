@@ -107,6 +107,11 @@ namespace LibCS2C.Generators
                     m_context.Generators.LabeledStatement.Generate(childNode as LabeledStatementSyntax);
                     break;
 
+                case SyntaxKind.CheckedStatement:
+                case SyntaxKind.UncheckedStatement:
+                    m_context.Generators.checkedStatement.Generate(childNode as CheckedStatementSyntax);
+                    break;
+
                 default:
                     throw new NotImplementedException();
             }

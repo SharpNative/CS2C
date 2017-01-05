@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -51,18 +50,13 @@ namespace LibCS2C.Generators
                 {
                     return "(void*)obj";
                 }
-                // member.member
-                else if (firstChildKind == SyntaxKind.SimpleMemberAccessExpression)
+                else
                 {
                     WriterDestination destination = m_context.Writer.CurrentDestination;
                     m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
-                    m_context.Generators.SimpleMemberAccess.Generate(firstChild as MemberAccessExpressionSyntax);
+                    m_context.Generators.Expression.Generate(firstChild as ExpressionSyntax);
                     m_context.Writer.CurrentDestination = destination;
                     return m_context.Writer.FlushTempBuffer();
-                }
-                else
-                {
-                    throw new NotImplementedException();
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -52,19 +53,22 @@ namespace LibCS2C.Context
             string className = currentClassName;
 
             TypeDeclarationSyntax parent = method.Parent as TypeDeclarationSyntax;
+            bool found = false;
             if (parent.BaseList != null)
             {
                 IEnumerable<SyntaxNode> children = parent.BaseList.ChildNodes();
-
-                bool found = false;
+                
                 foreach (SimpleBaseTypeSyntax child in children)
                 {
                     IdentifierNameSyntax identifier = child.ChildNodes().First() as IdentifierNameSyntax;
+
                     ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(identifier).Type;
 
                     ImmutableArray<ISymbol> members = typeSymbol.GetMembers();
                     foreach (ISymbol member in members)
                     {
+                        Console.WriteLine(member.Name + " | " + method.Identifier.ToString());
+
                         if (member.Name == method.Identifier.ToString())
                         {
                             className = string.Format("{0}_{1}", typeSymbol.ContainingNamespace.ToString().Replace('.', '_'), typeSymbol.Name);
@@ -72,16 +76,16 @@ namespace LibCS2C.Context
                             break;
                         }
                     }
-
-                    if (found)
-                        break;
                 }
             }
+
+            if (!found)
+                return;
             
             if (!m_methods.ContainsKey(className))
                 m_methods.Add(className, new List<string>());
 
-            if(!m_methodsPerClass.ContainsKey(currentClassName))
+            if (!m_methodsPerClass.ContainsKey(currentClassName))
                 m_methodsPerClass.Add(currentClassName, new List<string>());
 
             m_methods[className].Add(str);

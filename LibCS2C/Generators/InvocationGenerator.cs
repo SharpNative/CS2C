@@ -130,7 +130,7 @@ namespace LibCS2C.Generators
 
                         if (useFunctionPointer)
                         {
-                            m_context.Writer.Append(string.Format("((fp_{0})({2}->lookup_table[{1}])", prototype, m_context.MethodTable.GetID(lookFor, methodDeclaration), GenerateObjectPart(first)));
+                            m_context.Writer.Append(string.Format("((fp_{0})({1}->lookup_table[{2}])", prototype, GenerateObjectPart(first), m_context.MethodTable.GetID(lookFor, methodDeclaration)));
                         }
                         else
                         {

@@ -29,9 +29,6 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine(m_context.TypeConvert.CurrentClassStructName);
             m_context.Writer.AppendLine("{");
 
-            // Usage count for garbage collector
-            m_context.Writer.AppendLine("\tint32_t usage_count;");
-
             // For method lookup
             m_context.Writer.AppendLine("\tvoid** lookup_table;");
 

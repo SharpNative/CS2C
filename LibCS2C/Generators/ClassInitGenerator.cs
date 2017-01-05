@@ -1,10 +1,6 @@
 ﻿using LibCS2C.Context;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -44,10 +40,7 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine(string.Format("\t{0}* object = calloc(1, sizeof({0}));", m_context.TypeConvert.CurrentClassStructName));
             m_context.Writer.AppendLine("\tif(!object)");
             m_context.Writer.AppendLine("\t\treturn NULL;");
-
-            // For the garbage collector
-            m_context.Writer.AppendLine("\tobject->usage_count = 1;");
-
+            
             // For indirect function calls
             m_context.Writer.AppendLine(string.Format("\tobject->lookup_table = methods_{0};", m_context.TypeConvert.CurrentClassNameFormatted));
 

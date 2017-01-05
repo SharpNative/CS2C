@@ -28,7 +28,6 @@ namespace LibCS2C.Generators
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("struct base_class");
             sb.AppendLine("{");
-            sb.AppendLine("\tint32_t usage_count;");
             sb.AppendLine("\tvoid** lookup_table;");
             sb.AppendLine("};");
             return sb.ToString();

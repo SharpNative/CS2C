@@ -26,7 +26,7 @@ namespace LibCS2C.Compiler
             // Loop through each file of the project
             foreach (Document document in project.Documents)
             {
-                Console.WriteLine("File: " + document.Name);
+                Console.WriteLine("Process file: " + document.Name);
 
                 walker.SetDocument(document);
 
@@ -34,9 +34,6 @@ namespace LibCS2C.Compiler
                 SyntaxTree tree = document.GetSyntaxTreeAsync().Result;
                 SyntaxNode node = tree.GetRoot();
                 walker.Visit(node);
-
-                Console.WriteLine("End of file: " + document.Name);
-                Console.WriteLine("------------");
             }
             
             return walker.ToString();

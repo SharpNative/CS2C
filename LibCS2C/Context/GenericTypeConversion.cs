@@ -12,7 +12,7 @@ namespace LibCS2C.Context
         {
             { "void", "void" },
 
-            { "bool", "int32_t" },
+            { "bool", "bool_t" },
             { "long", "int64_t" },
             { "ulong", "uint64_t" },
             { "int", "int32_t" },
@@ -26,7 +26,7 @@ namespace LibCS2C.Context
             { "double", "double" },
 
             { "char", "char" },
-            { "string", "char*" },
+            { "string", "string_t" },
 
             { "Action", "action_t" },
             { "object", "object_t" },
@@ -44,7 +44,7 @@ namespace LibCS2C.Context
             { "Int16", "int16_t" },
             { "Int32", "int32_t" },
             { "Int64", "int64_t" },
-            { "Boolean", "int32_t" },
+            { "Boolean", "bool_t" },
             { "Byte", "uint8_t" }
         };
 

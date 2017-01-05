@@ -53,17 +53,13 @@ namespace LibCS2C.Generators
                     {
                         objName = m_context.TypeConvert.ConvertVariableName(firstChild);
                     }
-                    else if (firstChildKind == SyntaxKind.ElementAccessExpression)
+                    else
                     {
                         WriterDestination destination = m_context.Writer.CurrentDestination;
                         m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
-                        m_context.Generators.ElementAccess.Generate(firstChild as ElementAccessExpressionSyntax);
+                        m_context.Generators.Expression.Generate(firstChild as ExpressionSyntax);
                         m_context.Writer.CurrentDestination = destination;
                         objName = m_context.Writer.FlushTempBuffer();
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
                     }
                 }
                 

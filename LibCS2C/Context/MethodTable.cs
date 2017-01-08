@@ -67,8 +67,6 @@ namespace LibCS2C.Context
                     ImmutableArray<ISymbol> members = typeSymbol.GetMembers();
                     foreach (ISymbol member in members)
                     {
-                        Console.WriteLine(member.Name + " | " + method.Identifier.ToString());
-
                         if (member.Name == method.Identifier.ToString())
                         {
                             className = string.Format("{0}_{1}", typeSymbol.ContainingNamespace.ToString().Replace('.', '_'), typeSymbol.Name);

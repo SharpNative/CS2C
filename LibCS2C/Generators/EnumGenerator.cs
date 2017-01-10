@@ -1,7 +1,9 @@
 ﻿using LibCS2C.Context;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace LibCS2C.Generators
 {
@@ -28,11 +30,18 @@ namespace LibCS2C.Generators
             bool insideClass = (node.Parent is ClassDeclarationSyntax);
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
 
+            string lastValue = "0";
             foreach (EnumMemberDeclarationSyntax child in nodes)
             {
+                // Enum values are always ints
                 string identifier = child.Identifier.ToString();
-                ExpressionSyntax value = child.EqualsValue.Value;
+                string currentValue = lastValue;
+                if (child.EqualsValue != null)
+                {
+                    currentValue = lastValue = child.EqualsValue.Value.ToString();
+                }
 
+                lastValue += "+1";
                 if (insideClass)
                     m_context.Writer.Append(string.Format("#define enum_{0}_{1}_{2}", m_context.TypeConvert.CurrentClassNameFormatted, node.Identifier, identifier));
                 else
@@ -40,7 +49,7 @@ namespace LibCS2C.Generators
 
                 m_context.Writer.Append(" (");
                 m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
-                m_context.Generators.Expression.Generate(value);
+                m_context.Writer.Append(currentValue.ToString());
                 m_context.Writer.CurrentDestination = WriterDestination.Defines;
                 m_context.Writer.Append(m_context.Writer.FlushTempBuffer());
                 m_context.Writer.AppendLine(")");

@@ -100,13 +100,9 @@ namespace LibCS2C.Generators
                     if (!first || !isProperty)
                         m_context.Generators.Expression.Generate(child.AsNode());
                 }
-                else if (m_context.Generators.Expression.IsSubExpression(kind))
-                {
-                    m_context.Generators.Expression.Generate(child.AsNode());
-                }
                 else
                 {
-                    m_context.Writer.Append(child.ToString());
+                    m_context.Generators.Expression.Generate(child.AsNode());
                 }
 
                 first = false;

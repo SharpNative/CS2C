@@ -25,7 +25,7 @@ namespace LibCS2C.Generators
         /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
-            string methodPrototype = string.Format("{0}* classInit_{1}_{2}(void)", m_context.TypeConvert.CurrentClassStructName, m_context.TypeConvert.CurrentNamespaceFormatted, node.Identifier);
+            string methodPrototype = string.Format("void* classInit_{0}_{1}(void)", m_context.TypeConvert.CurrentNamespaceFormatted, node.Identifier);
 
             // Method prototype
             m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
@@ -38,8 +38,7 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine(methodPrototype);
             m_context.Writer.AppendLine("{");
             m_context.Writer.AppendLine(string.Format("\t{0}* object = calloc(1, sizeof({0}));", m_context.TypeConvert.CurrentClassStructName));
-            m_context.Writer.AppendLine("\tif(!object)");
-            m_context.Writer.AppendLine("\t\treturn NULL;");
+            m_context.Writer.AppendLine("\tif(!object) return NULL;");
             
             // For indirect function calls
             m_context.Writer.AppendLine(string.Format("\tobject->lookup_table = methods_{0};", m_context.TypeConvert.CurrentClassNameFormatted));

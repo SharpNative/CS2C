@@ -3,7 +3,6 @@ using LibCS2C.Context;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -128,7 +127,6 @@ namespace LibCS2C.Generators
         public override void Generate(BaseMethodDeclarationSyntax node)
         {
             SyntaxToken identifier = default(SyntaxToken);
-            string returnType;
             string methodPrototype = "";
 
             bool isInsideClass = (node.Parent.Kind() == SyntaxKind.ClassDeclaration);
@@ -140,14 +138,13 @@ namespace LibCS2C.Generators
             {
                 ConstructorDeclarationSyntax nodeTyped = node as ConstructorDeclarationSyntax;
                 identifier = nodeTyped.Identifier;
-                returnType = m_context.TypeConvert.CurrentClassStructName + "*";
-                methodPrototype = string.Format("{0} {1}", returnType, CreateMethodPrototype(node, true, false));
+                methodPrototype = string.Format("void* {0}", CreateMethodPrototype(node, true, false));
             }
             else
             {
                 MethodDeclarationSyntax nodeTyped = node as MethodDeclarationSyntax;
                 identifier = nodeTyped.Identifier;
-                returnType = m_context.ConvertTypeName(nodeTyped.ReturnType);
+                string returnType = m_context.ConvertTypeName(nodeTyped.ReturnType);
 
                 methodTypedef = string.Format("typedef {0} {1}", returnType, CreateMethodPrototype(node, true, true));
                 if (isInsideClass)

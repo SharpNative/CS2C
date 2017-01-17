@@ -28,7 +28,7 @@ namespace LibCS2C.Generators
             m_context.Writer.CurrentDestination = WriterDestination.Defines;
 
             bool insideClass = (node.Parent is ClassDeclarationSyntax);
-            IEnumerable<SyntaxNode> nodes = node.ChildNodes();
+            SeparatedSyntaxList<EnumMemberDeclarationSyntax> nodes = node.Members;
 
             string lastValue = "0";
             foreach (EnumMemberDeclarationSyntax child in nodes)

@@ -1,12 +1,5 @@
 ﻿using LibCS2C.Context;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -29,7 +22,7 @@ namespace LibCS2C.Generators
         {
             m_context.Writer.Append("if((");
             m_context.Generators.Expression.Generate(node.Expression);
-            m_context.Writer.Append(") != null)");
+            m_context.Writer.Append(") != NULL)");
 
             m_context.Writer.AppendLine("{");
             m_context.Writer.Indent();

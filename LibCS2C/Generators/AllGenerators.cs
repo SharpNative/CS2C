@@ -8,6 +8,7 @@ namespace LibCS2C.Generators
         public AddressOfExpressionGenerator AddressOfExpression { get; private set; }
         public ArgumentListGenerator ArgumentList { get; private set; }
         public ArrayCreationExpressionGenerator ArrayCreationExpression { get; private set; }
+        public ArrayInitializerGenerator ArrayInitializerExpression { get; private set; }
         public AssignmentGenerator BinaryAndAssignment { get; private set; }
         public AssignmentGenerator BinaryOrAssignment { get; private set; }
         public BlockGenerator Block { get; private set; }
@@ -62,6 +63,7 @@ namespace LibCS2C.Generators
             AddressOfExpression = new AddressOfExpressionGenerator(context);
             ArgumentList = new ArgumentListGenerator(context);
             ArrayCreationExpression = new ArrayCreationExpressionGenerator(context);
+            ArrayInitializerExpression = new ArrayInitializerGenerator(context);
             BinaryAndAssignment = new AssignmentGenerator(context, AssignmentType.BinaryAnd);
             BinaryOrAssignment = new AssignmentGenerator(context, AssignmentType.BinaryOr);
             Block = new BlockGenerator(context);

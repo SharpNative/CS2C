@@ -95,7 +95,7 @@ namespace LibCS2C.Generators
                     break;
 
                 case SyntaxKind.ModuloAssignmentExpression:
-
+                    m_context.Generators.ModuloAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
 
                 case SyntaxKind.LessThanExpression:
@@ -181,6 +181,22 @@ namespace LibCS2C.Generators
                     m_context.Writer.Append("obj");
                     break;
                     
+                case SyntaxKind.TrueLiteralExpression:
+                    m_context.Writer.Append("1");
+                    break;
+
+                case SyntaxKind.FalseLiteralExpression:
+                    m_context.Writer.Append("0");
+                    break;
+
+                case SyntaxKind.NullLiteralExpression:
+                    m_context.Writer.Append("NULL");
+                    break;
+
+                case SyntaxKind.ArrayInitializerExpression:
+                    m_context.Generators.ArrayInitializerExpression.Generate(node as InitializerExpressionSyntax);
+                    break;
+
                 default:
                     m_context.Writer.Append(node.ToString());
                     break;

@@ -24,7 +24,9 @@ namespace LibCS2C.Generators
         /// <param name="node">The expression node</param>
         public override void Generate(SyntaxNode node)
         {
-            switch (node.Kind())
+            SyntaxKind kind = node.Kind();
+
+            switch (kind)
             {
                 case SyntaxKind.ArrayCreationExpression:
                     m_context.Generators.ArrayCreationExpression.Generate(node as ArrayCreationExpressionSyntax);
@@ -85,7 +87,7 @@ namespace LibCS2C.Generators
                 case SyntaxKind.SubtractAssignmentExpression:
                     m_context.Generators.SubstractAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
-                    
+
                 case SyntaxKind.MultiplyAssignmentExpression:
                     m_context.Generators.MultiplyAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
@@ -98,55 +100,8 @@ namespace LibCS2C.Generators
                     m_context.Generators.ModuloAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
 
-                case SyntaxKind.LessThanExpression:
-                case SyntaxKind.GreaterThanExpression:
-                case SyntaxKind.LessThanOrEqualExpression:
-                case SyntaxKind.GreaterThanOrEqualExpression:
-                case SyntaxKind.EqualsExpression:
-                case SyntaxKind.NotEqualsExpression:
-                case SyntaxKind.AddExpression:
-                case SyntaxKind.SubtractExpression:
-                case SyntaxKind.MultiplyExpression:
-                case SyntaxKind.DivideExpression:
-                case SyntaxKind.ParenthesizedExpression:
-                case SyntaxKind.BitwiseAndExpression:
-                case SyntaxKind.BitwiseNotExpression:
-                case SyntaxKind.BitwiseOrExpression:
-                case SyntaxKind.LogicalAndExpression:
-                case SyntaxKind.LogicalNotExpression:
-                case SyntaxKind.LogicalOrExpression:
-                case SyntaxKind.ConditionalExpression:
-                case SyntaxKind.ModuloExpression:
-                case SyntaxKind.RightShiftExpression:
-                case SyntaxKind.LeftShiftExpression:
-                case SyntaxKind.UnaryMinusExpression:
-                case SyntaxKind.UnaryPlusExpression:
-                case SyntaxKind.PointerIndirectionExpression:
-                case SyntaxKind.StringLiteralExpression:
-                    ChildSyntaxList children = node.ChildNodesAndTokens();
-                    foreach (SyntaxNodeOrToken child in children)
-                    {
-                        SyntaxKind childKind = child.Kind();
-
-                        if (child.IsToken)
-                        {
-                            m_context.Writer.Append(" " + child + " ");
-                        }
-                        else
-                        {
-                            Generate(child.AsNode());
-                        }
-                    }
-                    break;
-
                 case SyntaxKind.IdentifierName:
-                    ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
-                    ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(node).Type;
-                    
-                    if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
-                        m_context.Writer.Append("obj->");
-                    
-                    m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(node));
+                    m_context.Generators.IdentifierName.Generate(node as IdentifierNameSyntax);
                     break;
 
                 case SyntaxKind.CastExpression:
@@ -160,7 +115,7 @@ namespace LibCS2C.Generators
                 case SyntaxKind.PostDecrementExpression:
                     m_context.Generators.PostDecrementExpression.Generate(node as ExpressionSyntax);
                     break;
-                
+
                 case SyntaxKind.PostIncrementExpression:
                     m_context.Generators.PostIncrementExpression.Generate(node as ExpressionSyntax);
                     break;
@@ -180,7 +135,7 @@ namespace LibCS2C.Generators
                 case SyntaxKind.ThisExpression:
                     m_context.Writer.Append("obj");
                     break;
-                    
+
                 case SyntaxKind.TrueLiteralExpression:
                     m_context.Writer.Append("1");
                     break;
@@ -198,7 +153,28 @@ namespace LibCS2C.Generators
                     break;
 
                 default:
-                    m_context.Writer.Append(node.ToString());
+                    if (IsSubExpression(kind) || IsLiteralExpression(kind))
+                    {
+                        ChildSyntaxList children = node.ChildNodesAndTokens();
+                        foreach (SyntaxNodeOrToken child in children)
+                        {
+                            SyntaxKind childKind = child.Kind();
+
+                            if (child.IsToken)
+                            {
+                                m_context.Writer.Append(child.ToString());
+                            }
+                            else
+                            {
+                                Generate(child.AsNode());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new NotImplementedException("Unknown SyntaxKind in Expression: " + node.Kind());
+                    }
+
                     break;
             }
         }
@@ -210,7 +186,7 @@ namespace LibCS2C.Generators
         /// <returns>If it's a sub expression</returns>
         public bool IsSubExpression(SyntaxKind kind)
         {
-            SyntaxKind[] kinds = { SyntaxKind.AddExpression, SyntaxKind.CastExpression, SyntaxKind.SubtractExpression, SyntaxKind.MultiplyExpression, SyntaxKind.DivideExpression, SyntaxKind.BitwiseAndExpression, SyntaxKind.BitwiseNotExpression, SyntaxKind.BitwiseOrExpression, SyntaxKind.EqualsExpression, SyntaxKind.NotEqualsExpression, SyntaxKind.ElementAccessExpression, SyntaxKind.LessThanExpression, SyntaxKind.LessThanOrEqualExpression, SyntaxKind.GreaterThanExpression, SyntaxKind.GreaterThanOrEqualExpression, SyntaxKind.ParenthesizedExpression, SyntaxKind.SimpleMemberAccessExpression, SyntaxKind.SimpleAssignmentExpression, SyntaxKind.ObjectCreationExpression, SyntaxKind.ArrayCreationExpression, SyntaxKind.AddressOfExpression, SyntaxKind.InvocationExpression, SyntaxKind.LogicalAndExpression, SyntaxKind.LogicalNotExpression, SyntaxKind.LogicalOrExpression, SyntaxKind.ConditionalExpression, SyntaxKind.PointerMemberAccessExpression, SyntaxKind.RightShiftExpression, SyntaxKind.LeftShiftExpression, SyntaxKind.PreDecrementExpression, SyntaxKind.PreIncrementExpression, SyntaxKind.PostDecrementExpression, SyntaxKind.PostIncrementExpression, SyntaxKind.UnaryMinusExpression, SyntaxKind.UnaryPlusExpression, SyntaxKind.ModuloExpression, SyntaxKind.PointerIndirectionExpression, SyntaxKind.StringLiteralExpression, SyntaxKind.ThisExpression };
+            SyntaxKind[] kinds = { SyntaxKind.AddExpression, SyntaxKind.CastExpression, SyntaxKind.SubtractExpression, SyntaxKind.MultiplyExpression, SyntaxKind.DivideExpression, SyntaxKind.BitwiseAndExpression, SyntaxKind.BitwiseNotExpression, SyntaxKind.BitwiseOrExpression, SyntaxKind.EqualsExpression, SyntaxKind.NotEqualsExpression, SyntaxKind.ElementAccessExpression, SyntaxKind.LessThanExpression, SyntaxKind.LessThanOrEqualExpression, SyntaxKind.GreaterThanExpression, SyntaxKind.GreaterThanOrEqualExpression, SyntaxKind.ParenthesizedExpression, SyntaxKind.SimpleMemberAccessExpression, SyntaxKind.SimpleAssignmentExpression, SyntaxKind.ObjectCreationExpression, SyntaxKind.ArrayCreationExpression, SyntaxKind.AddressOfExpression, SyntaxKind.InvocationExpression, SyntaxKind.LogicalAndExpression, SyntaxKind.LogicalNotExpression, SyntaxKind.LogicalOrExpression, SyntaxKind.ConditionalExpression, SyntaxKind.PointerMemberAccessExpression, SyntaxKind.RightShiftExpression, SyntaxKind.LeftShiftExpression, SyntaxKind.PreDecrementExpression, SyntaxKind.PreIncrementExpression, SyntaxKind.PostDecrementExpression, SyntaxKind.PostIncrementExpression, SyntaxKind.UnaryMinusExpression, SyntaxKind.UnaryPlusExpression, SyntaxKind.ModuloExpression, SyntaxKind.PointerIndirectionExpression, SyntaxKind.ThisExpression, SyntaxKind.ArrayType };
             return kinds.Contains(kind);
         }
 
@@ -221,7 +197,7 @@ namespace LibCS2C.Generators
         /// <returns>If it's a literal expression</returns>
         public bool IsLiteralExpression(SyntaxKind kind)
         {
-            SyntaxKind[] kinds = { SyntaxKind.CharacterLiteralExpression, SyntaxKind.FalseLiteralExpression, SyntaxKind.TrueLiteralExpression, SyntaxKind.StringLiteralExpression, SyntaxKind.NumericLiteralExpression, SyntaxKind.NullLiteralExpression, SyntaxKind.ArrayInitializerExpression };
+            SyntaxKind[] kinds = { SyntaxKind.CharacterLiteralExpression, SyntaxKind.NullLiteralExpression, SyntaxKind.FalseLiteralExpression, SyntaxKind.TrueLiteralExpression, SyntaxKind.StringLiteralExpression, SyntaxKind.NumericLiteralExpression, SyntaxKind.NullLiteralExpression, SyntaxKind.ArrayInitializerExpression };
             return kinds.Contains(kind);
         }
     }

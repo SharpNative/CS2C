@@ -40,13 +40,9 @@ namespace LibCS2C.Generators
                 else
                     m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(node));
             }
-            else if (m_context.Generators.Expression.IsSubExpression(firstKind))
-            {
-                m_context.Generators.Expression.Generate(node);
-            }
             else
             {
-                throw new NotImplementedException();
+                m_context.Generators.Expression.Generate(node);
             }
         }
 

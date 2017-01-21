@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using LibCS2C.Context;
 
-namespace LibCS2C.Compiler
+namespace LibCS2C.Compilation
 {
     public class SyntaxWalker : CSharpSyntaxWalker
     {

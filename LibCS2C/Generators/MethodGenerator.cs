@@ -1,4 +1,4 @@
-﻿using LibCS2C.Compiler;
+﻿using LibCS2C.Compilation;
 using LibCS2C.Context;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -90,7 +90,7 @@ namespace LibCS2C.Generators
                     argumentBuilder.Append(", ");
             }
 
-            // TODO: out and ref
+            // Parameters
             foreach (ParameterSyntax paramNode in paramNodes)
             {
                 string typeName = m_context.ConvertTypeName(paramNode.Type);

@@ -3,6 +3,7 @@ using Microsoft.Build.Utilities;
 using System;
 using System.Diagnostics;
 using System.IO;
+using LibCS2C.Compilation;
 
 namespace LibCS2C.Tasks
 {
@@ -65,24 +66,30 @@ namespace LibCS2C.Tasks
             }
         }
 
+        /// <summary>
+        /// Executes the compiler
+        /// </summary>
+        /// <returns>If the compilation was successful</returns>
         public override bool Execute()
         {
             // Log a high-importance comment
-            Log.LogMessage(MessageImportance.High,
-                "CS2C Compiler: starting compiling \"" + Path + "\".");
+            Log.LogMessage(MessageImportance.High, "CS2C Compiler: Compiling project \"" + Path + "\".");
 
+            Compiler compiler = new Compiler();
             try
             {
-                var output = Compiler.Compiler.CompileProject(Path);
+                string output = compiler.CompileProject(Path);
 
+                // Create output directory if it doesn't exist
                 string outDir = System.IO.Path.GetDirectoryName(Outpath);
-
                 if (!Directory.Exists(outDir))
                     Directory.CreateDirectory(outDir);
 
+                // Contents
                 File.WriteAllText(m_outputpath, output);
 
-                if(m_afterbuildcommand != null)
+                // Command after building is done
+                if (m_afterbuildcommand != null)
                 {
                     Log.LogMessage(MessageImportance.High, "Running after build command " + m_afterbuildcommand);
 
@@ -95,9 +102,12 @@ namespace LibCS2C.Tasks
 
                 Log.LogMessage(MessageImportance.High, "Finished compiling");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Log.LogErrorFromException(e);
+                Log.LogError("StackTrace: " + e.StackTrace);
+                Log.LogError("Error occurred in file: " + compiler.CurrentDocumentName);
+                return false;
             }
 
             return true;

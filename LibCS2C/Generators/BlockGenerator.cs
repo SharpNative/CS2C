@@ -90,11 +90,7 @@ namespace LibCS2C.Generators
                     break;
 
                 case SyntaxKind.IdentifierName:
-                    ISymbol symbol = m_context.Model.GetSymbolInfo(childNode).Symbol;
-                    if (symbol.Kind == SymbolKind.Field && !symbol.IsStatic)
-                        m_context.Writer.Append("obj->");
-                    
-                    m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(childNode));
+                    m_context.Generators.IdentifierName.Generate(childNode as IdentifierNameSyntax);
                     semiColonNeeded = false;
                     break;
 
@@ -113,7 +109,7 @@ namespace LibCS2C.Generators
                     break;
 
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException("Unknown SyntaxKind in Block: " + childNode.Kind());
             }
 
             // At the end of the line

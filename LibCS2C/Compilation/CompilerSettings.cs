@@ -1,4 +1,4 @@
-﻿namespace LibCS2C.Compiler
+﻿namespace LibCS2C.Compilation
 {
     class CompilerSettings
     {

@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 
 namespace LibCS2C.Generators
@@ -53,13 +52,9 @@ namespace LibCS2C.Generators
 
                     m_context.Writer.Append("]");
                 }
-                else if (m_context.Generators.Expression.IsSubExpression(kind))
-                {
-                    m_context.Generators.Expression.Generate(child);
-                }
                 else
                 {
-                    throw new NotImplementedException();
+                    m_context.Generators.Expression.Generate(child);
                 }
             }
 

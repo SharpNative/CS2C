@@ -90,7 +90,18 @@ namespace LibCS2C.Generators
                 }
             }
 
-            m_context.Writer.AppendLine(string.Format("\t{0} {1};", typeName, name));
+            // Check for extra modifiers
+            IEnumerable<SyntaxToken> tokens = type.Parent.Parent.ChildTokens();
+            foreach (SyntaxToken token in tokens)
+            {
+                if (token.Kind() == SyntaxKind.VolatileKeyword)
+                {
+                    m_context.Writer.Append("volatile ");
+                    break;
+                }
+            }
+
+            m_context.Writer.AppendLine(string.Format("{0} {1};", typeName, name));
         }
 
         /// <summary>
@@ -120,7 +131,7 @@ namespace LibCS2C.Generators
             // Initializers
             m_context.Writer.AppendLine(" = {");
             m_context.Writer.Indent();
-            
+
             GenerateInitializer(m_classCode.staticFieldTypes, m_classCode.staticFields);
             GenerateInitializer(m_classCode.propertyTypesStatic, m_classCode.propertyInitialValuesStatic);
 

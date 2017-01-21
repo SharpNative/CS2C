@@ -1,4 +1,6 @@
 ﻿using LibCS2C.Context;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 
@@ -30,16 +32,27 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine("{");
 
             // For method lookup at runtime
-            m_context.Writer.AppendLine("\tvoid** lookup_table;");
+            m_context.Writer.AppendLine("void** lookup_table;");
 
             foreach (KeyValuePair<string, TypeSyntax> pair in m_classCode.nonStaticFieldTypes)
             {
-                m_context.Writer.AppendLine(string.Format("\t{0} field_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
+                // Check for extra modifiers
+                IEnumerable<SyntaxToken> tokens = pair.Value.Parent.Parent.ChildTokens();
+                foreach (SyntaxToken token in tokens)
+                {
+                    if (token.Kind() == SyntaxKind.VolatileKeyword)
+                    {
+                        m_context.Writer.Append("volatile ");
+                        break;
+                    }
+                }
+
+                m_context.Writer.AppendLine(string.Format("{0} field_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
 
             foreach (KeyValuePair<string, TypeSyntax> pair in m_classCode.propertyTypesNonStatic)
             {
-                m_context.Writer.AppendLine(string.Format("\t{0} prop_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
+                m_context.Writer.AppendLine(string.Format("{0} prop_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
             
             m_context.Writer.AppendLine("};");

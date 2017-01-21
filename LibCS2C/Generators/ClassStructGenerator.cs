@@ -29,7 +29,7 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine(m_context.TypeConvert.CurrentClassStructName);
             m_context.Writer.AppendLine("{");
 
-            // For method lookup
+            // For method lookup at runtime
             m_context.Writer.AppendLine("\tvoid** lookup_table;");
 
             foreach (KeyValuePair<string, TypeSyntax> pair in m_classCode.nonStaticFieldTypes)
@@ -41,9 +41,8 @@ namespace LibCS2C.Generators
             {
                 m_context.Writer.AppendLine(string.Format("\t{0} prop_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
-
+            
             m_context.Writer.AppendLine("};");
-            m_context.Writer.AppendLine("");
 
             m_context.Writer.CurrentDestination = WriterDestination.StructPrototypes;
             m_context.Writer.AppendLine(string.Format("{0};", m_context.TypeConvert.CurrentClassStructName));

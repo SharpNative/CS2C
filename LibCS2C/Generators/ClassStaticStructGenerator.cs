@@ -5,8 +5,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -40,7 +38,7 @@ namespace LibCS2C.Generators
                 {
                     ExpressionSyntax expression = value.Value;
 
-                    // If it's a literal, we can initialize it safely
+                    // If it's a literal, we can initialize it safely inside the struct
                     if (m_context.Generators.Expression.IsLiteralExpression(expression.Kind()))
                     {
                         m_context.Generators.Expression.Generate(expression);
@@ -55,7 +53,7 @@ namespace LibCS2C.Generators
                 else
                 {
                     // Uninitialized for now
-                    // C wants {0} for structs instead of 0
+                    // About C: if a struct should be initialized to zeroes, we need {0} instead of 0
                     ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(pair.Value).Type;
                     if (!m_context.GenericTypeConvert.IsGeneric(pair.Value) && typeSymbol.TypeKind == TypeKind.Struct)
                     {

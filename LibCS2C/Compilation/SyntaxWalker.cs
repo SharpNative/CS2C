@@ -123,7 +123,7 @@ namespace LibCS2C.Compilation
             sb.AppendLine(m_context.Writer.SbDelegates.ToString());
             sb.AppendLine(m_context.Writer.SbStructs.ToString());
             sb.AppendLine(m_context.Writer.SbClassStructs.ToString());
-            sb.AppendLine(m_context.Generators.ClassCode.CreateBaseClassStruct());
+            sb.AppendLine(m_context.Generators.ClassCode.GetBaseClassCode());
             sb.AppendLine(m_context.Writer.SbMethodPrototypes.ToString());
             sb.AppendLine(m_context.MethodTable.ToPrototypeArrayCode());
             sb.AppendLine(m_context.Writer.SbMethodDeclarations.ToString());

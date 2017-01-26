@@ -57,7 +57,7 @@ namespace LibCS2C.Generators
             SyntaxNodeOrToken[] children = node.ChildNodesAndTokens().ToArray();
 
             // Check if it's a constant-defined value
-            bool isDefined = (symbolType.TypeKind == TypeKind.Enum);
+            bool isDefined = (symbolType != null && symbolType.TypeKind == TypeKind.Enum);
             bool isConst = false;
 
             if (nodeSymbol.DeclaringSyntaxReferences.Length > 0)

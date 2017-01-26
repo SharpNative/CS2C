@@ -13,9 +13,9 @@ namespace CS_2_C
         static void Main(string[] args)
         {
             Compiler compiler = new Compiler();
-            // string output = Compiler.CompileProject(@"C:\Users\jeffr\Documents\visual studio 2015\Projects\Sharpen\kernel\Sharpen\Sharpen.csproj");
-            // string output = Compiler.CompileProject(@"C:\Users\Niels\Documents\Sharpen\kernel\Sharpen\Sharpen.csproj");
-            string output = compiler.CompileProject(@"C:\Users\Niels\Source\Repos\Sharpen\kernel\Sharpen\Sharpen.csproj");
+            // string output = compiler.CompileProject(@"C:\Users\jeffr\Documents\visual studio 2015\Projects\Sharpen\kernel\Sharpen\Sharpen.csproj");
+            string output = compiler.CompileProject(@"C:\Users\Niels\Documents\Sharpen\kernel\Sharpen\Sharpen.csproj");
+            //string output = compiler.CompileProject(@"C:\Users\Niels\Source\Repos\Sharpen\kernel\Sharpen\Sharpen.csproj");
 
             File.WriteAllText("output.c", output);
             Console.ReadLine();

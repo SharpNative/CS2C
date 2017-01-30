@@ -1,6 +1,5 @@
 ﻿using LibCS2C.Context;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 
 namespace LibCS2C.Generators
 {

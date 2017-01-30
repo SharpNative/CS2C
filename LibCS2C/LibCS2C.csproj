@@ -100,6 +100,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\Plug.cs" />
     <Compile Include="Compilation\Compiler.cs" />
     <Compile Include="Compilation\CompilerSettings.cs" />
     <Compile Include="Context\MethodTable.cs" />

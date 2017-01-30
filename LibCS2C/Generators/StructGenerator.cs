@@ -5,8 +5,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -33,29 +31,29 @@ namespace LibCS2C.Generators
             bool packed = false;
 
             SyntaxList<AttributeListSyntax> attribLists = node.AttributeLists;
-            foreach(AttributeListSyntax attribList in attribLists)
+            foreach (AttributeListSyntax attribList in attribLists)
             {
                 SeparatedSyntaxList<AttributeSyntax> attribs = attribList.Attributes;
-                foreach(AttributeSyntax attrib in attribs)
+                foreach (AttributeSyntax attrib in attribs)
                 {
                     IdentifierNameSyntax name = attrib.ChildNodes().First() as IdentifierNameSyntax;
                     string identifier = name.Identifier.ToString();
-                    
+
                     // Defines layout of the struct
-                    if(identifier.Equals("StructLayoutAttribute") || identifier.Equals("StructLayout"))
+                    if (identifier.Equals("StructLayoutAttribute") || identifier.Equals("StructLayout"))
                     {
                         SeparatedSyntaxList<AttributeArgumentSyntax> argsList = attrib.ArgumentList.Arguments;
-                        foreach(AttributeArgumentSyntax arg in argsList)
+                        foreach (AttributeArgumentSyntax arg in argsList)
                         {
                             SyntaxNode first = arg.ChildNodes().First();
                             SyntaxKind kind = first.Kind();
-                            
-                            if(kind == SyntaxKind.NameEquals)
+
+                            if (kind == SyntaxKind.NameEquals)
                             {
                                 NameEqualsSyntax nameEquals = first as NameEqualsSyntax;
                                 string nameIdentifier = nameEquals.Name.Identifier.ToString();
 
-                                if(nameIdentifier.Equals("Pack"))
+                                if (nameIdentifier.Equals("Pack"))
                                 {
                                     packed = true;
                                 }
@@ -65,7 +63,7 @@ namespace LibCS2C.Generators
                     // Unknown attribute
                     else
                     {
-                        Console.WriteLine("Unknown attribute on struct: " + identifier);
+                        throw new NotImplementedException("Unknown attribute on struct: " + identifier);
                     }
                 }
             }
@@ -107,7 +105,7 @@ namespace LibCS2C.Generators
                                                                         where a.Kind() == SyntaxKind.BracketedArgumentList
                                                                         select a).FirstOrDefault() as BracketedArgumentListSyntax;
 
-                            if(argumentList != default(BracketedArgumentListSyntax))
+                            if (argumentList != default(BracketedArgumentListSyntax))
                             {
                                 ArgumentSyntax argument = argumentList.Arguments[0];
                                 dataSuffixes.Add(identifier, "[" + argument.ToString() + "]");
@@ -115,7 +113,7 @@ namespace LibCS2C.Generators
                         }
                     }
                 }
-                else if(kind == SyntaxKind.PropertyDeclaration)
+                else if (kind == SyntaxKind.PropertyDeclaration)
                 {
                     PropertyDeclarationSyntax property = child as PropertyDeclarationSyntax;
                     string identifier = "prop_" + property.Identifier.ToString();
@@ -132,7 +130,7 @@ namespace LibCS2C.Generators
             m_context.Writer.CurrentDestination = WriterDestination.Structs;
             m_context.Writer.AppendLine(structPrototype);
             m_context.Writer.AppendLine("{");
-            
+
             foreach (KeyValuePair<string, TypeSyntax> pair in dataTypes)
             {
                 m_context.Writer.Append(string.Format("\t{0} {1}", m_context.ConvertTypeName(pair.Value), pair.Key));
@@ -142,11 +140,11 @@ namespace LibCS2C.Generators
             }
 
             // Attributes
-            if(packed)
+            if (packed)
                 m_context.Writer.AppendLine("} __attribute__((packed));");
             else
                 m_context.Writer.AppendLine("};");
-            
+
 
             // Method prototype of init code
             string methodName = string.Format("static inline struct struct_{0} structInit_{0}(void)", structName);

@@ -72,7 +72,10 @@ namespace LibCS2C.Generators
                 argumentBuilder.Append(string.Format("{0}* obj", (createType) ? "void" : m_context.TypeConvert.CurrentClassStructName));
 
                 if (paramCount > 1)
+                {
                     argumentBuilder.Append(", ");
+                    argNameBuilder.Append(", ");
+                }
             }
 
             // Parameters
@@ -87,7 +90,10 @@ namespace LibCS2C.Generators
 
                 // A comma if it's not the last parameter
                 if (paramNode != paramNodes.Last())
+                {
                     argumentBuilder.Append(", ");
+                    argNameBuilder.Append(", ");
+                }
             }
 
             // Insert void if no parameters are found

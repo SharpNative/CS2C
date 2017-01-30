@@ -1,7 +1,6 @@
 ﻿using LibCS2C.Context;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LibCS2C.Generators
 {
@@ -21,6 +20,18 @@ namespace LibCS2C.Generators
         }
 
         /// <summary>
+        /// Checks if we need to generator Cctor code
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <returns>If we need Cctor code</returns>
+        private bool needCctorCode(EqualsValueClauseSyntax value)
+        {
+            // If it's a literal expression, it is already in the struct initializer
+            ExpressionSyntax expression = value.Value;
+            return !m_context.Generators.Expression.IsLiteralExpression(expression.Kind());
+        }
+
+        /// <summary>
         /// Generates the initializer
         /// </summary>
         /// <param name="className">The converted class name</param>
@@ -28,15 +39,12 @@ namespace LibCS2C.Generators
         /// <param name="value">The value</param>
         private void GenerateInitializer(string className, string name, EqualsValueClauseSyntax value)
         {
-            ExpressionSyntax expression = value.Value;
+            if (!needCctorCode(value))
+                return;
 
-            // If it's a literal expression, it is already in the struct initializer
-            if (!m_context.Generators.Expression.IsLiteralExpression(expression.Kind()))
-            {
-                m_context.Writer.Append(string.Format("\tclassStatics_{0}.{1} = ", className, name));
-                m_context.Generators.Expression.Generate(expression);
-                m_context.Writer.AppendLine(";");
-            }
+            m_context.Writer.Append(string.Format("\tclassStatics_{0}.{1} = ", className, name));
+            m_context.Generators.Expression.Generate(value.Value);
+            m_context.Writer.AppendLine(";");
         }
 
         /// <summary>
@@ -45,11 +53,29 @@ namespace LibCS2C.Generators
         /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
-            // Are there even things to initialize?
-            if(m_classCode.staticFields.Count() == 0 && m_classCode.propertyInitialValuesStatic.Count() == 0)
+            // Are there even things to initialize in the cctor?
+            bool need = false;
+
+            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_classCode.staticFields)
             {
-                return;
+                if (needCctorCode(pair.Value))
+                {
+                    need = true;
+                    break;
+                }
             }
+
+            foreach (KeyValuePair<string, EqualsValueClauseSyntax> pair in m_classCode.propertyInitialValuesStatic)
+            {
+                if (needCctorCode(pair.Value))
+                {
+                    need = true;
+                    break;
+                }
+            }
+
+            if (!need)
+                return;
 
             string convertedClassName = m_context.TypeConvert.ConvertClassName(node.Identifier.ToString());
             string methodName = string.Format("classCctor_{0}", convertedClassName);

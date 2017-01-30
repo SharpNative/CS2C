@@ -110,6 +110,10 @@ namespace LibCS2C.Generators
         /// <param name="node">The class declaration</param>
         public override void Generate(ClassDeclarationSyntax node)
         {
+            // Are there even static fields?
+            if (m_classCode.staticFieldTypes.Count == 0 && m_classCode.propertyTypesStatic.Count == 0)
+                return;
+
             string convertedClassName = m_context.TypeConvert.ConvertClassName(node.Identifier.ToString());
 
             m_context.Writer.AppendLine("struct");

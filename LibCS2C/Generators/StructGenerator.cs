@@ -156,7 +156,9 @@ namespace LibCS2C.Generators
             m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
             m_context.Writer.AppendLine(methodName);
             m_context.Writer.AppendLine("{");
-            m_context.Writer.AppendLine(string.Format("\tstruct struct_{0} object;", structName));
+            string structType = string.Format("struct struct_{0}", structName);
+            m_context.Writer.AppendLine(string.Format("\t{0} object;", structType));
+            m_context.Writer.AppendLine(string.Format("\tmemset(&object, 0, sizeof({0}));", structType));
             m_context.Writer.AppendLine("\treturn object;");
             m_context.Writer.AppendLine("}");
 

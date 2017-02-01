@@ -218,7 +218,7 @@ namespace LibCS2C.Generators
                         processAttributePlug(node, attribute);
                     }
                     // Extern
-                    else if(attribIdentifier.Equals("Extern"))
+                    else if (attribIdentifier.Equals("Extern"))
                     {
                         processAttributeExtern(node, attribute);
                     }

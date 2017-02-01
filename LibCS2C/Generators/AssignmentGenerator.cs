@@ -97,7 +97,7 @@ namespace LibCS2C.Generators
                 // Check for the object name
                 string objectName = "obj";
                 IEnumerable<SyntaxNode> children = node.Left.ChildNodes();
-                if(children.Count() > 1)
+                if (children.Count() > 1)
                 {
                     objectName = m_context.TypeConvert.ConvertVariableName(children.First());
                 }

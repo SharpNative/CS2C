@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -88,10 +89,18 @@ namespace LibCS2C.Generators
             else
             {
                 ImmutableArray<SyntaxReference> references = firstSymbol.DeclaringSyntaxReferences;
-                SyntaxNode reference = references[0].GetSyntax();
-                SyntaxKind referenceKind = reference.Kind();
+                
+                IMethodSymbol methodSym = null;
+                if (firstSymbol.Kind == SymbolKind.Method)
+                {
+                    methodSym = firstSymbol as IMethodSymbol;
+                }
+                
+                SyntaxNode reference = null;
+                if (references.Length > 0)
+                    reference = references[0].GetSyntax();
 
-                if (referenceKind == SyntaxKind.VariableDeclarator)
+                if (reference != null && reference.Kind() == SyntaxKind.VariableDeclarator)
                 {
                     foreach (SyntaxNode child in node.ChildNodes())
                     {
@@ -102,12 +111,9 @@ namespace LibCS2C.Generators
                 }
                 else
                 {
-                    MethodDeclarationSyntax methodDeclaration = reference as MethodDeclarationSyntax;
-                    needsObjReference = !m_context.Generators.MethodDeclaration.IsMethodStatic(methodDeclaration);
-
+                    needsObjReference = !methodSym.IsStatic;
                     SyntaxNode type = (first.Kind() == SyntaxKind.IdentifierName) ? first : first.ChildNodes().First();
-
-                    string prototype = m_context.Generators.MethodDeclaration.CreateMethodPrototype(methodDeclaration, false, false);
+                    string prototype = m_context.Generators.MethodDeclaration.CreateMethodPrototype(methodSym, false, false);
 
                     // If the type of the reference is an interface, we need to use the lookup table
                     // If there are classes that extend the type of the reference, we need to use the lookup table
@@ -119,7 +125,8 @@ namespace LibCS2C.Generators
                     }
                     else
                     {
-                        string lookFor = string.Format("{0}_{1}", typeOfReference.ContainingNamespace.ToString().Replace('.', '_'), typeOfReference.Name);
+                        MethodDeclarationSyntax methodDeclaration = reference as MethodDeclarationSyntax;
+                        string lookFor = string.Format("{0}_{1}", m_context.ConvertNameSpace(typeOfReference.ContainingNamespace), typeOfReference.Name);
                         useFunctionPointer = (typeOfReference.TypeKind == TypeKind.Interface || (m_context.TypeIsExtended.ContainsKey(lookFor) && m_context.TypeIsExtended[lookFor]));
 
                         if (useFunctionPointer)

@@ -50,73 +50,61 @@ namespace LibCS2C.Context
         /// </summary>
         /// <param name="type">The C# type</param>
         /// <returns>The C type name</returns>
-        public string ConvertTypeName(SyntaxNode type)
+        public string ConvertTypeName(ITypeSymbol type)
         {
             string typeNameConverted;
-            if (type is QualifiedNameSyntax)
-            {
-                ITypeSymbol typeSymbol = m_context.Model.Compilation.GetSemanticModel(type.Parent.SyntaxTree).GetTypeInfo(type).Type;
-                bool nameContainsType = (typeSymbol.ContainingType == null);
-                string containingType = nameContainsType ? typeSymbol.ToString().Replace('.', '_') : typeSymbol.ContainingType.ToString().Replace('.', '_');
-                string typeName = typeSymbol.Name;
 
-                if (typeSymbol.TypeKind == TypeKind.Class)
-                {
-                    if (nameContainsType)
-                        typeNameConverted = string.Format("struct class_{0}*", containingType);
-                    else
-                        typeNameConverted = string.Format("struct class_{0}_{1}*", containingType, typeName);
-                }
-                else if(typeSymbol.TypeKind == TypeKind.Enum)
-                {
-                    typeNameConverted = "int32_t";
-                }
+            bool nameContainsType = (type.ContainingType == null);
+            string containingType = nameContainsType ? type.ToString().Replace('.', '_') : type.ContainingType.ToString().Replace('.', '_');
+            string nameSpace = (type.ContainingNamespace == null) ? "" : m_context.ConvertNameSpace(type.ContainingNamespace);
+
+            if (type.TypeKind == TypeKind.Class)
+            {
+                if (nameContainsType)
+                    typeNameConverted = string.Format("struct class_{0}*", containingType);
                 else
-                {
-                    if (nameContainsType)
-                        typeNameConverted = string.Format("struct struct_{0}", containingType);
-                    else
-                        typeNameConverted = string.Format("struct struct_{0}_{1}", containingType, typeName);
-                }
+                    typeNameConverted = string.Format("struct class_{0}_{1}*", containingType, type.Name);
             }
-            else if (type is PointerTypeSyntax)
+            else if (type.TypeKind == TypeKind.Enum)
             {
-                PointerTypeSyntax ptr = type as PointerTypeSyntax;
-                typeNameConverted = m_context.ConvertTypeName(ptr.ElementType) + "*";
+                typeNameConverted = "int32_t";
             }
-            else if (type is ArrayTypeSyntax)
+            else if (type.TypeKind == TypeKind.Struct)
             {
-                ArrayTypeSyntax array = type as ArrayTypeSyntax;
-                typeNameConverted = m_context.ConvertTypeName(array.ElementType) + new string('*', array.RankSpecifiers.Count);
+                if (nameContainsType)
+                    typeNameConverted = string.Format("struct struct_{0}", containingType);
+                else
+                    typeNameConverted = string.Format("struct struct_{0}_{1}", containingType, type.Name);
+            }
+            else if (type.TypeKind == TypeKind.Pointer)
+            {
+                IPointerTypeSymbol pointer = (IPointerTypeSymbol)type;
+                typeNameConverted = m_context.ConvertTypeName(pointer.PointedAtType) + "*";
+            }
+            else if (type.TypeKind == TypeKind.Array)
+            {
+                IArrayTypeSymbol array = (IArrayTypeSymbol)type;
+                typeNameConverted = m_context.ConvertTypeName(array.ElementType) + new string('*', array.Rank);
+            }
+            else if (type.TypeKind == TypeKind.Delegate)
+            {
+                typeNameConverted = string.Format("delegate_{0}", type.ToString().Replace('.', '_'));
+            }
+            else if (type.TypeKind == TypeKind.Class)
+            {
+                typeNameConverted = string.Format("struct class_{0}_{1}*", nameSpace, type.ToString());
+            }
+            else if (type.TypeKind == TypeKind.Enum)
+            {
+                typeNameConverted = "int32_t";
+            }
+            else if (type.TypeKind == TypeKind.Interface)
+            {
+                typeNameConverted = "struct base_class*";
             }
             else
             {
-                ITypeSymbol typeSymbol = m_context.Model.Compilation.GetSemanticModel(type.Parent.SyntaxTree).GetTypeInfo(type).Type;
-                string nameSpace = typeSymbol.ContainingNamespace.ToString().Replace(".", "_");
-
-                if (typeSymbol.TypeKind == TypeKind.Delegate)
-                {
-                    typeNameConverted = string.Format("delegate_{0}_{1}", typeSymbol.ContainingType.ToString().Replace(".", "_"), type.ToString());
-                }
-                else if (typeSymbol.TypeKind == TypeKind.Class)
-                {
-                    typeNameConverted = string.Format("struct class_{0}_{1}*", nameSpace, type.ToString());
-                }
-                else if (typeSymbol.TypeKind == TypeKind.Enum)
-                {
-                    typeNameConverted = "int32_t";
-                }
-                else if (typeSymbol.TypeKind == TypeKind.Interface)
-                {
-                    typeNameConverted = "struct base_class*";
-                }
-                else
-                {
-                    if (typeSymbol.ContainingType == null)
-                        typeNameConverted = string.Format("struct struct_{0}_{1}", nameSpace, type.ToString());
-                    else
-                        typeNameConverted = string.Format("struct struct_{0}_{1}", typeSymbol.ContainingType.ToString().Replace(".", "_"), type.ToString());
-                }
+                throw new NotImplementedException("Could not convert type name: " + type.TypeKind + " is unimplemented");
             }
 
             return typeNameConverted;
@@ -125,7 +113,7 @@ namespace LibCS2C.Context
         /// <summary>
         /// Converts a variable name from C# to C
         /// </summary>
-        /// <param name="node">The symbol node</param>
+        /// <param name="node">The node</param>
         /// <returns>The converted variable name</returns>
         public string ConvertVariableName(SyntaxNode node)
         {
@@ -152,8 +140,7 @@ namespace LibCS2C.Context
             // Method
             else if (symbol.Kind == SymbolKind.Method)
             {
-                MethodDeclarationSyntax reference = symbol.DeclaringSyntaxReferences[0].GetSyntax() as MethodDeclarationSyntax;
-                typeNameConverted = m_context.Generators.MethodDeclaration.CreateMethodPrototype(reference, false, false);
+                typeNameConverted = m_context.Generators.MethodDeclaration.CreateMethodPrototype((IMethodSymbol)symbol, false, false);
             }
             // Static field
             else if (symbol.IsStatic)

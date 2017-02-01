@@ -55,7 +55,7 @@ namespace LibCS2C.Generators
                     // Uninitialized for now
                     // About C: if a struct should be initialized to zeroes, we need {0} instead of 0
                     ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(pair.Value).Type;
-                    if (!m_context.GenericTypeConvert.IsGeneric(pair.Value) && typeSymbol.TypeKind == TypeKind.Struct)
+                    if (!m_context.GenericTypeConvert.IsGeneric(typeSymbol) && typeSymbol.TypeKind == TypeKind.Struct)
                     {
                         m_context.Writer.AppendLine("{0},");
                     }

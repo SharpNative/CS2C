@@ -76,16 +76,37 @@ namespace LibCS2C.Context
         /// </summary>
         /// <param name="type">The C# type</param>
         /// <returns>The C type name</returns>
-        public string ConvertTypeName(SyntaxNode type)
+        public string ConvertTypeName(ITypeSymbol type)
         {
-            if (GenericTypeConvert.IsGeneric(type as TypeSyntax))
+            if (GenericTypeConvert.IsGeneric(type))
             {
-                return GenericTypeConvert.Convert(type as TypeSyntax);
+                return GenericTypeConvert.Convert(type);
             }
             else
             {
                 return TypeConvert.ConvertTypeName(type);
             }
+        }
+
+        /// <summary>
+        /// Converts the C# type to a C type name
+        /// </summary>
+        /// <param name="type">The C# type</param>
+        /// <returns>The C type name</returns>
+        public string ConvertTypeName(TypeSyntax type)
+        {
+            ITypeSymbol symbol = Model.GetTypeInfo(type).Type;
+            return ConvertTypeName(symbol);
+        }
+
+        /// <summary>
+        /// Converts a namespace to a C namespace name
+        /// </summary>
+        /// <param name="nameSpace">The namespace</param>
+        /// <returns>The C name</returns>
+        public string ConvertNameSpace(INamespaceSymbol nameSpace)
+        {
+            return nameSpace.ToString().Replace('.', '_');
         }
     }
 }

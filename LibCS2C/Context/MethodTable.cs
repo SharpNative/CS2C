@@ -69,7 +69,7 @@ namespace LibCS2C.Context
                     {
                         if (member.Name == method.Identifier.ToString())
                         {
-                            className = string.Format("{0}_{1}", typeSymbol.ContainingNamespace.ToString().Replace('.', '_'), typeSymbol.Name);
+                            className = string.Format("{0}_{1}", m_context.ConvertNameSpace(typeSymbol.ContainingNamespace), typeSymbol.Name);
                             found = true;
                             break;
                         }
@@ -110,11 +110,14 @@ namespace LibCS2C.Context
         private string GetMethodLookupName(MethodDeclarationSyntax method)
         {
             TypeDeclarationSyntax parent = method.Parent as TypeDeclarationSyntax;
-            NamespaceDeclarationSyntax nameSpace = parent.Parent as NamespaceDeclarationSyntax;
+            
+            SyntaxTree owningTree = method.Parent.SyntaxTree;
+            SemanticModel model = m_context.Model.Compilation.GetSemanticModel(owningTree);
+            IMethodSymbol symbol = (IMethodSymbol)model.GetDeclaredSymbol(method);
 
-            string suffix = string.Format("{0}_{1}", nameSpace.Name.ToString().Replace('.', '_'), parent.Identifier.ToString());
-            string str = m_context.Generators.MethodDeclaration.CreateMethodPrototype(method, false, false);
-
+            string suffix = string.Format("{0}_{1}", m_context.ConvertNameSpace(symbol.ContainingNamespace), parent.Identifier.ToString());
+            string str = m_context.Generators.MethodDeclaration.CreateMethodPrototype(symbol, false, false);
+            
             return str.Substring(suffix.Length);
         }
 

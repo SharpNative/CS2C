@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
@@ -20,43 +20,21 @@ namespace LibCS2C.Generators
         {
             m_context = context;
         }
-
-        /// <summary>
-        /// Checks if the method is static
-        /// </summary>
-        /// <param name="node">The method declaration node</param>
-        /// <returns>If it's static</returns>
-        public bool IsMethodStatic(BaseMethodDeclarationSyntax node)
-        {
-            IEnumerable<SyntaxToken> tokens = node.ChildTokens();
-            foreach (SyntaxToken token in tokens)
-            {
-                if (token.Kind() == SyntaxKind.StaticKeyword)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
+        
         /// <summary>
         /// Create method arguments and parameters
         /// </summary>
-        /// <param name="node">The node</param>
+        /// <param name="symbol">The symbol</param>
         /// <param name="createType">If a function pointer type is used</param>
         /// <returns>An array, index 0 contains the arguments, index 1 contains the parameter types, index 2 contains the argument names</returns>
-        public string[] CreateMethodArgsAndParams(BaseMethodDeclarationSyntax node, bool createType)
+        public string[] CreateMethodArgsAndParams(IMethodSymbol symbol, bool createType)
         {
             // Check for parameters
-            IEnumerable<SyntaxNode> paramNodes = node.ParameterList.ChildNodes();
-
-            // Check if the method is static
-            bool isStatic = IsMethodStatic(node);
+            ImmutableArray<IParameterSymbol> parameters = symbol.Parameters;
 
             // Count parameters, non-static methods require an object reference
-            int paramCount = paramNodes.Count();
-            if (!isStatic)
+            int paramCount = parameters.Length;
+            if (!symbol.IsStatic)
                 paramCount++;
 
             // Method name: namespaceName_className_methodName_PARAMCOUNT_PARAMTYPES_
@@ -65,7 +43,7 @@ namespace LibCS2C.Generators
             StringBuilder argNameBuilder = new StringBuilder();
 
             // Not static? Object reference is required as parameter
-            if (!isStatic)
+            if (!symbol.IsStatic)
             {
                 paramTypeBuilder.Append("class_");
                 argNameBuilder.Append("obj");
@@ -79,17 +57,17 @@ namespace LibCS2C.Generators
             }
 
             // Parameters
-            foreach (ParameterSyntax paramNode in paramNodes)
+            foreach (IParameterSymbol param in parameters)
             {
-                string typeName = m_context.ConvertTypeName(paramNode.Type);
-                argNameBuilder.Append(paramNode.Identifier);
+                string typeName = m_context.ConvertTypeName(param.Type);
+                argNameBuilder.Append(param.Name);
                 paramTypeBuilder.Append(typeName.Replace(' ', '_').Replace('*', '_'));
                 paramTypeBuilder.Append("_");
 
-                argumentBuilder.Append(string.Format("{0} {1}", typeName, paramNode.Identifier));
+                argumentBuilder.Append(string.Format("{0} {1}", typeName, param.Name));
 
                 // A comma if it's not the last parameter
-                if (paramNode != paramNodes.Last())
+                if (param != parameters.Last())
                 {
                     argumentBuilder.Append(", ");
                     argNameBuilder.Append(", ");
@@ -106,39 +84,26 @@ namespace LibCS2C.Generators
         /// <summary>
         /// Creates the method prototype
         /// </summary>
-        /// <param name="node">The method declaration</param>
+        /// <param name="symbol">The method symbol</param>
         /// <param name="generateArguments">If the arguments should be generated</param>
         /// <param name="createType">If a function pointer type should be created</param>
         /// <returns>The string containing the prototype</returns>
-        public string CreateMethodPrototype(BaseMethodDeclarationSyntax node, bool generateArguments, bool createType)
+        public string CreateMethodPrototype(IMethodSymbol symbol, bool generateArguments, bool createType)
         {
-            SyntaxToken identifier;
-            if (node is MethodDeclarationSyntax)
-            {
-                identifier = (node as MethodDeclarationSyntax).Identifier;
-            }
-            else /*if (node is ConstructorDeclarationSyntax)*/
-            {
-                identifier = (node as ConstructorDeclarationSyntax).Identifier;
-            }
-
-            TypeDeclarationSyntax parent = node.Parent as TypeDeclarationSyntax;
-            NamespaceDeclarationSyntax nameSpace = parent.Parent as NamespaceDeclarationSyntax;
-
             // Check for parameters
-            IEnumerable<SyntaxNode> paramNodes = node.ParameterList.ChildNodes();
+            ImmutableArray<IParameterSymbol> paramNodes = symbol.Parameters;
 
             // Count parameters, non-static methods require an object reference
             int paramCount = paramNodes.Count();
-            if (!IsMethodStatic(node))
+            if (!symbol.IsStatic)
                 paramCount++;
 
-            string methodPrototype = string.Format("{0}_{1}_{2}_{3}", nameSpace.Name.ToString().Replace('.', '_'), parent.Identifier.ToString(), identifier, paramCount);
+            string methodPrototype = string.Format("{0}_{1}_{2}_{3}", m_context.ConvertNameSpace(symbol.ContainingNamespace), symbol.ContainingType.Name.ToString(), symbol.Name.Replace('.', '_'), paramCount);
             if (createType)
                 methodPrototype = "(*fp_" + methodPrototype;
 
             // Create method arguments and parameters
-            string[] argsAndParams = CreateMethodArgsAndParams(node, createType);
+            string[] argsAndParams = CreateMethodArgsAndParams(symbol, createType);
 
             methodPrototype += argsAndParams[1];
             if (createType)
@@ -158,6 +123,7 @@ namespace LibCS2C.Generators
         private void processAttributePlug(BaseMethodDeclarationSyntax node, AttributeSyntax attribute)
         {
             SeparatedSyntaxList<AttributeArgumentSyntax> argsList = attribute.ArgumentList.Arguments;
+            IMethodSymbol symbol = m_context.Model.GetDeclaredSymbol(node);
 
             // We expect there to be one argument with the name of the method to plug/override
             if (argsList.Count != 1)
@@ -179,7 +145,7 @@ namespace LibCS2C.Generators
 
             // Method arguments
             // Note that we use "inline static" here to make sure the call code is inlined
-            string[] argsAndParams = CreateMethodArgsAndParams(node, false);
+            string[] argsAndParams = CreateMethodArgsAndParams(symbol, false);
             string args = argsAndParams[0];
             string argNames = argsAndParams[2];
             string methodPrototype = string.Format("inline static {0} {1}({2})", returnType, overrideName, args);
@@ -199,7 +165,7 @@ namespace LibCS2C.Generators
                 m_context.Writer.Append("return ");
 
             // Call to real method implementation
-            string methodName = CreateMethodPrototype(node, false, false);
+            string methodName = CreateMethodPrototype(symbol, false, false);
             m_context.Writer.Append(methodName);
             m_context.Writer.Append("(");
             m_context.Writer.Append(argNames);
@@ -248,24 +214,26 @@ namespace LibCS2C.Generators
             bool isInsideClass = (node.Parent.Kind() == SyntaxKind.ClassDeclaration);
             bool isConstructor = (node.Kind() == SyntaxKind.ConstructorDeclaration);
 
+            IMethodSymbol symbol = m_context.Model.GetDeclaredSymbol(node);
+
             // Type of method
             if (isConstructor)
             {
                 ConstructorDeclarationSyntax nodeTyped = node as ConstructorDeclarationSyntax;
                 SyntaxToken identifier = nodeTyped.Identifier;
-                methodPrototype = string.Format("void* {0}", CreateMethodPrototype(node, true, false));
+                methodPrototype = string.Format("void* {0}", CreateMethodPrototype(symbol, true, false));
             }
             else
             {
                 MethodDeclarationSyntax nodeTyped = node as MethodDeclarationSyntax;
                 SyntaxToken identifier = nodeTyped.Identifier;
                 string returnType = m_context.ConvertTypeName(nodeTyped.ReturnType);
-
-                methodTypedef = string.Format("typedef {0} {1}", returnType, CreateMethodPrototype(node, true, true));
+                
+                methodTypedef = string.Format("typedef {0} {1}", returnType, CreateMethodPrototype(symbol, true, true));
                 if (isInsideClass)
                 {
                     m_context.MethodTable.Add(nodeTyped);
-                    methodPrototype = string.Format("{0} {1}", returnType, CreateMethodPrototype(node, true, false));
+                    methodPrototype = string.Format("{0} {1}", returnType, CreateMethodPrototype(symbol, true, false));
                 }
             }
 
@@ -295,7 +263,7 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine("{");
 
             // If it's not static, we should check
-            if (CompilerSettings.EnableRuntimeChecks && !IsMethodStatic(node))
+            if (CompilerSettings.EnableRuntimeChecks && !symbol.IsStatic)
             {
                 m_context.Writer.AppendLine("\tif(obj == NULL) fatal(__ERROR_NULL_CALLED__);");
             }

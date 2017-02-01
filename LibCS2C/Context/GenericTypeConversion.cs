@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 
 namespace LibCS2C.Context
@@ -28,7 +30,7 @@ namespace LibCS2C.Context
             { "char", "char" },
             { "string", "string_t" },
 
-            { "Action", "action_t" },
+            { "System.Action", "action_t" },
             { "object", "object_t" },
 
             { "UInt8", "uint8_t" },
@@ -53,7 +55,7 @@ namespace LibCS2C.Context
         /// </summary>
         /// <param name="type">The C# type</param>
         /// <returns>If the type is a generic type</returns>
-        public bool IsGeneric(TypeSyntax type)
+        public bool IsGeneric(ITypeSymbol type)
         {
             return m_convert.ContainsKey(type.ToString().Trim());
         }
@@ -73,7 +75,7 @@ namespace LibCS2C.Context
         /// </summary>
         /// <param name="type">The C# type</param>
         /// <returns>The C type</returns>
-        public string Convert(TypeSyntax type)
+        public string Convert(ITypeSymbol type)
         {
             return m_convert[type.ToString().Trim()];
         }

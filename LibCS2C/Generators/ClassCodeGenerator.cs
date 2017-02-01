@@ -159,7 +159,7 @@ namespace LibCS2C.Generators
                 foreach (SimpleBaseTypeSyntax child in children)
                 {
                     ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(child.ChildNodes().First()).Type;
-                    string str = string.Format("{0}_{1}", typeSymbol.ContainingNamespace.ToString().Replace('.', '_'), typeSymbol.Name);
+                    string str = string.Format("{0}_{1}", m_context.ConvertNameSpace(typeSymbol.ContainingNamespace), typeSymbol.Name);
                     m_context.TypeIsExtended[str] = true;
                 }
             }

@@ -43,8 +43,7 @@ namespace LibCS2C.Generators
                 // Call constructor
                 if (hasConstructor)
                 {
-                    ConstructorDeclarationSyntax reference = references[0].GetSyntax() as ConstructorDeclarationSyntax;
-                    m_context.Writer.Append(m_context.Generators.MethodDeclaration.CreateMethodPrototype(reference, false, false));
+                    m_context.Writer.Append(m_context.Generators.MethodDeclaration.CreateMethodPrototype((IMethodSymbol)symbol, false, false));
                     m_context.Writer.Append("(");
                 }
 

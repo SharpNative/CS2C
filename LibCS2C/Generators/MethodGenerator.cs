@@ -122,38 +122,63 @@ namespace LibCS2C.Generators
         /// <param name="attribute">The plug attribute</param>
         private void processAttributePlug(BaseMethodDeclarationSyntax node, AttributeSyntax attribute)
         {
+            routeMethod(node, attribute, true);
+        }
+
+        /// <summary>
+        /// Processes a plug attribute
+        /// </summary>
+        /// <param name="node">The node</param>
+        /// <param name="attribute">The plug attribute</param>
+        private void processAttributeExtern(BaseMethodDeclarationSyntax node, AttributeSyntax attribute)
+        {
+            routeMethod(node, attribute, false);
+        }
+
+        /// <summary>
+        /// Routes method code
+        /// </summary>
+        /// <param name="node">The node</param>
+        /// <param name="attribute">The attribute</param>
+        /// <param name="toMethod">If it's routed to the original method</param>
+        private void routeMethod(BaseMethodDeclarationSyntax node, AttributeSyntax attribute, bool toMethod)
+        {
             SeparatedSyntaxList<AttributeArgumentSyntax> argsList = attribute.ArgumentList.Arguments;
             IMethodSymbol symbol = m_context.Model.GetDeclaredSymbol(node);
 
             // We expect there to be one argument with the name of the method to plug/override
             if (argsList.Count != 1)
-                throw new Exception("Invalid use of Plug: argument count incorrect!");
+                throw new Exception("Invalid use of Extern: argument count incorrect!");
 
             // The argument needs to be a string
             AttributeArgumentSyntax argument = argsList.First();
             SyntaxNode argumentContents = argument.ChildNodes().First();
             if (argumentContents.Kind() != SyntaxKind.StringLiteralExpression)
-                throw new Exception("Invalid use of Plug: expected a string!");
+                throw new Exception("Invalid use of Extern: expected a string!");
 
             // If we take the stringliteral, there will be "" on the outside of the string
-            string overrideName = argumentContents.ToString();
-            overrideName = overrideName.Substring(1, overrideName.Length - 2);
+            string aliasName = argumentContents.ToString();
+            aliasName = aliasName.Substring(1, aliasName.Length - 2);
 
             // Return type
             MethodDeclarationSyntax nodeTyped = node as MethodDeclarationSyntax;
             string returnType = m_context.ConvertTypeName(((MethodDeclarationSyntax)node).ReturnType);
+            string methodName = CreateMethodPrototype(symbol, false, false);
 
             // Method arguments
-            // Note that we use "inline static" here to make sure the call code is inlined
             string[] argsAndParams = CreateMethodArgsAndParams(symbol, false);
             string args = argsAndParams[0];
             string argNames = argsAndParams[2];
-            string methodPrototype = string.Format("inline static {0} {1}({2})", returnType, overrideName, args);
+            string prefix = (toMethod) ? "inline static" : "";
+            string methodPrototype = string.Format("{0} {1} {2}({3})", prefix, returnType, toMethod ? aliasName : methodName, args);
 
-            // Append to prototypes
-            m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
-            m_context.Writer.Append(methodPrototype);
-            m_context.Writer.AppendLine(";");
+            if (toMethod)
+            {
+                // Append to prototypes
+                m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
+                m_context.Writer.Append(methodPrototype);
+                m_context.Writer.AppendLine(";");
+            }
 
             // Append the declaration so we can add contents
             m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
@@ -165,8 +190,7 @@ namespace LibCS2C.Generators
                 m_context.Writer.Append("return ");
 
             // Call to real method implementation
-            string methodName = CreateMethodPrototype(symbol, false, false);
-            m_context.Writer.Append(methodName);
+            m_context.Writer.Append(toMethod ? methodName : aliasName);
             m_context.Writer.Append("(");
             m_context.Writer.Append(argNames);
             m_context.Writer.AppendLine(");");
@@ -192,6 +216,11 @@ namespace LibCS2C.Generators
                     if (attribIdentifier.Equals("Plug"))
                     {
                         processAttributePlug(node, attribute);
+                    }
+                    // Extern
+                    else if(attribIdentifier.Equals("Extern"))
+                    {
+                        processAttributeExtern(node, attribute);
                     }
                     // Unknown
                     else

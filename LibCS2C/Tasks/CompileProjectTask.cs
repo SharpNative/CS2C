@@ -4,67 +4,21 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using LibCS2C.Compilation;
+using System.Text;
 
 namespace LibCS2C.Tasks
 {
     public class CompileProjectTask : Task
     {
-        private string m_projectpath;
-        private string m_outputpath;
-        private string m_afterbuildcommand;
-        private string m_afterworkingdir;
+        [Required]
+        public string Path { get; private set; }
 
         [Required]
-        public string Path
-        {
-            get
-            {
-                return m_projectpath;
-            }
-            set
-            {
-                m_projectpath = value;
-            }
-        }
+        public string Outpath { get; private set; }
 
-        [Required]
-        public string Outpath
-        {
-            get
-            {
-                return m_outputpath;
-            }
-            set
-            {
-                m_outputpath = value;
-            }
-        }
-
-        public string AfterBuildCommand
-        {
-            get
-            {
-                return m_afterbuildcommand;
-            }
-
-            set
-            {
-                m_afterbuildcommand = value;
-            }
-        }
-
-        public string AfterBuildWorkingDir
-        {
-            get
-            {
-                return m_afterworkingdir;
-            }
-
-            set
-            {
-                m_afterworkingdir = value;
-            }
-        }
+        public string AfterBuildCommand { get; private set; }
+        public string AfterBuildWorkingDir { get; private set; }
+        public string HeaderFiles { get; private set; }
 
         /// <summary>
         /// Executes the compiler
@@ -78,24 +32,39 @@ namespace LibCS2C.Tasks
             Compiler compiler = new Compiler();
             try
             {
-                string output = compiler.CompileProject(Path);
+                StringBuilder output = compiler.CompileProject(Path);
 
                 // Create output directory if it doesn't exist
                 string outDir = System.IO.Path.GetDirectoryName(Outpath);
                 if (!Directory.Exists(outDir))
                     Directory.CreateDirectory(outDir);
 
-                // Contents
-                File.WriteAllText(m_outputpath, output);
+                // Write contents
+                StreamWriter stream = new StreamWriter(Outpath, false);
+
+                // Additional header files to include
+                if (HeaderFiles != null)
+                {
+                    string[] files = HeaderFiles.Split(' ');
+                    foreach (string file in files)
+                    {
+                        stream.WriteLine(string.Format("#include \"{0}\"", file));
+                    }
+                }
+
+                // The output code itself
+                stream.Write(output.ToString());
+
+                stream.Close();
 
                 // Command after building is done
-                if (m_afterbuildcommand != null)
+                if (AfterBuildCommand != null)
                 {
-                    Log.LogMessage(MessageImportance.High, "Running after build command " + m_afterbuildcommand);
+                    Log.LogMessage(MessageImportance.High, "Running after build command " + AfterBuildCommand);
 
-                    ProcessStartInfo info = new ProcessStartInfo(m_afterbuildcommand);
-                    if (m_afterworkingdir != null)
-                        info.WorkingDirectory = m_afterworkingdir;
+                    ProcessStartInfo info = new ProcessStartInfo(AfterBuildCommand);
+                    if (AfterBuildWorkingDir != null)
+                        info.WorkingDirectory = AfterBuildWorkingDir;
 
                     Process.Start(info);
                 }

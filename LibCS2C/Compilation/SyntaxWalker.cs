@@ -11,7 +11,7 @@ namespace LibCS2C.Compilation
         private WalkerContext m_context;
 
         /// <summary>
-        /// Walks through the syntax and outputs C code to a <see cref="FormattedStringBuilder">FormattedStringBuilder</see>
+        /// Walks through the syntax and outputs C code to a string
         /// </summary>
         public SyntaxWalker() : base(SyntaxWalkerDepth.Node)
         {
@@ -114,7 +114,7 @@ namespace LibCS2C.Compilation
         /// Outputs the code in a string
         /// </summary>
         /// <returns>The code</returns>
-        public override string ToString()
+        public StringBuilder GetCode()
         {
             // Append all the code
             StringBuilder sb = new StringBuilder();
@@ -139,7 +139,7 @@ namespace LibCS2C.Compilation
             sb.AppendLine("}");
 
             // Output string
-            return sb.ToString();
+            return sb;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using System;
+using System.Text;
 
 namespace LibCS2C.Compilation
 {
@@ -13,8 +14,8 @@ namespace LibCS2C.Compilation
         /// Compiles a project
         /// </summary>
         /// <param name="path">The project path</param>
-        /// <returns></returns>
-        public string CompileProject(string path)
+        /// <returns>The code</returns>
+        public StringBuilder CompileProject(string path)
         {
             // Workspace to open project
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
@@ -41,7 +42,7 @@ namespace LibCS2C.Compilation
                 walker.Visit(node);
             }
             
-            return walker.ToString();
+            return walker.GetCode();
         }
     }
 }

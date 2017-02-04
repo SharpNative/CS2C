@@ -1,7 +1,5 @@
 ﻿using LibCS2C.Compilation;
 using System;
-using System.IO;
-using System.Text;
 
 namespace CS_2_C
 {
@@ -14,11 +12,10 @@ namespace CS_2_C
         static void Main(string[] args)
         {
             Compiler compiler = new Compiler();
-            // string output = compiler.CompileProject(@"C:\Users\jeffr\Documents\visual studio 2015\Projects\Sharpen\kernel\Sharpen\Sharpen.csproj");
-            StringBuilder output = compiler.CompileProject(@"C:\Users\Niels\Documents\Sharpen\kernel\Sharpen\Sharpen.csproj");
-            //string output = compiler.CompileProject(@"C:\Users\Niels\Source\Repos\Sharpen\kernel\Sharpen\Sharpen.csproj");
-
-            File.WriteAllText("output.c", output.ToString());
+            // compiler.CompileProject(@"C:\Users\jeffr\Documents\visual studio 2015\Projects\Sharpen\kernel\Sharpen\Sharpen.csproj");
+            // compiler.CompileProject(@"C:\Users\Niels\Source\Repos\Sharpen\kernel\Sharpen\Sharpen.csproj");
+            compiler.CreateHeaderFile("output.h", new string[0]);
+            compiler.CreateSourceFile("output.c", new string[] { "output.h" });
             Console.ReadLine();
         }
     }

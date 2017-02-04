@@ -19,21 +19,7 @@ namespace LibCS2C.Generators
         {
             m_context = context;
         }
-
-        /// <summary>
-        /// Creates the base class struct code
-        /// </summary>
-        /// <returns>The code for the base class struct</returns>
-        public string GetBaseClassCode()
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("struct base_class");
-            sb.AppendLine("{");
-            sb.AppendLine("\tvoid** lookup_table;");
-            sb.AppendLine("};");
-            return sb.ToString();
-        }
-
+        
         /// <summary>
         /// Gets a list of fields (as variable declarations) from a class definition
         /// </summary>

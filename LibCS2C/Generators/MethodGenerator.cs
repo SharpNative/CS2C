@@ -169,20 +169,20 @@ namespace LibCS2C.Generators
             string[] argsAndParams = CreateMethodArgsAndParams(symbol, false);
             string args = argsAndParams[0];
             string argNames = argsAndParams[2];
-            string prefix = (toMethod) ? "inline static" : "";
-            string methodPrototype = string.Format("{0} {1} {2}({3})", prefix, returnType, toMethod ? aliasName : methodName, args);
+            string prefix = (toMethod) ? "inline " : "";
+            string methodPrototype = string.Format("{0} {1}({2})", returnType, toMethod ? aliasName : methodName, args);
 
             if (toMethod)
             {
                 // Append to prototypes
                 m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
-                m_context.Writer.Append(methodPrototype);
+                m_context.Writer.Append("extern " + methodPrototype);
                 m_context.Writer.AppendLine(";");
             }
 
             // Append the declaration so we can add contents
             m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
-            m_context.Writer.AppendLine(methodPrototype);
+            m_context.Writer.AppendLine(prefix + methodPrototype);
             m_context.Writer.AppendLine("{");
 
             // Does it have a return value? Then don't only pass the method but also do a return

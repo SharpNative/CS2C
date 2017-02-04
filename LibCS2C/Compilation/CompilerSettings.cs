@@ -5,7 +5,10 @@
         // Compiler flags
         public static bool EnableRuntimeChecks { get; set; } = true;
 
-        // Error messages (defined in program's C source file)
-        public const string RuntimeErrorNullCalled = "__ERROR_NULL_CALLED__";
+        // Error messages name
+        public const string RuntimeErrorNullCalledName = "__ERROR_NULL_CALLED__";
+
+        // Error message
+        public const string RuntimeErrorNullCalled = "The program tried to call a method of an object that is null";
     }
 }

@@ -147,16 +147,16 @@ namespace LibCS2C.Generators
 
 
             // Method prototype of init code
-            string methodName = string.Format("static inline struct struct_{0} structInit_{0}(void)", structName);
+            string methodName = string.Format("struct struct_{0} structInit_{0}(void)", structName);
             m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
-            m_context.Writer.Append(methodName);
+            m_context.Writer.Append("extern " + methodName);
             m_context.Writer.AppendLine(";");
 
             // Init method declaration
             m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
-            m_context.Writer.AppendLine(methodName);
+            m_context.Writer.AppendLine("inline " + methodName);
             m_context.Writer.AppendLine("{");
-            string structType = string.Format("struct struct_{0}", structName);
+            string structType = "struct struct_" + structName;
             m_context.Writer.AppendLine(string.Format("\t{0} object;", structType));
             m_context.Writer.AppendLine(string.Format("\tmemset(&object, 0, sizeof({0}));", structType));
             m_context.Writer.AppendLine("\treturn object;");

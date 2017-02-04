@@ -9,13 +9,15 @@ namespace LibCS2C.Compilation
     public class SyntaxWalker : CSharpSyntaxWalker
     {
         private WalkerContext m_context;
+        private string m_initSuffix;
 
         /// <summary>
         /// Walks through the syntax and outputs C code to a string
         /// </summary>
-        public SyntaxWalker() : base(SyntaxWalkerDepth.Node)
+        public SyntaxWalker(string initSuffix) : base(SyntaxWalkerDepth.Node)
         {
             m_context = new WalkerContext();
+            m_initSuffix = initSuffix;
         }
 
         /// <summary>
@@ -111,34 +113,82 @@ namespace LibCS2C.Compilation
         }
 
         /// <summary>
-        /// Outputs the code in a string
+        /// Generates the header code
         /// </summary>
-        /// <returns>The code</returns>
-        public StringBuilder GetCode()
+        /// <returns>The header</returns>
+        public StringBuilder GetHeaderCode()
         {
-            // Append all the code
             StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine("#ifndef __TYPES_DEFINED__");
+            sb.AppendLine("#define __TYPES_DEFINED__");
+
+            // Error message
+            string[][] errors =
+            {
+                new string[] { CompilerSettings.RuntimeErrorNullCalledName, CompilerSettings.RuntimeErrorNullCalled }
+            };
+            foreach (string[] error in errors)
+            {
+                sb.AppendLine(string.Format("const static char* {0} = \"{1}\";", error));
+            }
+
+            // Types
+            string[][] types =
+            {
+                new string[]{ "action_t", "void*" },
+                new string[]{ "object_t", "void*" },
+                new string[]{ "bool_t", "int32_t" },
+                new string[]{ "string_t", "char*" }
+            };
+            foreach (string[] type in types)
+            {
+                sb.AppendLine(string.Format("typedef {1} {0};", type));
+            }
+
+            // Default class
+            sb.AppendLine("struct base_class");
+            sb.AppendLine("{");
+            sb.AppendLine("\tvoid** lookup_table;");
+            sb.AppendLine("};");
+
+            sb.AppendLine("#endif");
+
+            // .cctor prototype
+            sb.AppendLine(string.Format("void init{0}(void);", m_initSuffix));
+
+            // Code
             sb.AppendLine(m_context.Writer.SbEnums.ToString());
             sb.AppendLine(m_context.Writer.SbStructPrototypes.ToString());
             sb.AppendLine(m_context.Writer.SbDelegates.ToString());
             sb.AppendLine(m_context.Writer.SbStructs.ToString());
             sb.AppendLine(m_context.Writer.SbClassStructs.ToString());
-            sb.AppendLine(m_context.Generators.ClassCode.GetBaseClassCode());
             sb.AppendLine(m_context.Writer.SbMethodPrototypes.ToString());
             sb.AppendLine(m_context.MethodTable.ToPrototypeArrayCode());
+
+            return sb;
+        }
+
+        /// <summary>
+        /// Outputs the source code
+        /// </summary>
+        /// <returns>The source code</returns>
+        public StringBuilder GetSourceCode()
+        {
+            StringBuilder sb = new StringBuilder();
+            
             sb.AppendLine(m_context.Writer.SbMethodDeclarations.ToString());
             sb.AppendLine(m_context.MethodTable.ToArrayCode());
 
             // Add .cctor calls in init method
-            sb.AppendLine("void init(void)");
+            sb.AppendLine(string.Format("void init{0}(void)", m_initSuffix));
             sb.AppendLine("{");
             foreach (string cctor in m_context.CctorList)
             {
                 sb.AppendLine("\t" + cctor + "();");
             }
             sb.AppendLine("}");
-
-            // Output string
+            
             return sb;
         }
     }

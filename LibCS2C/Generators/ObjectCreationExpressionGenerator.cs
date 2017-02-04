@@ -34,16 +34,14 @@ namespace LibCS2C.Generators
             // Class
             if (type.TypeKind == TypeKind.Class)
             {
-                IdentifierNameSyntax identifier = node.ChildNodes().First() as IdentifierNameSyntax;
-                ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
-
-                ImmutableArray<SyntaxReference> references = symbol.DeclaringSyntaxReferences;
-                bool hasConstructor = (references.Length > 0);
+                IMethodSymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol as IMethodSymbol;
+                // A .ctor will have "specialname" metadata, IsExtensionMethod will return true if "specialname" metadata is set
+                bool hasConstructor = (!symbol.IsImplicitlyDeclared);
 
                 // Call constructor
                 if (hasConstructor)
                 {
-                    m_context.Writer.Append(m_context.Generators.MethodDeclaration.CreateMethodPrototype((IMethodSymbol)symbol, false, false));
+                    m_context.Writer.Append(m_context.Generators.MethodDeclaration.CreateMethodPrototype(symbol, false, false));
                     m_context.Writer.Append("(");
                 }
 

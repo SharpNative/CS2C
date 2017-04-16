@@ -150,7 +150,7 @@ namespace LibCS2C.Generators
                 SyntaxNode name = children[2].AsNode();
                 bool getterArgument = (symbol.Kind == SymbolKind.Property && !symbol.IsStatic);
                 string convertedVariableName = m_context.TypeConvert.ConvertVariableName(name);
-                
+
                 // Property getter argument
                 if (getterArgument)
                 {
@@ -165,14 +165,23 @@ namespace LibCS2C.Generators
                     ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(first).Type;
 
                     // Pass struct in this case by reference
-                    if (!m_context.GenericTypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct)
+                    // Note: we need to surround the object part with extra parantheses in case it is a getter
+                    bool makePointer = (!m_context.GenericTypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct);
+                    if (makePointer)
                         m_context.Writer.Append("&");
 
                     if (firstSymbol != null && (!firstSymbol.IsStatic && firstSymbol.Kind == SymbolKind.Field))
                         m_context.Writer.Append("obj->");
 
+                    if (makePointer)
+                        m_context.Writer.Append("(");
+                    
                     GenerateObjectPart(first, false);
-                    m_context.Writer.Append(")");
+
+                    if (makePointer)
+                        m_context.Writer.Append("))");
+                    else
+                        m_context.Writer.Append(")");
                 }
                 else
                 {

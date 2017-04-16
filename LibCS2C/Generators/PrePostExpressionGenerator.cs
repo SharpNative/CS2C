@@ -56,9 +56,9 @@ namespace LibCS2C.Generators
             ISymbol symbol = m_context.Model.GetSymbolInfo(name).Symbol;
 
             bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);
-            
+
             WriterDestination originalDestination = m_context.Writer.CurrentDestination;
-            
+
             // Property
             if (isProperty)
             {
@@ -83,11 +83,12 @@ namespace LibCS2C.Generators
                     getter = string.Format("{0}_{1}_getter({2})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, objectName);
                     m_context.Writer.Append(string.Format("{0}_{1}_setter({4}, {2}{3})", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, getter, m_type, objectName));
                 }
-                
+
                 if (m_isPost)
                     m_context.Writer.CurrentDestination = originalDestination;
-
-                if (doFutureValue)
+                
+                // Only get the value if we're part of another expression
+                if (doFutureValue && (node.Parent.Parent is ExpressionSyntax || node.Parent.Parent.Kind() == SyntaxKind.BracketedArgumentList))
                     m_context.Writer.Append(string.Format("{0}", getter));
             }
             // Variable
@@ -98,7 +99,7 @@ namespace LibCS2C.Generators
                 m_context.Generators.Expression.Generate(name);
                 string variable = m_context.Writer.FlushTempBuffer();
                 m_context.Writer.CurrentDestination = destinationVariable;
-                
+
                 if (m_isPost)
                     m_context.Writer.Append(string.Format("{0}{1}", variable, m_shortType));
                 else

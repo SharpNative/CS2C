@@ -90,17 +90,7 @@ namespace LibCS2C.Util
             m_sb.AppendLine(text);
             m_alreadyIndented = false;
         }
-
-        /// <summary>
-        /// Append text at the start
-        /// </summary>
-        /// <param name="text">The text</param>
-        /*public void Prepend(string text)
-        {
-            m_empty = false;
-            m_sb.Insert(0, text);
-        }*/
-
+        
         /// <summary>
         /// Checks if the stringbuilder is empty
         /// </summary>

@@ -74,73 +74,92 @@ namespace LibCS2C.Generators
                                                              where a.Kind() == SyntaxKind.SetAccessorDeclaration
                                                              select a).FirstOrDefault();
 
+                    // Method/macro names
+                    string commonName = typeName + "_" + node.Identifier;
+                    string getterName = commonName + "_getter";
+                    string setterName = commonName + "_setter";
 
                     if (getAccessor != default(AccessorDeclarationSyntax))
                     {
-
-                        string methodPrototype;
-                        if (isStatic)
-                            methodPrototype = string.Format("{0} {1}_{2}_getter(void)", m_context.ConvertTypeName(node.Type), typeName, node.Identifier);
-                        else
-                            methodPrototype = string.Format("{0} {1}_{2}_getter({3}* obj)", m_context.ConvertTypeName(node.Type), typeName, node.Identifier, objTypeName);
-
-                        // Method prototype
-                        m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
-                        m_context.Writer.Append(methodPrototype);
-                        m_context.Writer.AppendLine(";");
-
-                        // Method declaration
-                        m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
-                        m_context.Writer.AppendLine(methodPrototype);
-                        m_context.Writer.AppendLine("{");
-
+                        // No custom body for getter, just return the variable
                         if (getAccessor.Body == null)
                         {
+                            m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
+
                             if (isStatic)
-                                m_context.Writer.AppendLine(string.Format("\treturn classStatics_{0}.prop_{1};", typeName, node.Identifier));
+                                m_context.Writer.AppendLine(string.Format("#define {0}() (classStatics_{1}.prop_{2})", getterName, typeName, node.Identifier));
                             else
-                                m_context.Writer.AppendLine(string.Format("\treturn obj->prop_{0};", node.Identifier));
+                                m_context.Writer.AppendLine(string.Format("#define {0}(obj) ((({1}*)obj)->prop_{2})", getterName, objTypeName, node.Identifier));
                         }
+                        // Custom body for getter, method required
                         else
                         {
-                            m_context.Generators.Block.Generate(getAccessor.Body);
-                        }
+                            string methodPrototype;
+                            if (isStatic)
+                                methodPrototype = string.Format("{0} {1}(void)", m_context.ConvertTypeName(node.Type), getterName);
+                            else
+                                methodPrototype = string.Format("{0} {1}({2}* obj)", m_context.ConvertTypeName(node.Type), getterName, objTypeName);
 
-                        m_context.Writer.AppendLine("}");
+                            // Method prototype
+                            m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
+                            m_context.Writer.Append(methodPrototype);
+                            m_context.Writer.AppendLine(";");
+
+                            // Method declaration
+                            m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
+                            m_context.Writer.AppendLine(methodPrototype);
+                            m_context.Writer.AppendLine("{");
+                            m_context.Generators.Block.Generate(getAccessor.Body);
+                            m_context.Writer.AppendLine("}");
+                        }
                     }
 
                     if (setAccessor != default(AccessorDeclarationSyntax))
                     {
-                        string methodPrototype;
-                        if (isStatic)
-                            methodPrototype = string.Format("{0} {1}_{2}_setter({0} value)", m_context.ConvertTypeName(node.Type), typeName, node.Identifier);
-                        else
-                            methodPrototype = string.Format("{0} {1}_{2}_setter({3}* obj, {0} value)", m_context.ConvertTypeName(node.Type), typeName, node.Identifier, objTypeName);
-
-                        // Method prototype
-                        m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
-                        m_context.Writer.Append(methodPrototype);
-                        m_context.Writer.AppendLine(";");
-
-                        // Method declaration
-                        m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
-                        m_context.Writer.AppendLine(methodPrototype);
-                        m_context.Writer.AppendLine("{");
-
+                        // No custom body for setter, just set the variable
                         if (setAccessor.Body == null)
                         {
+                            m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
+
                             if (isStatic)
-                                m_context.Writer.AppendLine(string.Format("\tclassStatics_{0}.prop_{1} = value;", typeName, node.Identifier));
+                                m_context.Writer.AppendLine(string.Format("#define {0}(value) (classStatics_{1}.prop_{2} = ({3})value)", setterName, typeName, node.Identifier, m_context.ConvertTypeName(node.Type)));
                             else
-                                m_context.Writer.AppendLine(string.Format("\tobj->prop_{0} = value;", node.Identifier));
+                                m_context.Writer.AppendLine(string.Format("#define {0}(obj, value) ((({1}*)obj)->prop_{2} = ({3})value)", setterName, objTypeName, node.Identifier, m_context.ConvertTypeName(node.Type)));
                         }
+                        // Custom body for setter, method required
                         else
                         {
-                            m_context.Generators.Block.Generate(setAccessor.Body);
-                        }
+                            string methodPrototype;
+                            if (isStatic)
+                                methodPrototype = string.Format("{0} {1}({0} value)", m_context.ConvertTypeName(node.Type), setterName);
+                            else
+                                methodPrototype = string.Format("{0} {1}({2}* obj, {0} value)", m_context.ConvertTypeName(node.Type), setterName, objTypeName);
 
-                        m_context.Writer.AppendLine("\treturn value;");
-                        m_context.Writer.AppendLine("}");
+                            // Method prototype
+                            m_context.Writer.CurrentDestination = WriterDestination.MethodPrototypes;
+                            m_context.Writer.Append(methodPrototype);
+                            m_context.Writer.AppendLine(";");
+
+                            // Method declaration
+                            m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
+                            m_context.Writer.AppendLine(methodPrototype);
+                            m_context.Writer.AppendLine("{");
+
+                            if (setAccessor.Body == null)
+                            {
+                                if (isStatic)
+                                    m_context.Writer.AppendLine(string.Format("\tclassStatics_{0}.prop_{1} = value;", typeName, node.Identifier));
+                                else
+                                    m_context.Writer.AppendLine(string.Format("\tobj->prop_{0} = value;", node.Identifier));
+                            }
+                            else
+                            {
+                                m_context.Generators.Block.Generate(setAccessor.Body);
+                            }
+
+                            m_context.Writer.AppendLine("\treturn value;");
+                            m_context.Writer.AppendLine("}");
+                        }
                     }
                 }
             }

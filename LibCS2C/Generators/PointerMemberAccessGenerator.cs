@@ -23,33 +23,44 @@ namespace LibCS2C.Generators
         /// <summary>
         /// Generates a PointerMemberAccess
         /// </summary>
-        /// <param name="node">The access</param>
+        /// <param name="node">The PointerMemberAccess node</param>
         public override void Generate(MemberAccessExpressionSyntax node)
         {
             ChildSyntaxList children = node.ChildNodesAndTokens();
 
-            bool first = true;
-            foreach (SyntaxNodeOrToken child in children)
+            ISymbol symbol = m_context.Model.GetSymbolInfo(node).Symbol;
+            if (symbol.Kind == SymbolKind.Property)
             {
-                SyntaxKind childKind = child.Kind();
-                if (childKind == SyntaxKind.MinusGreaterThanToken)
+                m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(node));
+                m_context.Writer.Append("(");
+                m_context.Generators.Expression.Generate(node.ChildNodes().First());
+                m_context.Writer.Append(")");
+            }
+            else
+            {
+                bool first = true;
+                foreach (SyntaxNodeOrToken child in children)
                 {
-                    m_context.Writer.Append("->");
-                }
-                else if(childKind == SyntaxKind.IdentifierName)
-                {
-                    ISymbol firstSymbol = m_context.Model.GetSymbolInfo(child.AsNode()).Symbol;
-                    if (firstSymbol != null && (!firstSymbol.IsStatic && firstSymbol.Kind == SymbolKind.Field) && first)
-                        m_context.Writer.Append("obj->");
+                    SyntaxKind childKind = child.Kind();
+                    if (childKind == SyntaxKind.MinusGreaterThanToken)
+                    {
+                        m_context.Writer.Append("->");
+                    }
+                    else if (childKind == SyntaxKind.IdentifierName)
+                    {
+                        ISymbol firstSymbol = m_context.Model.GetSymbolInfo(child.AsNode()).Symbol;
+                        if (firstSymbol != null && (!firstSymbol.IsStatic && firstSymbol.Kind == SymbolKind.Field) && first)
+                            m_context.Writer.Append("obj->");
 
-                    m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(child.AsNode()));
-                }
-                else
-                {
-                    m_context.Generators.Expression.Generate(child.AsNode());
-                }
+                        m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(child.AsNode()));
+                    }
+                    else
+                    {
+                        m_context.Generators.Expression.Generate(child.AsNode());
+                    }
 
-                first = false;
+                    first = false;
+                }
             }
         }
     }

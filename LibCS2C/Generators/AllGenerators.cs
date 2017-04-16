@@ -28,6 +28,7 @@ namespace LibCS2C.Generators
         public GotoStatementGenerator GotoStatement { get; private set; }
         public IfStatementGenerator IfStatement { get; private set; }
         public InvocationGenerator Invocation { get; private set; }
+        public InterfaceGenerator Interface { get; private set; }
         public IdentifierNameGenerator IdentifierName { get; private set; }
         public LabeledStatementGenerator LabeledStatement { get; private set; }
         public AssignmentGenerator LeftShiftAssignment { get; private set; }
@@ -84,6 +85,7 @@ namespace LibCS2C.Generators
             GotoStatement = new GotoStatementGenerator(context);
             IfStatement = new IfStatementGenerator(context);
             Invocation = new InvocationGenerator(context);
+            Interface = new InterfaceGenerator(context);
             IdentifierName = new IdentifierNameGenerator(context);
             LabeledStatement = new LabeledStatementGenerator(context);
             LeftShiftAssignment = new AssignmentGenerator(context, AssignmentType.LeftShift);

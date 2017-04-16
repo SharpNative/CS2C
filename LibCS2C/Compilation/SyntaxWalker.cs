@@ -53,6 +53,16 @@ namespace LibCS2C.Compilation
         }
 
         /// <summary>
+        /// Visits an interface declaration
+        /// </summary>
+        /// <param name="node">The interface declaration node</param>
+        public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
+        {
+            m_context.Generators.Interface.Generate(node);
+            base.VisitInterfaceDeclaration(node);
+        }
+
+        /// <summary>
         /// Visit a constructor declaration
         /// </summary>
         /// <param name="node">The constructor declaration node</param>

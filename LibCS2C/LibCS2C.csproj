@@ -110,6 +110,7 @@
     <Compile Include="Generators\ArrayInitializerGenerator.cs" />
     <Compile Include="Generators\GotoStatementGenerator.cs" />
     <Compile Include="Generators\LabeledStatementGenerator.cs" />
+    <Compile Include="Generators\InterfaceGenerator.cs" />
     <Compile Include="Generators\UncheckedStatementGenerator.cs" />
     <Compile Include="Generators\IdentifierNameGenerator.cs" />
     <Compile Include="Util\FormattedStringBuilder.cs" />

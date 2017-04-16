@@ -5,8 +5,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibCS2C.Generators
 {
@@ -27,12 +25,19 @@ namespace LibCS2C.Generators
         /// <param name="node">The argument list</param>
         public override void Generate(ArgumentListSyntax node)
         {
+            Console.WriteLine(node.Parent.Kind());
+
             IEnumerable<SyntaxNode> argNodes = node.ChildNodes();
             foreach (ArgumentSyntax argument in argNodes)
             {
                 IEnumerable<SyntaxNode> children = argument.ChildNodes();
-                foreach(ExpressionSyntax child in children)
+                foreach (ExpressionSyntax child in children)
                 {
+                    ITypeSymbol type = m_context.Model.GetTypeInfo(child).Type;
+
+                    if (type != null && type.TypeKind == TypeKind.Class)
+                        m_context.Writer.Append("(void*)");
+
                     m_context.Generators.Expression.Generate(child);
                 }
 

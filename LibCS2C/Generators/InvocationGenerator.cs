@@ -83,19 +83,32 @@ namespace LibCS2C.Generators
             // Member binding expression call
             if (firstKind == SyntaxKind.MemberBindingExpression)
             {
-                m_context.Generators.Expression.Generate(node.Parent.ChildNodes().First());
+                // .Invoke is special
+                // TODO: better way for doing this
+                if (first.ToString().Equals(".Invoke"))
+                {
+                    m_context.Generators.Expression.Generate(node.Parent.ChildNodes().First());
+                }
+                // Normal call
+                else
+                {
+                    m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(first.ChildNodes().First()));
+                    m_context.Writer.Append("((void*)");
+                    m_context.Generators.Expression.Generate(node.Parent.ChildNodes().First());
+                    m_context.Writer.Append(")");
+                }
             }
             // Normal method call
             else
             {
                 ImmutableArray<SyntaxReference> references = firstSymbol.DeclaringSyntaxReferences;
-                
+
                 IMethodSymbol methodSym = null;
                 if (firstSymbol.Kind == SymbolKind.Method)
                 {
                     methodSym = firstSymbol as IMethodSymbol;
                 }
-                
+
                 SyntaxNode reference = null;
                 if (references.Length > 0)
                     reference = references[0].GetSyntax();

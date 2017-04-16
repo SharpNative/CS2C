@@ -57,6 +57,9 @@ namespace LibCS2C.Compilation
         private void ensureDirectoryExists(string path)
         {
             string outDir = Path.GetDirectoryName(path);
+            if (outDir.Length == 0)
+                return;
+
             if (!Directory.Exists(outDir))
                 Directory.CreateDirectory(outDir);
         }

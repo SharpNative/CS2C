@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Linq;
 
 namespace LibCS2C.Generators
@@ -46,10 +47,20 @@ namespace LibCS2C.Generators
                         typeName = m_context.TypeConvert.ConvertClassName(structDeclaration.Identifier.ToString());
                         objTypeName = "struct struct_" + m_context.TypeConvert.ConvertClassName(structDeclaration.Identifier.ToString());
                     }
-                    else /* if(parentKind == SyntaxKind.ClassDeclaration) */
+                    else if (parentKind == SyntaxKind.ClassDeclaration)
                     {
                         typeName = m_context.TypeConvert.CurrentClassNameFormatted;
                         objTypeName = m_context.TypeConvert.CurrentClassStructName;
+                    }
+                    else if (parentKind == SyntaxKind.InterfaceDeclaration)
+                    {
+                        InterfaceDeclarationSyntax interfaceDeclaration = parentNode as InterfaceDeclarationSyntax;
+                        typeName = m_context.TypeConvert.ConvertClassName(interfaceDeclaration.Identifier.ToString());
+                        objTypeName = "struct " + m_context.TypeConvert.ConvertClassName(interfaceDeclaration.Identifier.ToString());
+                    }
+                    else
+                    {
+                        throw new NotImplementedException("Unknown parent for getter: " + parentKind);
                     }
 
                     AccessorListSyntax accessors = child.AsNode() as AccessorListSyntax;
@@ -66,6 +77,7 @@ namespace LibCS2C.Generators
 
                     if (getAccessor != default(AccessorDeclarationSyntax))
                     {
+
                         string methodPrototype;
                         if (isStatic)
                             methodPrototype = string.Format("{0} {1}_{2}_getter(void)", m_context.ConvertTypeName(node.Type), typeName, node.Identifier);

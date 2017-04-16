@@ -104,9 +104,21 @@ namespace LibCS2C.Generators
                 ImmutableArray<SyntaxReference> references = firstSymbol.DeclaringSyntaxReferences;
 
                 IMethodSymbol methodSym = null;
+                string prototype = null;
                 if (firstSymbol.Kind == SymbolKind.Method)
                 {
                     methodSym = firstSymbol as IMethodSymbol;
+                    needsObjReference = !methodSym.IsStatic;
+                    prototype = m_context.Generators.MethodDeclaration.CreateMethodPrototype(methodSym, false, false);
+                }
+                else if (firstSymbol.Kind == SymbolKind.Property)
+                {
+                    needsObjReference = false;
+                    prototype = m_context.TypeConvert.ConvertVariableName(first);
+                }
+                else
+                {
+                    // Handled by code below
                 }
 
                 SyntaxNode reference = null;
@@ -124,9 +136,7 @@ namespace LibCS2C.Generators
                 }
                 else
                 {
-                    needsObjReference = !methodSym.IsStatic;
                     SyntaxNode type = (first.Kind() == SyntaxKind.IdentifierName) ? first : first.ChildNodes().First();
-                    string prototype = m_context.Generators.MethodDeclaration.CreateMethodPrototype(methodSym, false, false);
 
                     // If the type of the reference is an interface, we need to use the lookup table
                     // If there are classes that extend the type of the reference, we need to use the lookup table

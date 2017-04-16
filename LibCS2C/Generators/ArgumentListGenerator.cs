@@ -25,8 +25,6 @@ namespace LibCS2C.Generators
         /// <param name="node">The argument list</param>
         public override void Generate(ArgumentListSyntax node)
         {
-            Console.WriteLine(node.Parent.Kind());
-
             IEnumerable<SyntaxNode> argNodes = node.ChildNodes();
             foreach (ArgumentSyntax argument in argNodes)
             {

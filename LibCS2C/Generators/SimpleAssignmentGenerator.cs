@@ -94,7 +94,7 @@ namespace LibCS2C.Generators
                     if (!isProperty)
                         m_context.Writer.Append(" = ");
                 }
-                else if (kind == SyntaxKind.SimpleMemberAccessExpression)
+                else if (kind == SyntaxKind.SimpleMemberAccessExpression || kind == SyntaxKind.PointerMemberAccessExpression)
                 {
                     // Ignore if property because we would get an getter here
                     if (!first || !isProperty)

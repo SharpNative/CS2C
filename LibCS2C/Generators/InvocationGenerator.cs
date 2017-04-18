@@ -92,10 +92,30 @@ namespace LibCS2C.Generators
                 // Normal call
                 else
                 {
-                    m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(first.ChildNodes().First()));
-                    m_context.Writer.Append("((void*)");
-                    m_context.Generators.Expression.Generate(node.Parent.ChildNodes().First());
-                    m_context.Writer.Append(")");
+                    SyntaxNode type = first.ChildNodes().First();
+
+                    ISymbol sym = m_context.Model.GetSymbolInfo(type).Symbol;
+                    string lookFor = sym.ContainingType.ToString().Replace('.', '_');
+                    useFunctionPointer = (sym.Kind == SymbolKind.Method && (m_context.TypeIsExtending.ContainsKey(lookFor) && m_context.TypeIsExtending[lookFor]));
+
+                    if (useFunctionPointer)
+                    {
+                        needsObjReference = true;
+
+                        MethodDeclarationSyntax methodDeclaration = sym.DeclaringSyntaxReferences[0].GetSyntax() as MethodDeclarationSyntax;
+                        string prototype = m_context.TypeConvert.ConvertVariableName(first);
+
+                        first = node.Parent;
+                        m_context.Writer.Append(string.Format("((fp_{0})({1}->lookup_table[{2}])", prototype, GenerateObjectPart(first), m_context.MethodTable.GetID(lookFor, methodDeclaration)));
+                    }
+                    else
+                    {
+                        m_context.Writer.Append(m_context.TypeConvert.ConvertVariableName(first.ChildNodes().First()));
+
+                        m_context.Writer.Append("((void*)");
+                        m_context.Generators.Expression.Generate(node.Parent.ChildNodes().First());
+                        m_context.Writer.Append(")");
+                    }
                 }
             }
             // Normal method call
@@ -150,7 +170,7 @@ namespace LibCS2C.Generators
                     {
                         MethodDeclarationSyntax methodDeclaration = reference as MethodDeclarationSyntax;
                         string lookFor = string.Format("{0}_{1}", m_context.ConvertNameSpace(typeOfReference.ContainingNamespace), typeOfReference.Name);
-                        useFunctionPointer = (typeOfReference.TypeKind == TypeKind.Interface || (m_context.TypeIsExtended.ContainsKey(lookFor) && m_context.TypeIsExtended[lookFor]));
+                        useFunctionPointer = (typeOfReference.TypeKind == TypeKind.Interface || (m_context.TypeIsExtending.ContainsKey(lookFor) && m_context.TypeIsExtending[lookFor]));
 
                         if (useFunctionPointer)
                         {
@@ -159,6 +179,13 @@ namespace LibCS2C.Generators
                         else
                         {
                             m_context.Writer.Append(prototype);
+
+                            if (firstSymbol.Kind == SymbolKind.Property && type != first)
+                            {
+                                m_context.Writer.Append("(");
+                                m_context.Generators.Expression.Generate(type);
+                                m_context.Writer.Append(")");
+                            }
                         }
                     }
                 }

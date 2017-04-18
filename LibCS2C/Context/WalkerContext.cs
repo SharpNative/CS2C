@@ -27,7 +27,7 @@ namespace LibCS2C.Context
         /// <summary>
         /// If a class is ever extended by another type
         /// </summary>
-        public Dictionary<string, bool> TypeIsExtended { get; private set; } = new Dictionary<string, bool>();
+        public Dictionary<string, bool> TypeIsExtending { get; private set; } = new Dictionary<string, bool>();
 
         /// <summary>
         /// .cctor list

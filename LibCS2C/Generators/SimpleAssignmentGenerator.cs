@@ -52,6 +52,9 @@ namespace LibCS2C.Generators
                     if (firstChildKind == SyntaxKind.IdentifierName)
                     {
                         objName = m_context.TypeConvert.ConvertVariableName(firstChild);
+                        ISymbol childSymbol = m_context.Model.GetSymbolInfo(firstChild).Symbol;
+                        if (childSymbol.Kind == SymbolKind.Field)
+                            objName = "obj->" + objName;
                     }
                     else
                     {
@@ -82,7 +85,7 @@ namespace LibCS2C.Generators
                         SyntaxNode childNode = child.AsNode();
                         ISymbol identifierSymbol = m_context.Model.GetSymbolInfo(childNode).Symbol;
                         string converted = m_context.TypeConvert.ConvertVariableName(childNode);
-
+                        
                         if (identifierSymbol.Kind == SymbolKind.Field && !identifierSymbol.IsStatic)
                             m_context.Writer.Append("obj->" + converted);
                         else

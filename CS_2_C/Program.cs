@@ -13,7 +13,7 @@ namespace CS_2_C
         {
             Compiler compiler = new Compiler();
             // compiler.CompileProject(@"C:\Users\jeffr\Documents\visual studio 2015\Projects\Sharpen\kernel\Sharpen\Sharpen.csproj", "");
-            compiler.CompileProject(@"C:\Users\Niels\Source\Repos\Sharpen\kernel\Sharpen\Sharpen.csproj", "");
+            compiler.CompileProject(@"C:\Users\Niels\Documents\Sharpen\kernel\Sharpen\Sharpen.csproj", "");
             compiler.CreateHeaderFile("output.h", new string[0]);
             compiler.CreateSourceFile("output.c", new string[] { "output.h" });
             Console.ReadLine();

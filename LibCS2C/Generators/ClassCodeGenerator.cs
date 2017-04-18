@@ -146,7 +146,7 @@ namespace LibCS2C.Generators
                 {
                     ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(child.ChildNodes().First()).Type;
                     string str = string.Format("{0}_{1}", m_context.ConvertNameSpace(typeSymbol.ContainingNamespace), typeSymbol.Name);
-                    m_context.TypeIsExtended[str] = true;
+                    m_context.TypeIsExtending[str] = true;
                 }
             }
 

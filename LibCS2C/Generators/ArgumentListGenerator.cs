@@ -33,7 +33,7 @@ namespace LibCS2C.Generators
                 {
                     ITypeSymbol type = m_context.Model.GetTypeInfo(child).Type;
 
-                    if (type != null && type.TypeKind == TypeKind.Class)
+                    if (type != null && !m_context.GenericTypeConvert.IsGeneric(type) && type.TypeKind == TypeKind.Class)
                         m_context.Writer.Append("(void*)");
 
                     m_context.Generators.Expression.Generate(child);

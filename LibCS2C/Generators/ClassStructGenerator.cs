@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 
 namespace LibCS2C.Generators
@@ -49,12 +50,41 @@ namespace LibCS2C.Generators
 
                 m_context.Writer.AppendLine(string.Format("{0} field_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
+            
+            // We need to keep the order of the base (with interfaces), so first generate those properties
+            // and then generate the properties of this class that are not part of the interface
+            // TODO: multiple levels of bases (?)
+            BaseListSyntax baseList = node.BaseList;
+            if (baseList != null)
+            {
+                IEnumerable<SyntaxNode> nodes = baseList.ChildNodes();
+                foreach (SimpleBaseTypeSyntax child in nodes)
+                {
+                    // Get base type
+                    ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(child.Type).Type;
+
+                    // Loop through interface properties
+                    InterfaceDeclarationSyntax interfaceDeclaration = typeSymbol.DeclaringSyntaxReferences[0].GetSyntax() as InterfaceDeclarationSyntax;
+                    IEnumerable<SyntaxNode> interfaceNodes = node.ChildNodes();
+                    foreach (SyntaxNode interfaceChild in interfaceNodes)
+                    {
+                        if (interfaceChild.Kind() == SyntaxKind.PropertyDeclaration)
+                        {
+                            PropertyDeclarationSyntax property = interfaceChild as PropertyDeclarationSyntax;
+                            m_context.Writer.AppendLine(string.Format("{0} prop_{1};", m_context.ConvertTypeName(property.Type), property.Identifier));
+
+                            // Remove from list so we don't generate them twice
+                            m_classCode.propertyTypesNonStatic.Remove(property.Identifier.ToString());
+                        }
+                    }
+                }
+            }
 
             foreach (KeyValuePair<string, TypeSyntax> pair in m_classCode.propertyTypesNonStatic)
             {
                 m_context.Writer.AppendLine(string.Format("{0} prop_{1};", m_context.ConvertTypeName(pair.Value), pair.Key));
             }
-            
+
             m_context.Writer.AppendLine("};");
 
             m_context.Writer.CurrentDestination = WriterDestination.StructPrototypes;

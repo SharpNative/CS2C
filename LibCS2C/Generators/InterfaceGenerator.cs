@@ -33,9 +33,9 @@ namespace LibCS2C.Generators
             m_context.Writer.AppendLine("void** lookup_table;");
 
             IEnumerable<SyntaxNode> nodes = node.ChildNodes();
-            foreach(SyntaxNode child in nodes)
+            foreach (SyntaxNode child in nodes)
             {
-                if(child.Kind() == SyntaxKind.PropertyDeclaration)
+                if (child.Kind() == SyntaxKind.PropertyDeclaration)
                 {
                     PropertyDeclarationSyntax property = child as PropertyDeclarationSyntax;
                     m_context.Writer.AppendLine(string.Format("{0} prop_{1};", m_context.ConvertTypeName(property.Type), property.Identifier));

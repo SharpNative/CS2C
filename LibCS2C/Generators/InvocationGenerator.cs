@@ -121,31 +121,36 @@ namespace LibCS2C.Generators
             // Normal method call
             else
             {
-                ImmutableArray<SyntaxReference> references = firstSymbol.DeclaringSyntaxReferences;
-
+                ImmutableArray<SyntaxReference> references;
                 IMethodSymbol methodSym = null;
                 string prototype = null;
-                if (firstSymbol.Kind == SymbolKind.Method)
-                {
-                    methodSym = firstSymbol as IMethodSymbol;
-                    needsObjReference = !methodSym.IsStatic;
-                    prototype = m_context.Generators.MethodDeclaration.CreateMethodPrototype(methodSym, false, false);
-                }
-                else if (firstSymbol.Kind == SymbolKind.Property)
-                {
-                    needsObjReference = false;
-                    prototype = m_context.TypeConvert.ConvertVariableName(first);
-                }
-                else
-                {
-                    // Handled by code below
-                }
-
                 SyntaxNode reference = null;
-                if (references.Length > 0)
-                    reference = references[0].GetSyntax();
 
-                if (reference != null && reference.Kind() == SyntaxKind.VariableDeclarator)
+                if (firstSymbol != null)
+                {
+                    references = firstSymbol.DeclaringSyntaxReferences;
+
+                    if (firstSymbol.Kind == SymbolKind.Method)
+                    {
+                        methodSym = firstSymbol as IMethodSymbol;
+                        needsObjReference = !methodSym.IsStatic;
+                        prototype = m_context.Generators.MethodDeclaration.CreateMethodPrototype(methodSym, false, false);
+                    }
+                    else if (firstSymbol.Kind == SymbolKind.Property)
+                    {
+                        needsObjReference = false;
+                        prototype = m_context.TypeConvert.ConvertVariableName(first);
+                    }
+                    else
+                    {
+                        // Handled by code below
+                    }
+                    
+                    if (references.Length > 0)
+                        reference = references[0].GetSyntax();
+                }
+                
+                if (references == null || (reference != null && reference.Kind() == SyntaxKind.VariableDeclarator))
                 {
                     foreach (SyntaxNode child in node.ChildNodes())
                     {

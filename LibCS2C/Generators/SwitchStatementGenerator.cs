@@ -50,6 +50,8 @@ namespace LibCS2C.Generators
                     }
                 }
 
+                m_context.Writer.AppendLine("{");
+
                 m_context.Writer.Indent();
 
                 // Statement for this section
@@ -74,6 +76,8 @@ namespace LibCS2C.Generators
                         m_context.Generators.Block.GenerateChild(statement);
                     }
                 }
+
+                m_context.Writer.AppendLine("}");
 
                 m_context.Writer.UnIndent();
             }

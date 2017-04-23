@@ -2,12 +2,11 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Linq;
 
 namespace LibCS2C.Generators
 {
-    public class SimpleAssignmentGenerator : GeneratorBase<ExpressionSyntax>
+    public class SimpleAssignmentGenerator : GeneratorBase<AssignmentExpressionSyntax>
     {
         /// <summary>
         /// Simple assignment generator
@@ -22,99 +21,61 @@ namespace LibCS2C.Generators
         /// Generates a simple assignment
         /// </summary>
         /// <param name="node">The expression node</param>
-        public override void Generate(ExpressionSyntax node)
+        public override void Generate(AssignmentExpressionSyntax node)
         {
             // The first node will be an identifier
             // Check its type, if it's a property, that means we need to use the setter
-            ChildSyntaxList nodes = node.ChildNodesAndTokens();
             ISymbol symbol = m_context.Model.GetSymbolInfo(node.ChildNodes().First()).Symbol;
             bool isProperty = (symbol != null && symbol.Kind == SymbolKind.Property);
-            
-            string prefix = "";
+
             if (isProperty)
             {
                 // If the first node is a memberaccess, we need to get the object name from that node
                 string objName = "obj";
-                SyntaxNode firstNode = nodes[0].AsNode();
-                
+                string prefix = "";
+
+                ChildSyntaxList expression = (node as ExpressionSyntax).ChildNodesAndTokens();
+                SyntaxNode firstNode = expression[0].AsNode();
+
                 if (firstNode is MemberAccessExpressionSyntax)
                 {
                     SyntaxNode firstChild = firstNode.ChildNodes().First();
                     SyntaxKind firstChildKind = firstChild.Kind();
 
                     // Check if the argument needs to be passed as a reference
-                    ITypeSymbol typeSymbol = m_context.Model.GetTypeInfo(firstChild).Type;
-                    if (!m_context.GenericTypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct)
+                    ITypeSymbol childTypeSymbol = m_context.Model.GetTypeInfo(firstChild).Type;
+                    if (!m_context.GenericTypeConvert.IsGeneric(childTypeSymbol) && childTypeSymbol.TypeKind == TypeKind.Struct)
                     {
                         prefix = "&";
                     }
-
-                    if (firstChildKind == SyntaxKind.IdentifierName)
-                    {
-                        objName = m_context.TypeConvert.ConvertVariableName(firstChild);
-                        ISymbol childSymbol = m_context.Model.GetSymbolInfo(firstChild).Symbol;
-                        if (childSymbol.Kind == SymbolKind.Field)
-                            objName = "obj->" + objName;
-                    }
-                    else
-                    {
-                        WriterDestination destination = m_context.Writer.CurrentDestination;
-                        m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
-                        m_context.Generators.Expression.Generate(firstChild as ExpressionSyntax);
-                        m_context.Writer.CurrentDestination = destination;
-                        objName = m_context.Writer.FlushTempBuffer();
-                    }
+                    
+                    WriterDestination destination = m_context.Writer.CurrentDestination;
+                    m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
+                    m_context.Generators.Expression.Generate(firstChild as ExpressionSyntax);
+                    m_context.Writer.CurrentDestination = destination;
+                    objName = m_context.Writer.FlushTempBuffer();
                 }
-                
+
                 m_context.Writer.Append(string.Format("{0}_{1}_setter({2}", symbol.ContainingType.ToString().Replace(".", "_"), symbol.Name, prefix));
                 if (!symbol.IsStatic)
-                    m_context.Writer.Append(string.Format("{0}, ", objName));
+                    m_context.Writer.Append(string.Format("{0},", objName));
             }
-            
-            bool first = true;
-            foreach (SyntaxNodeOrToken child in nodes)
+            else
             {
-                SyntaxKind kind = child.Kind();
-                
-                if (kind == SyntaxKind.IdentifierName)
-                {
-                    // Skip the first identifier if it's a property
-                    // because we already emitted the code for the setter
-                    if (!isProperty || !first)
-                    {
-                        SyntaxNode childNode = child.AsNode();
-                        ISymbol identifierSymbol = m_context.Model.GetSymbolInfo(childNode).Symbol;
-                        string converted = m_context.TypeConvert.ConvertVariableName(childNode);
-                        
-                        if (identifierSymbol.Kind == SymbolKind.Field && !identifierSymbol.IsStatic)
-                            m_context.Writer.Append("obj->" + converted);
-                        else
-                            m_context.Writer.Append(converted);
-                    }
-                }
-                else if (kind == SyntaxKind.EqualsToken)
-                {
-                    if (!isProperty)
-                        m_context.Writer.Append(" = ");
-                }
-                else if (kind == SyntaxKind.SimpleMemberAccessExpression || kind == SyntaxKind.PointerMemberAccessExpression)
-                {
-                    // Ignore if property because we would get an getter here
-                    if (!first || !isProperty)
-                        m_context.Generators.Expression.Generate(child.AsNode());
-                }
-                else
-                {
-                    m_context.Generators.Expression.Generate(child.AsNode());
-                }
-
-                first = false;
+                m_context.Generators.Expression.Generate(node.Left);
+                m_context.Writer.Append("=");
             }
+
+            // If the type on the right is an object, cast it
+            ITypeSymbol leftSymbol = m_context.Model.GetTypeInfo(node.Left).Type;
+            ITypeSymbol rightSymbol = m_context.Model.GetTypeInfo(node.Right).Type;
+            if (leftSymbol != null && rightSymbol != null && !leftSymbol.Name.Equals(rightSymbol.Name) && rightSymbol.TypeKind == TypeKind.Class && !m_context.GenericTypeConvert.IsGeneric(rightSymbol))
+                m_context.Writer.Append("(void*)");
+
+            m_context.Generators.Expression.Generate(node.Right);
 
             if (isProperty)
-            {
                 m_context.Writer.Append(")");
-            }
         }
     }
 }

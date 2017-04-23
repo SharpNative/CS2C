@@ -53,7 +53,7 @@ namespace LibCS2C.Generators
                     break;
 
                 case SyntaxKind.SimpleAssignmentExpression:
-                    m_context.Generators.SimpleAssignment.Generate(node as ExpressionSyntax);
+                    m_context.Generators.SimpleAssignment.Generate(node as AssignmentExpressionSyntax);
                     break;
 
                 case SyntaxKind.InvocationExpression:

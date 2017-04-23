@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -166,7 +165,7 @@ namespace LibCS2C.Generators
 
                     // Pass struct in this case by reference
                     // Note: we need to surround the object part with extra parantheses in case it is a getter
-                    bool makePointer = (!m_context.GenericTypeConvert.IsGeneric(typeSymbol.Name) && typeSymbol.TypeKind == TypeKind.Struct);
+                    bool makePointer = (!m_context.GenericTypeConvert.IsGeneric(typeSymbol) && typeSymbol.TypeKind == TypeKind.Struct);
                     if (makePointer)
                         m_context.Writer.Append("&");
 

@@ -20,6 +20,24 @@ namespace LibCS2C.Generators
         }
 
         /// <summary>
+        /// Generates an argument
+        /// </summary>
+        /// <param name="arg">The argument</param>
+        public void GenerateArgument(ArgumentSyntax arg)
+        {
+            IEnumerable<SyntaxNode> children = arg.ChildNodes();
+            foreach (ExpressionSyntax child in children)
+            {
+                ITypeSymbol type = m_context.Model.GetTypeInfo(child).Type;
+
+                if (type != null && !m_context.GenericTypeConvert.IsGeneric(type) && type.TypeKind == TypeKind.Class)
+                    m_context.Writer.Append("(void*)");
+
+                m_context.Generators.Expression.Generate(child);
+            }
+        }
+
+        /// <summary>
         /// Generates the argument list code
         /// </summary>
         /// <param name="node">The argument list</param>
@@ -28,16 +46,7 @@ namespace LibCS2C.Generators
             IEnumerable<SyntaxNode> argNodes = node.ChildNodes();
             foreach (ArgumentSyntax argument in argNodes)
             {
-                IEnumerable<SyntaxNode> children = argument.ChildNodes();
-                foreach (ExpressionSyntax child in children)
-                {
-                    ITypeSymbol type = m_context.Model.GetTypeInfo(child).Type;
-
-                    if (type != null && !m_context.GenericTypeConvert.IsGeneric(type) && type.TypeKind == TypeKind.Class)
-                        m_context.Writer.Append("(void*)");
-
-                    m_context.Generators.Expression.Generate(child);
-                }
+                GenerateArgument(argument);
 
                 // A comma if it's not the last argument
                 if (argument != argNodes.Last())

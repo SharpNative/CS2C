@@ -108,7 +108,12 @@ namespace LibCS2C.Generators
                             if (argumentList != default(BracketedArgumentListSyntax))
                             {
                                 ArgumentSyntax argument = argumentList.Arguments[0];
-                                dataSuffixes.Add(identifier, "[" + argument.ToString() + "]");
+                                WriterDestination dest = m_context.Writer.CurrentDestination;
+                                m_context.Writer.CurrentDestination = WriterDestination.TempBuffer;
+                                m_context.Generators.ArgumentList.GenerateArgument(argument);
+                                string arg = m_context.Writer.FlushTempBuffer();
+                                dataSuffixes.Add(identifier, "[" + arg + "]");
+                                m_context.Writer.CurrentDestination = dest;
                             }
                         }
                     }

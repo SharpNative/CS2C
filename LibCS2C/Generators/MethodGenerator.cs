@@ -20,7 +20,7 @@ namespace LibCS2C.Generators
         {
             m_context = context;
         }
-        
+
         /// <summary>
         /// Create method arguments and parameters
         /// </summary>
@@ -132,7 +132,21 @@ namespace LibCS2C.Generators
         /// <param name="attribute">The plug attribute</param>
         private void processAttributeExtern(BaseMethodDeclarationSyntax node, AttributeSyntax attribute)
         {
-            routeMethod(node, attribute, false);
+            SeparatedSyntaxList<AttributeArgumentSyntax> args = attribute.ArgumentList.Arguments;
+
+            if (args.Count == 2)
+            {
+                AttributeArgumentSyntax argument = args[1];
+                SyntaxNode argumentContents = argument.ChildNodes().First();
+                if (argumentContents.Kind() == SyntaxKind.TrueLiteralExpression)
+                {
+                    routeMethod(node, attribute, false, true);
+                }
+            }
+            else
+            {
+                routeMethod(node, attribute, false);
+            }
         }
 
         /// <summary>
@@ -141,20 +155,17 @@ namespace LibCS2C.Generators
         /// <param name="node">The node</param>
         /// <param name="attribute">The attribute</param>
         /// <param name="toMethod">If it's routed to the original method</param>
-        private void routeMethod(BaseMethodDeclarationSyntax node, AttributeSyntax attribute, bool toMethod)
+        /// <param name="createPrototype">If we need to create a prototype</param>
+        private void routeMethod(BaseMethodDeclarationSyntax node, AttributeSyntax attribute, bool toMethod, bool createPrototype = false)
         {
             SeparatedSyntaxList<AttributeArgumentSyntax> argsList = attribute.ArgumentList.Arguments;
             IMethodSymbol symbol = m_context.Model.GetDeclaredSymbol(node);
-
-            // We expect there to be one argument with the name of the method to plug/override
-            if (argsList.Count != 1)
-                throw new Exception("Invalid use of Extern: argument count incorrect!");
 
             // The argument needs to be a string
             AttributeArgumentSyntax argument = argsList.First();
             SyntaxNode argumentContents = argument.ChildNodes().First();
             if (argumentContents.Kind() != SyntaxKind.StringLiteralExpression)
-                throw new Exception("Invalid use of Extern: expected a string!");
+                throw new Exception("Invalid use of method attribute: expected a string!");
 
             // If we take the stringliteral, there will be "" on the outside of the string
             string aliasName = argumentContents.ToString();
@@ -184,6 +195,12 @@ namespace LibCS2C.Generators
             m_context.Writer.CurrentDestination = WriterDestination.MethodDeclarations;
             m_context.Writer.AppendLine(prefix + methodPrototype);
             m_context.Writer.AppendLine("{");
+
+            // Create prototype if needed
+            if (createPrototype)
+            {
+                m_context.Writer.AppendLine(string.Format("extern {0} {1}({2});", returnType, aliasName, args));
+            }
 
             // Does it have a return value? Then don't only pass the method but also do a return
             if (!returnType.Equals("void"))
@@ -257,7 +274,7 @@ namespace LibCS2C.Generators
                 MethodDeclarationSyntax nodeTyped = node as MethodDeclarationSyntax;
                 SyntaxToken identifier = nodeTyped.Identifier;
                 string returnType = m_context.ConvertTypeName(nodeTyped.ReturnType);
-                
+
                 methodTypedef = string.Format("typedef {0} {1}", returnType, CreateMethodPrototype(symbol, true, true));
                 if (isInsideClass)
                 {

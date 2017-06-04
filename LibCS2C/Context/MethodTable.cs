@@ -98,7 +98,15 @@ namespace LibCS2C.Context
         /// <returns>Its ID</returns>
         public int GetID(string className, MethodDeclarationSyntax method)
         {
+            // Terrible hack
             string str = GetMethodLookupName(method);
+            if (!m_methods.ContainsKey(className))
+            {
+                m_methods.Add(className, new List<string>());
+                m_methods[className].Add(str);
+            }
+            if (m_methods[className].IndexOf(str) == -1)
+                m_methods[className].Add(str);
             return m_methods[className].IndexOf(str);
         }
 

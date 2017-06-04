@@ -41,9 +41,9 @@ namespace LibCS2C.Generators
                     m_context.Writer.AppendLine(string.Format("{0} prop_{1};", m_context.ConvertTypeName(property.Type), property.Identifier));
                 }
             }
-
+            
             m_context.Writer.AppendLine("};");
-
+            
             m_context.Writer.CurrentDestination = WriterDestination.StructPrototypes;
             m_context.Writer.AppendLine(structName + ";");
         }
